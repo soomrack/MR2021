@@ -1,1 +1,0 @@
-/usr/bin/cc -g -Wl,--enable-auto-import CMakeFiles/mortgage_and_deposit.dir/main.c.o -o mortgage_and_deposit.exe -Wl,--out-implib,libmortgage_and_deposit.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
