@@ -1,3 +1,0 @@
-/cygdrive/c/Users/Admin/CLionProjects/MR2021/chernikov_alexandr/string/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/cygdrive/c/Users/Admin/CLionProjects/MR2021/chernikov_alexandr/string/cmake-build-debug/CMakeFiles/edit_cache.dir
-/cygdrive/c/Users/Admin/CLionProjects/MR2021/chernikov_alexandr/string/cmake-build-debug/CMakeFiles/string.dir
