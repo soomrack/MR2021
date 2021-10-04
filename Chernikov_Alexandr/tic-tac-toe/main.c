@@ -157,14 +157,25 @@ void input_coords(int *x, int *y){
 }
 
 void output_game(Field* field){
+
+    // print horizontal axis
     putchar('\t');
     for(int x = 0; x < FIELD_SIZE; x++)
         printf("%d  ", x);
     putchar('\n');
 
+    // print horizontal line
+    putchar('\t');
+    for(int x = 0; x < FIELD_SIZE; x++)
+        if (x != FIELD_SIZE - 1)
+            printf("___");
+        else
+            printf("_");
+    putchar('\n');
+
     char cell_char;
     for(int y = 0; y < FIELD_SIZE; y++){
-        printf("%d\t", y);
+        printf("%d |\t", y);
         for(int x = 0; x < FIELD_SIZE; x++){
             switch (field->cell_state_array[x][y]){
                 case EMPTY:
