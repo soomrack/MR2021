@@ -1,1 +1,0 @@
-/usr/bin/cc -g -Wl,--enable-auto-import CMakeFiles/Krestic_nulik.dir/main.c.o -o Krestic_nulik.exe -Wl,--out-implib,libKrestic_nulik.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
