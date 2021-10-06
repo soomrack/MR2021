@@ -86,7 +86,7 @@ unsigned int step, victory;
 
     for (step=1;victory!=1 && victory!=2 && victory!=3;step++) {
        victory=krestik(step);
-       if (victory==1) break;
+       if (victory==1 || victory==3) break;
         victory=nolik(step);
     }
     congratulation(victory);
