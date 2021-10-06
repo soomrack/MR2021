@@ -1,4 +1,0 @@
-C:\Users\king-komp\AppData\Local\JetBrains\CLion2021.2\cygwin_cmake\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - Unix Makefiles" /cygdrive/d/Git/MR2021/Vestnikov_Roman/krestiki_noliki
--- Configuring done
--- Generating done
--- Build files have been written to: /cygdrive/d/Git/MR2021/Vestnikov_Roman/krestiki_noliki/cmake-build-debug
