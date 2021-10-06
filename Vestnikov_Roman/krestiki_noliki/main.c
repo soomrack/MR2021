@@ -174,10 +174,12 @@ int check()      //Проверка на победу/ничью
         }
         c=0;n=0;
     }
-    for (i = 0, j = 0; i < size, j < size; i++, j++) {       //Проверка по одной диагонали
 
-            if (pole[i][j] == 1) c++;
-            if (pole[i][j] == 2) n++;
+    for (i = 0; i < size; i++) {             //Проверка по одной диагонали
+        for (j = 0; j < size; j++) {
+            if (pole[i][j] == 1 && pole[i+1][j+1]==1 && pole[i+2][j+2]==1) c+=3;
+            if (pole[i][j] == 2 && pole[i+1][j+1]==2 && pole[i+2][j+2]==2) n+=3;
+        }
         }
     if (c == 3) victory = 1;
 
@@ -185,15 +187,18 @@ int check()      //Проверка на победу/ничью
 
     c=0;n=0;
 
-    for (i = 0, j = size; i < size, j > 0; i++, j--) {      //Проверка по другой диагонали
-
-        if (pole[i][j] == 1) c++;
-        if (pole[i][j] == 2) n++;
+    for (i = 0; i < size; i++) {             //Проверка по другой диагонали
+        for (j = 0; j < size; j++) {
+            if (pole[i][j] == 1 && pole[i + 1][j - 1] == 1 && pole[i + 2][j - 2] == 1) c+=3;
+            if (pole[i][j] == 2 && pole[i + 1][j - 1] == 2 && pole[i + 2][j - 2] == 2) n+=3;
+        }
     }
-    if (c == 3) victory = 1;
+        if (c == 3) victory = 1;
 
-    if (n == 3) victory = 2;
-    c=0;n=0;
+        if (n == 3) victory = 2;
+
+        c=0;n=0;
+
 
     for (j = 0; j < size; j++) {            //Проверка на ничью
         for (i = 0; i < size; i++) {
