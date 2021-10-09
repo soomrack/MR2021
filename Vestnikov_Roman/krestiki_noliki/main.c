@@ -31,7 +31,7 @@ do {
 }
 
 int field_size()
-{ int word, size;
+{ int word;
     printf ("Какой размер поля вы хотите? (введите 3 для стандартной игры)\n");
     word = scanf("%d",&size);
     while ((word != 1) || size>20 || size<3)  {
@@ -81,7 +81,7 @@ void rules()     //Правила
 void play()      //Ход игры
 {
 
-unsigned int step, victory;
+int step, victory;
  victory=0;
 
     for (step=1;victory!=1 && victory!=2 && victory!=3;step++) {
@@ -95,7 +95,7 @@ unsigned int step, victory;
 int krestik(int step)    //Ход крестика
 {
 
-    unsigned int victory,row, col;
+    int victory,row, col;
     printf("%d ход - крестик\n", step);
     printf("Выберите клетку: ");
     syntax (&row, &col);
@@ -108,7 +108,7 @@ int krestik(int step)    //Ход крестика
 void syntax(int *a, int *b)     //Контроль вводимых данных
 {
 
-    unsigned int  word, roww, coll ;
+    int  word, roww, coll ;
     word = scanf("%d %d",&roww, &coll);
     while ((word != 2) || roww>size || roww<=0 || coll>size || coll<=0 || pole[roww-1][coll-1]!=0) {
         if (word != 2) scanf("%*s");
@@ -124,7 +124,7 @@ void syntax(int *a, int *b)     //Контроль вводимых данных
 int nolik(int step)     //Ход нолика
 {
 
-    unsigned int victory,row, col;
+    int victory,row, col;
     printf("%d ход - нолик\n", step);
     printf("Выберите клетку: ");
     syntax (&row, &col);
@@ -138,66 +138,64 @@ int nolik(int step)     //Ход нолика
 int check()      //Проверка на победу/ничью
 {
 
-    int c = 0, n = 0, victory = 0;
+    int victory = 0, c=0;
     for (i = 0; i < size; i++) {             //Проверка по горизонтали
-        for (j = 0; j < size; j++) {
-            if (pole[i][j] == 1) c++;
-            if (pole[i][j] == 2) n++;
-        }
-        if (c == 3)
-        {
-            victory = 1;
-            break;
-        }
-        if (n == 3)
-        {
-            victory = 2;
-            break;
+        for (j = 0; j < size-2; j++) {
+            if (pole[i][j] == 1 && pole[i][j + 1] == 1 && pole[i][j + 2] == 1) {
+                victory = 1;
+                break;
+            }
+            if (pole[i][j] == 2 && pole[i][j + 1] == 2 && pole[i][j + 2] == 2) {
+                victory = 2;
+                break;
+            }
         }
 
-        c=0;n=0;
     }
     for (j = 0; j < size; j++) {             //Проверка по вертикали
-        for (i = 0; i < size; i++) {
-            if (pole[i][j] == 1) c++;
-            if (pole[i][j] == 2) n++;
-        }
-        if (c == 3)
-        {
-            victory = 1;
-            break;
-        }
-        if (n == 3)
-        {
-            victory = 2;
-            break;
-        }
-        c=0;n=0;
-    }
+        for (i = 0; i < size-2; i++) {
+            if (pole[i][j] == 1 && pole[i+1][j] == 1 && pole[i+2][j] == 1) {
+                victory = 1;
+                break;
+            }
+            if (pole[i][j] == 2 && pole[i+1][j] == 2 && pole[i+2][j] == 2) {
+                victory = 2;
+                break;
+            }}
+
+      }
 
     for (i = 0; i < size; i++) {             //Проверка по одной диагонали
         for (j = 0; j < size; j++) {
-            if (pole[i][j] == 1 && pole[i+1][j+1]==1 && pole[i+2][j+2]==1) c+=3;
-            if (pole[i][j] == 2 && pole[i+1][j+1]==2 && pole[i+2][j+2]==2) n+=3;
+            if (pole[i][j] == 1 && pole[i+1][j+1]==1 && pole[i+2][j+2]==1)
+            {
+                victory = 1;
+                break;
+            }
+            if (pole[i][j] == 2 && pole[i+1][j+1]==2 && pole[i+2][j+2]==2)
+            {
+                victory = 2;
+                break;
+            }
         }
         }
-    if (c == 3) victory = 1;
 
-    if (n == 3) victory = 2;
-
-    c=0;n=0;
 
     for (i = 0; i < size; i++) {             //Проверка по другой диагонали
         for (j = 0; j < size; j++) {
-            if (pole[i][j] == 1 && pole[i + 1][j - 1] == 1 && pole[i + 2][j - 2] == 1) c+=3;
-            if (pole[i][j] == 2 && pole[i + 1][j - 1] == 2 && pole[i + 2][j - 2] == 2) n+=3;
+            if (pole[i][j] == 1 && pole[i + 1][j - 1] == 1 && pole[i + 2][j - 2] == 1)
+            {
+                victory = 1;
+                break;
+            }
+            if (pole[i][j] == 2 && pole[i + 1][j - 1] == 2 && pole[i + 2][j - 2] == 2)
+            {
+                victory = 2;
+                break;
+            }
         }
     }
-        if (c == 3) victory = 1;
 
-        if (n == 3) victory = 2;
-
-        c=0;n=0;
 
 
     for (j = 0; j < size; j++) {            //Проверка на ничью
@@ -207,9 +205,6 @@ int check()      //Проверка на победу/ничью
         }
         }
     if (c==size*size) victory=3;
-
-
-        c=0;n=0;
 
     return victory;
 }
