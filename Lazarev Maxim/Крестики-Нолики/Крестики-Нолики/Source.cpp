@@ -1,41 +1,39 @@
 #include <iostream>
-#include <conio.h>
 #include <iomanip>
-#include <stdlib.h>
 
 using namespace std;
 
 
-const short int WIDTH = 3, HEIGHT = 3;																//Размер поля (две константы инициализированы по глупости:))
+const short int WIDTH = 3, HEIGHT = 3;																//ГђГ Г§Г¬ГҐГ° ГЇГ®Г«Гї (Г¤ГўГҐ ГЄГ®Г­Г±ГІГ Г­ГІГ» ГЁГ­ГЁГ¶ГЁГ Г«ГЁГ§ГЁГ°Г®ГўГ Г­Г» ГЇГ® ГЈГ«ГіГЇГ®Г±ГІГЁ:))
 
 
-enum PlayerTurn {																					//Перечисление игроков
+enum PlayerTurn {																					//ГЏГҐГ°ГҐГ·ГЁГ±Г«ГҐГ­ГЁГҐ ГЁГЈГ°Г®ГЄГ®Гў
 	X = 1,
 	O = 2
 };
 
 
-int turn;																							//Номер хода
-char input;																							//Ввод клавиатуры
-const char *gameStatus;																				//Статус игры
-char field[WIDTH][HEIGHT];																			//Поле																						
-bool correctInput;																					//Логическая переменная, хранящая информацию о корректности ввода
-PlayerTurn playerTurn;																				//Счетчик очередности хода
+int turn;																							//ГЌГ®Г¬ГҐГ° ГµГ®Г¤Г 
+char input;																							//Г‚ГўГ®Г¤ ГЄГ«Г ГўГЁГ ГІГіГ°Г»
+const char *gameStatus;																				//Г‘ГІГ ГІГіГ± ГЁГЈГ°Г»
+char field[WIDTH][HEIGHT];																			//ГЏГ®Г«ГҐ																						
+bool correctInput;																					//Г‹Г®ГЈГЁГ·ГҐГ±ГЄГ Гї ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г Гї, ГµГ°Г Г­ГїГ№Г Гї ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГѕ Г® ГЄГ®Г°Г°ГҐГЄГІГ­Г®Г±ГІГЁ ГўГўГ®Г¤Г 
+PlayerTurn playerTurn;																				//Г‘Г·ГҐГІГ·ГЁГЄ Г®Г·ГҐГ°ГҐГ¤Г­Г®Г±ГІГЁ ГµГ®Г¤Г 
 
 bool checkWin() {																					
 	bool flag;
 	int intDgFlag1 = 0, intDgFlag2 = 0, intVrFlag = 0, intGrFlag = 0;
 	if (field[1][1] != '*') {
-		for (int i = 0; i < WIDTH - 1; i++) {														//Проверка первой диагонали
+		for (int i = 0; i < WIDTH - 1; i++) {														//ГЏГ°Г®ГўГҐГ°ГЄГ  ГЇГҐГ°ГўГ®Г© Г¤ГЁГ ГЈГ®Г­Г Г«ГЁ
 			if (field[i + 1][i + 1] == field[i][i]) intDgFlag1++;
 		}
 
-		for (int i = 0; i < WIDTH - 1; i++) {														//Проверка второй диагонали
+		for (int i = 0; i < WIDTH - 1; i++) {														//ГЏГ°Г®ГўГҐГ°ГЄГ  ГўГІГ®Г°Г®Г© Г¤ГЁГ ГЈГ®Г­Г Г«ГЁ
 			if (field[WIDTH-1-i][i] == field[WIDTH-1-(i+1)][i + 1]) intDgFlag2++;
 		}
 	}
 	
-	for (int i = 0; i < WIDTH; i++) {																//Проверка вертикалей
+	for (int i = 0; i < WIDTH; i++) {																//ГЏГ°Г®ГўГҐГ°ГЄГ  ГўГҐГ°ГІГЁГЄГ Г«ГҐГ©
 		for (int j = 0; j < HEIGHT - 1; j++) {
 			if (field[(WIDTH - 1) / 2][i] != '*')
 				if (field[j + 1][i] == field[j][i]) intVrFlag++;
@@ -44,7 +42,7 @@ bool checkWin() {
 		if (intVrFlag == 2) break;
 	}
 
-	for (int i = 0; i < HEIGHT; i++) {																//Проверка горизонталей
+	for (int i = 0; i < HEIGHT; i++) {																//ГЏГ°Г®ГўГҐГ°ГЄГ  ГЈГ®Г°ГЁГ§Г®Г­ГІГ Г«ГҐГ©
 		for (int j = 0; j < HEIGHT - 1; j++) {
 			if (field[i][(HEIGHT - 1) / 2] != '*')
 				if (field[i][j + 1] == field[i][j]) intGrFlag++;
@@ -74,12 +72,12 @@ bool checkDraw() {
 	return flag;
 }
 
-void Setup() {																						//Установка настроек по умолчанию
+void Setup() {																						//Г“Г±ГІГ Г­Г®ГўГЄГ  Г­Г Г±ГІГ°Г®ГҐГЄ ГЇГ® ГіГ¬Г®Г«Г·Г Г­ГЁГѕ
 	setlocale(LC_ALL, "Russian");
 	
 	playerTurn = X;
 	turn = 0;																					
-	gameStatus = "Игра не окончена";
+	gameStatus = "Г€ГЈГ°Г  Г­ГҐ Г®ГЄГ®Г­Г·ГҐГ­Г ";
 
 	for (int i = 0; i < HEIGHT; i++) {
 		for (int j = 0; j < WIDTH; j++) {
@@ -88,20 +86,20 @@ void Setup() {																						//Установка настроек по умолчанию
 	}	
 }
 
-void Instruction() {																				//Функция дял вывода инструкции 
-	cout << "Игрок №1 - 'X', а Игрок №2 - '0'" << endl;
-	cout << "Для установки своего флага в соответствующую ячейку введите:" << endl;
-	cout << "'q' - ячейка a11; 'w' - ячейка a12; 'e' - ячейка a13;" << endl;
-	cout << "'a' - ячейка a21; 's' - ячейка a22; 'd' - ячейка a23;" << endl;
-	cout << "'z' - ячейка a31; 'x' - ячейка a32; 'c' - ячейка a33;" << endl;
-	cout << "Для выхода из игры введите: 'o'." << endl;
+void Instruction() {																				//Г”ГіГ­ГЄГ¶ГЁГї Г¤ГїГ« ГўГ»ГўГ®Г¤Г  ГЁГ­Г±ГІГ°ГіГЄГ¶ГЁГЁ 
+	cout << "Г€ГЈГ°Г®ГЄ В№1 - 'X', Г  Г€ГЈГ°Г®ГЄ В№2 - '0'" << endl;
+	cout << "Г„Г«Гї ГіГ±ГІГ Г­Г®ГўГЄГЁ Г±ГўГ®ГҐГЈГ® ГґГ«Г ГЈГ  Гў Г±Г®Г®ГІГўГҐГІГ±ГІГўГіГѕГ№ГіГѕ ГїГ·ГҐГ©ГЄГі ГўГўГҐГ¤ГЁГІГҐ:" << endl;
+	cout << "'q' - ГїГ·ГҐГ©ГЄГ  a11; 'w' - ГїГ·ГҐГ©ГЄГ  a12; 'e' - ГїГ·ГҐГ©ГЄГ  a13;" << endl;
+	cout << "'a' - ГїГ·ГҐГ©ГЄГ  a21; 's' - ГїГ·ГҐГ©ГЄГ  a22; 'd' - ГїГ·ГҐГ©ГЄГ  a23;" << endl;
+	cout << "'z' - ГїГ·ГҐГ©ГЄГ  a31; 'x' - ГїГ·ГҐГ©ГЄГ  a32; 'c' - ГїГ·ГҐГ©ГЄГ  a33;" << endl;
+	cout << "Г„Г«Гї ГўГ»ГµГ®Г¤Г  ГЁГ§ ГЁГЈГ°Г» ГўГўГҐГ¤ГЁГІГҐ: 'o'." << endl;
 }
 
 
-void Draw(){																						//Функция для отрисовки поля
+void Draw(){																						//Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї Г®ГІГ°ГЁГ±Г®ГўГЄГЁ ГЇГ®Г«Гї
 	cout << endl << endl << endl;
-	cout << "\t   Крестики-Нолики!" << endl << endl;
-	cout << "\t     Ход игрока №" << playerTurn << endl << endl;
+	cout << "\t   ГЉГ°ГҐГ±ГІГЁГЄГЁ-ГЌГ®Г«ГЁГЄГЁ!" << endl << endl;
+	cout << "\t     Г•Г®Г¤ ГЁГЈГ°Г®ГЄГ  В№" << playerTurn << endl << endl;
 	
 		for (int i = 0; i < HEIGHT; i++) {
 			cout << "\t\t";
@@ -116,7 +114,7 @@ void Draw(){																						//Функция для отрисовки поля
 
 
 void Input() {
-	cout << "Ввод: ";
+	cout << "Г‚ГўГ®Г¤: ";
 	cin >> setw(1) >> input;
 	switch (input) { 
 	default:
@@ -209,16 +207,16 @@ void Logic() {
 	if (checkWin()) {
 		turn--;
 		(turn % 2 == 0) ? (playerTurn = X) : (playerTurn = O);
-		gameStatus = "Игра окончена!";
+		gameStatus = "Г€ГЈГ°Г  Г®ГЄГ®Г­Г·ГҐГ­Г !";
 		Draw();
-		cout << "Победил игрок " << playerTurn << endl << endl;
+		cout << "ГЏГ®ГЎГҐГ¤ГЁГ« ГЁГЈГ°Г®ГЄ " << playerTurn << endl << endl;
 		exit(0);
 	}
 	
 	if (checkDraw()) {
-		gameStatus = "Игра окончена!";
+		gameStatus = "Г€ГЈГ°Г  Г®ГЄГ®Г­Г·ГҐГ­Г !";
 		Draw();
-		cout << "Ничья!" << endl << endl;
+		cout << "ГЌГЁГ·ГјГї!" << endl << endl;
 		exit(0);
 	}
 }
