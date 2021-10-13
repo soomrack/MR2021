@@ -70,11 +70,6 @@ void init_field(Field* field){
     // current player
     field->current_player = 0;
 }
-typedef enum{
-    HORIZONTAL,
-    VERTICAL,
-    DIAGONAL
-} LINE_TYPE;
 
 bool check_line(Field *field,
                 int x, int y,
@@ -115,7 +110,7 @@ bool check_horizontal_lines(Field *field){
     int step_x = 1;
     int step_y = 0;
     int num_of_steps = FIELD_SIZE - 1;
-    for (int y = 0; y < FIELD_SIZE - 1; y++){
+    for (int y = 0; y < FIELD_SIZE; y++){
         if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
             return true;
         }
@@ -128,7 +123,7 @@ bool check_vertical_lines(Field *field){
     int step_x = 0;
     int step_y = 1;
     int num_of_steps = FIELD_SIZE - 1;
-    for (int x = 0; x < FIELD_SIZE - 1; x++){
+    for (int x = 0; x < FIELD_SIZE; x++){
         if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
             return true;
         }
@@ -162,55 +157,6 @@ bool check_diagonal_lines(Field *field){
     return false;
 }
 
-bool check_homogeneous_lines(Field *field, LINE_TYPE line_type){
-
-    int x = 0;
-    int y = 0;
-    int step_x, step_y;
-    int amount_of_lines;
-
-    switch(line_type){
-        case HORIZONTAL:
-            step_x = 1;
-            step_y = 0;
-            amount_of_lines = FIELD_SIZE;
-            break;
-        case VERTICAL:
-            step_x = 0;
-            step_y = 1;
-            amount_of_lines = FIELD_SIZE;
-            break;
-        case DIAGONAL:
-            step_x = 1;
-            step_y = 1;
-            amount_of_lines = 2;
-            break;
-        default:
-            ;
-    }
-    for (int i = 0; i < amount_of_lines; i++){
-        if (check_line(field, x, y, step_x, step_y, FIELD_SIZE - 1)){
-            return true;
-        }
-        switch(line_type){
-            case HORIZONTAL:
-                y++;
-                break;
-            case VERTICAL:
-                x++;
-                break;
-            case DIAGONAL:
-                x = FIELD_SIZE - 1;
-                step_x = -1;
-                step_y = -1;
-                break;
-            default:
-                ;
-        }
-    }
-    return false;
-}
-
 void check_field(Field* field){
 
     // check are all cells not empty
@@ -218,54 +164,18 @@ void check_field(Field* field){
 
     // check is any horizontal filled
     bool horizontal_are_filled = check_horizontal_lines(field);
-    /*
-    for (int y = 0; y < FIELD_SIZE; y++){
-        horizontal_are_filled = true;
-        for (int x = 0; x < FIELD_SIZE - 1; x++){
-            if ((field->cell_state_array[x][y] == EMPTY)||
-            (field->cell_state_array[x][y] != field->cell_state_array[x + 1][y])) {
-                horizontal_are_filled = false;
-            }
-        }
-        if (horizontal_are_filled)
-            break;
-    }*/
 
     // check is any vertical filled
     bool vertical_are_filled = check_vertical_lines(field);
-    /*
-    for (int x = 0; x < FIELD_SIZE; x++){
-        vertical_are_filled = true;
-        for (int y = 0; y < FIELD_SIZE - 1; y++){
-            if ((field->cell_state_array[x][y] == EMPTY)||
-                (field->cell_state_array[x][y] != field->cell_state_array[x][y + 1])) {
-                vertical_are_filled = false;
-            }
-        }
-        if (vertical_are_filled)
-            break;
-    }*/
 
     // check is any diagonal filled
     bool diagonal_are_filled = check_diagonal_lines(field);
-    /*
-    for (int i = 0; i < 2; i++){
-        diagonal_are_filled = true;
-        for (int j = 0; j < FIELD_SIZE - 1; j++){
-            if ((field->cell_state_array[j][abs(j - (FIELD_SIZE-1)*i)] == EMPTY)||
-            (field->cell_state_array[j][abs(j - (FIELD_SIZE-1)*i)] !=
-            field->cell_state_array[j + 1][abs(j + 1 - (FIELD_SIZE-1)*i)])) {
-                diagonal_are_filled = false;
-            }
-        }
-        if (diagonal_are_filled)
-            break;
-    }*/
+
     // conditions to winning
-    if (horizontal_are_filled||vertical_are_filled||diagonal_are_filled)
+    if (horizontal_are_filled || vertical_are_filled || diagonal_are_filled)
         field->field_state = WIN;
 
-    // conditions to tie
+    // condition to tie
     else if (all_cells_are_filled)
         field->field_state = TIE;
 }
@@ -442,21 +352,22 @@ void outro(AppState* app_state){
         }
 }
 
-int main() {
-    // create array with all possible functions in the application
-    void (*op[4])(AppState*);
+typedef void (*worker) (AppState*);
+worker FSM_table[4] = {
+        [INTRO] = intro,
+        [SIZE_INPUT] = size_input,
+        [GAME] = game,
+        [OUTRO] = outro,
+};
 
-    op[0] = intro;      // game introduction
-    op[1] = size_input; // size input
-    op[2] = game;       // game process
-    op[3] = outro;      // game outro and an offer to repeat
+int main() {
 
     // create app_state that show what action is needed now
     AppState app_state = INTRO;
 
     // While you dont need to exit, define next action by app_state
     while (app_state != EXIT){
-        op[app_state](&app_state);
+        FSM_table[app_state](&app_state);
     }
     return 0;
 }
