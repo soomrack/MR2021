@@ -70,25 +70,155 @@ void init_field(Field* field){
     // current player
     field->current_player = 0;
 }
+typedef enum{
+    HORIZONTAL,
+    VERTICAL,
+    DIAGONAL
+} LINE_TYPE;
 
-void check_field(Field* field){
+bool check_line(Field *field,
+                int x, int y,
+                int step_x, int step_y,
+                int num_of_steps){
+    if (num_of_steps == 0){
+        return true;
+    }
+    bool cell_is_empty = field->cell_state_array[x][y] == EMPTY;
 
-    bool all_cells_are_filled;
-    bool horizontal_are_filled;
-    bool vertical_are_filled;
-    bool diagonal_are_filled;
+    CellState current_cell_state = field->cell_state_array[x][y];
+    CellState next_cell_state = field->cell_state_array[x + step_x][y + step_y];
+    bool current_is_not_next = current_cell_state != next_cell_state;
 
-    // check are all cells not empty
-    all_cells_are_filled = true;
+    if (cell_is_empty || current_is_not_next) {
+        return false;
+    }
+    return check_line(field,
+                      x + step_x, y + step_y,
+                      step_x, step_y,
+                      num_of_steps - 1);
+}
+
+bool check_cells_filling(Field *field){
+
     for (int x = 0; x < FIELD_SIZE; x++){
         for (int y = 0; y < FIELD_SIZE; y++){
             if (field->cell_state_array[x][y] == EMPTY) {
-                all_cells_are_filled = false;
+                return false;
             }
         }
     }
+    return true;
+}
+
+bool check_horizontal_lines(Field *field){
+    int x = 0;
+    int step_x = 1;
+    int step_y = 0;
+    int num_of_steps = FIELD_SIZE - 1;
+    for (int y = 0; y < FIELD_SIZE - 1; y++){
+        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool check_vertical_lines(Field *field){
+    int y = 0;
+    int step_x = 0;
+    int step_y = 1;
+    int num_of_steps = FIELD_SIZE - 1;
+    for (int x = 0; x < FIELD_SIZE - 1; x++){
+        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool check_diagonal_lines(Field *field){
+
+    int x = 0;
+    int y = 0;
+    int step_x = 1;
+    int step_y = 1;
+    int num_of_steps = FIELD_SIZE - 1;
+    if (check_line(field, x, y,
+                   step_x, step_y,
+                   num_of_steps)) {
+        return true;
+    }
+
+    x = FIELD_SIZE - 1;
+    y = 0;
+    step_x = -1;
+    step_y = -1;
+    num_of_steps = FIELD_SIZE - 1;
+    if (check_line(field, x, y,
+                   step_x, step_y,
+                   num_of_steps)) {
+        return true;
+    }
+    return false;
+}
+
+bool check_homogeneous_lines(Field *field, LINE_TYPE line_type){
+
+    int x = 0;
+    int y = 0;
+    int step_x, step_y;
+    int amount_of_lines;
+
+    switch(line_type){
+        case HORIZONTAL:
+            step_x = 1;
+            step_y = 0;
+            amount_of_lines = FIELD_SIZE;
+            break;
+        case VERTICAL:
+            step_x = 0;
+            step_y = 1;
+            amount_of_lines = FIELD_SIZE;
+            break;
+        case DIAGONAL:
+            step_x = 1;
+            step_y = 1;
+            amount_of_lines = 2;
+            break;
+        default:
+            ;
+    }
+    for (int i = 0; i < amount_of_lines; i++){
+        if (check_line(field, x, y, step_x, step_y, FIELD_SIZE - 1)){
+            return true;
+        }
+        switch(line_type){
+            case HORIZONTAL:
+                y++;
+                break;
+            case VERTICAL:
+                x++;
+                break;
+            case DIAGONAL:
+                x = FIELD_SIZE - 1;
+                step_x = -1;
+                step_y = -1;
+                break;
+            default:
+                ;
+        }
+    }
+    return false;
+}
+
+void check_field(Field* field){
+
+    // check are all cells not empty
+    bool all_cells_are_filled = check_cells_filling(field);
 
     // check is any horizontal filled
+    bool horizontal_are_filled = check_horizontal_lines(field);
+    /*
     for (int y = 0; y < FIELD_SIZE; y++){
         horizontal_are_filled = true;
         for (int x = 0; x < FIELD_SIZE - 1; x++){
@@ -99,9 +229,11 @@ void check_field(Field* field){
         }
         if (horizontal_are_filled)
             break;
-    }
+    }*/
 
     // check is any vertical filled
+    bool vertical_are_filled = check_vertical_lines(field);
+    /*
     for (int x = 0; x < FIELD_SIZE; x++){
         vertical_are_filled = true;
         for (int y = 0; y < FIELD_SIZE - 1; y++){
@@ -112,9 +244,11 @@ void check_field(Field* field){
         }
         if (vertical_are_filled)
             break;
-    }
+    }*/
 
     // check is any diagonal filled
+    bool diagonal_are_filled = check_diagonal_lines(field);
+    /*
     for (int i = 0; i < 2; i++){
         diagonal_are_filled = true;
         for (int j = 0; j < FIELD_SIZE - 1; j++){
@@ -126,7 +260,7 @@ void check_field(Field* field){
         }
         if (diagonal_are_filled)
             break;
-    }
+    }*/
     // conditions to winning
     if (horizontal_are_filled||vertical_are_filled||diagonal_are_filled)
         field->field_state = WIN;
@@ -310,7 +444,7 @@ void outro(AppState* app_state){
 
 int main() {
     // create array with all possible functions in the application
-    void (*op[3])(AppState*);
+    void (*op[4])(AppState*);
 
     op[0] = intro;      // game introduction
     op[1] = size_input; // size input
