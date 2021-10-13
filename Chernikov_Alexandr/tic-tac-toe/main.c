@@ -1,210 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 
-// size of one of the sides of the field
-int FIELD_SIZE = 3;
+#include "game_logic.h"
+#include "bot.h"
 
-// state of one cell
-typedef enum{
-    EMPTY,
-    ZERO,
-    CROSS
-} CellState;
-
-typedef enum{
-    INTRO,
-    SIZE_INPUT,
-    GAME,
-    OUTRO,
-    EXIT,
-} AppState;
-
-// state of field
-typedef enum{
-    GAME_IS_IN_PROCESS,     // game continues
-    WIN,                    // one of the players is win
-    TIE                     // tie happens, nobody can win
-} FieldState;
-
-// struct with player information
-typedef struct{
-    int player_number;              // number that defines the order of players
-    char* player_name;              // player name
-    CellState player_cell_state;    // cell state in which this player turn the chosen cell in the field
-} Player;
-
-typedef struct{
-    CellState** cell_state_array;   // states of all cells on the field
-    FieldState field_state;         // game stage
-    Player players[2];                // players
-    int current_player;             // which player now is doing a step
-} Field;
-
-void init_field(Field* field){
-
-    // allocate memory for cells array
-    field->cell_state_array = calloc(FIELD_SIZE, sizeof(enum CellState*));
-    for (int i = 0; i < FIELD_SIZE; i++)
-        field->cell_state_array[i] = calloc(FIELD_SIZE, sizeof(enum CellState*));
-    // filling field with empty values
-    for (int i = 0; i < FIELD_SIZE; i++){
-        for (int j = 0; j < FIELD_SIZE; j++)
-            field->cell_state_array[i][j] = EMPTY;
-    }
-
-    // initially the game continues
-    field->field_state = GAME_IS_IN_PROCESS;
-
-
-    // player 1 information
-    field->players[0].player_number = 0;
-    field->players[0].player_name = "Player 1";
-    field->players[0].player_cell_state = CROSS;
-
-    // player 2 information
-    field->players[1].player_number = 1;
-    field->players[1].player_name = "Player 2";
-    field->players[1].player_cell_state = ZERO;
-
-    // current player
-    field->current_player = 0;
-}
-
-bool check_line(Field *field,
-                int x, int y,
-                int step_x, int step_y,
-                int num_of_steps){
-    if (num_of_steps == 0){
-        return true;
-    }
-    bool cell_is_empty = field->cell_state_array[x][y] == EMPTY;
-
-    CellState current_cell_state = field->cell_state_array[x][y];
-    CellState next_cell_state = field->cell_state_array[x + step_x][y + step_y];
-    bool current_is_not_next = current_cell_state != next_cell_state;
-
-    if (cell_is_empty || current_is_not_next) {
-        return false;
-    }
-    return check_line(field,
-                      x + step_x, y + step_y,
-                      step_x, step_y,
-                      num_of_steps - 1);
-}
-
-bool check_cells_filling(Field *field){
-
-    for (int x = 0; x < FIELD_SIZE; x++){
-        for (int y = 0; y < FIELD_SIZE; y++){
-            if (field->cell_state_array[x][y] == EMPTY) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool check_horizontal_lines(Field *field){
-    int x = 0;
-    int step_x = 1;
-    int step_y = 0;
-    int num_of_steps = FIELD_SIZE - 1;
-    for (int y = 0; y < FIELD_SIZE; y++){
-        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool check_vertical_lines(Field *field){
-    int y = 0;
-    int step_x = 0;
-    int step_y = 1;
-    int num_of_steps = FIELD_SIZE - 1;
-    for (int x = 0; x < FIELD_SIZE; x++){
-        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool check_diagonal_lines(Field *field){
-
-    int x = 0;
-    int y = 0;
-    int step_x = 1;
-    int step_y = 1;
-    int num_of_steps = FIELD_SIZE - 1;
-    if (check_line(field, x, y,
-                   step_x, step_y,
-                   num_of_steps)) {
-        return true;
-    }
-
-    x = FIELD_SIZE - 1;
-    y = 0;
-    step_x = -1;
-    step_y = -1;
-    num_of_steps = FIELD_SIZE - 1;
-    if (check_line(field, x, y,
-                   step_x, step_y,
-                   num_of_steps)) {
-        return true;
-    }
-    return false;
-}
-
-void check_field(Field* field){
-
-    // check are all cells not empty
-    bool all_cells_are_filled = check_cells_filling(field);
-
-    // check is any horizontal filled
-    bool horizontal_are_filled = check_horizontal_lines(field);
-
-    // check is any vertical filled
-    bool vertical_are_filled = check_vertical_lines(field);
-
-    // check is any diagonal filled
-    bool diagonal_are_filled = check_diagonal_lines(field);
-
-    // conditions to winning
-    if (horizontal_are_filled || vertical_are_filled || diagonal_are_filled)
-        field->field_state = WIN;
-
-    // condition to tie
-    else if (all_cells_are_filled)
-        field->field_state = TIE;
-}
-
-int update_field(Field* field, int x, int y){
-
-    // if coordinates is out of the field area, return 1
-    if ((x >= FIELD_SIZE)||(y >= FIELD_SIZE))
-        return 1;
-
-    // if coordinates has been already filled by someone, return 1
-    if (field->cell_state_array[x][y] != EMPTY)
-        return 1;
-
-    // fill the chosen cell with character of current player
-    CellState current_player_cell_state = field->players[field->current_player].player_cell_state;
-    field->cell_state_array[x][y] = current_player_cell_state;
-
-    // check field
-    check_field(field);
-
-    // if after checking the game is in progress, change the current player
-    if (field->field_state == GAME_IS_IN_PROCESS){
-        field->current_player = (field->current_player + 1) % 2;
-    }
-
-    // if the input was correct, return 0
-    return 0;
-}
+int field_size;
 
 void input_coords(int *x, int *y){
     printf("Write two coordinates (horizontal and vertical) through the space: ");
@@ -215,14 +14,14 @@ void output_game(Field* field){
 
     // print horizontal axis
     printf("\t");
-    for(int x = 0; x < FIELD_SIZE; x++)
+    for(int x = 0; x < field_size; x++)
         printf("%d  ", x);
     putchar('\n');
 
     // print horizontal line
     printf("\t");
-    for(int x = 0; x < FIELD_SIZE; x++)
-        if (x != FIELD_SIZE - 1)
+    for(int x = 0; x < field_size; x++)
+        if (x != field_size - 1)
             printf("___");
         else
             printf("_");
@@ -230,9 +29,9 @@ void output_game(Field* field){
 
     // print the game field
     char cell_char;
-    for(int y = 0; y < FIELD_SIZE; y++){
+    for(int y = 0; y < field_size; y++){
         printf("%d|\t", y);
-        for(int x = 0; x < FIELD_SIZE; x++){
+        for(int x = 0; x < field_size; x++){
             switch (field->cell_state_array[x][y]){
                 case EMPTY:
                     cell_char = '*';
@@ -300,14 +99,14 @@ void size_input(AppState* app_state){
     if (input < 2)
         printf("It seems your input was wrong. Please, try again.\n");
     else{
-        FIELD_SIZE = input;
+        field_size = input;
         *app_state = GAME;
     }
 }
 
 void game(AppState* app_state){
-    Field tic_tac_toe_field;            // declare field
-    init_field(&tic_tac_toe_field);     // field inititalization
+    Field tic_tac_toe_field;                    // declare field
+    init_field(&tic_tac_toe_field, field_size); // field inititalization
 
     int x, y;                           // declare currents coordinates of chosen cell
     int update_result = 0;              // special variable that check validity of chosen coordinates
