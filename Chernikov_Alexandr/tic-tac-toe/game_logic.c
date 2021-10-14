@@ -10,6 +10,7 @@ typedef enum{
 
 typedef enum{
     INTRO,
+    DEFINE_BOT_NUM,
     SIZE_INPUT,
     GAME,
     OUTRO,
@@ -72,6 +73,10 @@ void init_field(Field* field, int field_size){
     field->current_player = 0;
 }
 
+
+// check one line (horizontal, vertical or diagonal)
+// return true if line filled by the same signs
+// otherwise return false
 bool check_line(Field *field,
                 int x, int y,
                 int step_x, int step_y,
@@ -148,7 +153,7 @@ bool check_diagonal_lines(Field *field){
     x = field->field_size - 1;
     y = 0;
     step_x = -1;
-    step_y = -1;
+    step_y = 1;
     num_of_steps = field->field_size - 1;
     if (check_line(field, x, y,
                    step_x, step_y,

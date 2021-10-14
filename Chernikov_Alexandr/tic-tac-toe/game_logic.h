@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 
-// size of one of the sides of the field
-
 // state of one cell
 typedef enum{
     EMPTY,
@@ -15,6 +13,7 @@ typedef enum{
 typedef enum{
     INTRO,
     SIZE_INPUT,
+    DEFINE_BOT_NUM,
     GAME,
     OUTRO,
     EXIT,
