@@ -27,6 +27,7 @@ typedef enum{
     TIE                     // tie happens, nobody can win
 } FieldState;
 
+
 // struct with player information
 typedef struct{
     int player_number;              // number that defines the order of players
@@ -43,6 +44,8 @@ typedef struct{
 } Field;
 
 void init_field(Field* field, int field_size);
+
+void check_field(Field* field);
 
 int update_field(Field* field, int x, int y);
 

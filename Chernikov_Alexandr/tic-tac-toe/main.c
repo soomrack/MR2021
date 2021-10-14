@@ -5,7 +5,9 @@
 
 int field_size;
 
-void input_coords(int *x, int *y){
+typedef void (*Move) (int*, int*, Field field);
+
+void human_move(int *x, int *y, Field field){
     printf("Write two coordinates (horizontal and vertical) through the space: ");
     scanf("%d %d", x, y);
 }
@@ -104,28 +106,36 @@ void size_input(AppState* app_state){
     }
 }
 
+Move players_move[2] = {
+        human_move,
+        bot_move
+};
+
 void game(AppState* app_state){
-    Field tic_tac_toe_field;                    // declare field
-    init_field(&tic_tac_toe_field, field_size); // field inititalization
+    Field field;                    // declare field
+    init_field(&field, field_size); // field inititalization
 
     int x, y;                           // declare currents coordinates of chosen cell
     int update_result = 0;              // special variable that check validity of chosen coordinates
+    Move player_move;
 
-    output_game(&tic_tac_toe_field);    // the first output of the game field
-    while (tic_tac_toe_field.field_state == GAME_IS_IN_PROCESS){
+    output_game(&field);    // the first output of the game field
+    while (field.field_state == GAME_IS_IN_PROCESS){
 
         // if earlier you write wrong coordinates, this code outputs warning message
         if (update_result == 1){
             output_input_warning();
         }
 
-        input_coords(&x, &y);                                       // current coordinates input
-        update_result = update_field(&tic_tac_toe_field, x, y);     // update field with chosen coordinates
-        output_game(&tic_tac_toe_field);                            // output game field
+        player_move = players_move[field.current_player];
+
+        player_move(&x, &y, field);                     // current coordinates input
+        update_result = update_field(&field, x, y);     // update field with chosen coordinates
+        output_game(&field);                            // output game field
 
     }
-    output_result(&tic_tac_toe_field);                              // if game is over then write its result
-    *app_state = OUTRO;         // change application state to outro
+    output_result(&field);                              // if game is over then write its result
+    *app_state = OUTRO;                                 // change application state to outro
 }
 
 void outro(AppState* app_state){
@@ -151,7 +161,9 @@ void outro(AppState* app_state){
         }
 }
 
+// declare type of working function
 typedef void (*worker) (AppState*);
+// create table to align function with their corresponding states
 worker FSM_table[4] = {
         [INTRO] = intro,
         [SIZE_INPUT] = size_input,
