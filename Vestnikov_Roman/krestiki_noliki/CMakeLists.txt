@@ -3,4 +3,4 @@ project(krestiki_noliki C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(krestiki_noliki main.c)
+add_executable(krestiki_noliki main.c movement.c)
