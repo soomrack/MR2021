@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <gtk/gtk.h>
 #include "game_logic.h"
 #include "bot.h"
+#include "gui.h"
 
 // length of one side of the field
 int field_size;
@@ -179,7 +181,7 @@ void game(AppState* app_state){
 }
 
 void outro(AppState* app_state){
-    printf("Are you want to play one more time?\n");
+    printf("Are you want to play with the same settings one more time?\n");
     printf("1 - yes\n"
            "0 - no\n");
     int outro_input;
@@ -212,14 +214,16 @@ worker FSM_table[5] = {
         [OUTRO] = outro
 };
 
-int main() {
-    // create app_state that show what action is needed now (initially its intro)
+int main(int argc, char **argv) {
+
+    gui_main(argc, argv);
+    /*
+    // create app_state that show what action is needed now (initially it is intro)
     AppState app_state = INTRO;
 
-    // While you dont need to exit, define next action by app_state and exexute correct function
+    // While you don't need to exit, define next action by app_state and execute correct function
     while (app_state != EXIT){
         FSM_table[app_state](&app_state);
-    }
+    }*/
     return 0;
 }
-

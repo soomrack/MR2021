@@ -8,16 +8,17 @@ typedef enum{
     CROSS
 } CellState;
 
+// type of the state of the application
 typedef enum{
     INTRO,
-    DEFINE_BOT_NUM,
     SIZE_INPUT,
+    DEFINE_BOT_NUM,
     GAME,
     OUTRO,
     EXIT,
 } AppState;
 
-// state of field
+// type of the state of the game field
 typedef enum{
     GAME_IS_IN_PROCESS,     // game continues
     WIN,                    // one of the players is win
@@ -32,12 +33,13 @@ typedef struct{
     CellState player_cell_state;    // cell state in which this player turn the chosen cell in the field
 } Player;
 
+// field information
 typedef struct{
     CellState** cell_state_array;   // states of all cells on the field
     int field_size;
     FieldState field_state;         // game stage
-    Player players[2];              // players
-    int current_player;             // which player now is doing a step
+    Player players[2];              // array of 2 players info
+    int current_player;             // number of which player now is doing a step
 } Field;
 
 void init_field(Field* field, int field_size){
@@ -99,6 +101,8 @@ bool check_line(Field *field,
                       num_of_steps - 1);
 }
 
+// true if all cells is not empty
+// otherwise false
 bool check_cells_filling(Field *field){
 
     for (int x = 0; x < field->field_size; x++){
@@ -210,5 +214,25 @@ int update_field(Field* field, int x, int y){
 
     // if the input was correct, return 0
     return 0;
+}
+
+void clear_field(Field *field){
+
+    for (int i = 0; i < field->field_size; i++){
+        for (int j = 0; j < field->field_size; j++)
+            field->cell_state_array[i][j] = EMPTY;
+    }
+
+    field->field_state = GAME_IS_IN_PROCESS;
+
+    field->players[0].player_number = 0;
+    field->players[0].player_name = "Player 1";
+    field->players[0].player_cell_state = CROSS;
+
+    field->players[1].player_number = 1;
+    field->players[1].player_name = "Player 2";
+    field->players[1].player_cell_state = ZERO;
+
+    field->current_player = 0;
 }
 
