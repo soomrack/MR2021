@@ -4,6 +4,6 @@ project(untitled2 C)
 set(CMAKE_C_STANDARD 99)
 
 add_library(library static library.h)
-target_link_libraries(library)
+target_link_libraries(main library)
 
 add_executable(untitled2 main.c)
