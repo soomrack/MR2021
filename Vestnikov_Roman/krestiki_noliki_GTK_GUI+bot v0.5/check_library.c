@@ -1,13 +1,11 @@
 #include "check_library.h"
 
 
-
 /* Функция проверки на победу/ничью */
-int check(int victory,int size,int pole[10][10],int size_for_win)
-{
-    victory = 0;
+int check(int size, int pole[10][10], int size_for_win) {
+    int victory = 0;
     int i, j;
-    int  kr = 0, nol = 0, c = 0;
+    int kr = 0, nol = 0, c = 0;
 
     for (i = 0; i < size; i++) { //Проверка по горизонтали
         for (j = 0; j < size - 1; j++) {
@@ -18,7 +16,7 @@ int check(int victory,int size,int pole[10][10],int size_for_win)
                 else nol = 0;
             }
         }
-        victory = check_2(victory, size_for_win, kr, nol);
+        victory = check_2(size_for_win, kr, nol);
         if (victory == 1 || victory == 2) break;
         kr = 0;
         nol = 0;
@@ -33,7 +31,7 @@ int check(int victory,int size,int pole[10][10],int size_for_win)
                 else nol = 0;
             }
         }
-        victory = check_2(victory, size_for_win, kr, nol);
+        victory = check_2(size_for_win, kr, nol);
         if (victory == 1 || victory == 2) break;
         kr = 0;
         nol = 0;
@@ -59,7 +57,7 @@ int check(int victory,int size,int pole[10][10],int size_for_win)
                 } else nol = 0;
             }
         }
-        victory = check_2(victory, size_for_win, kr, nol);
+        victory = check_2(size_for_win, kr, nol);
         if (victory == 1 || victory == 2) break;
         kr = 0;
         nol = 0;
@@ -88,7 +86,7 @@ int check(int victory,int size,int pole[10][10],int size_for_win)
                 } else nol = 0;
             }
         }
-        victory = check_2(victory, size_for_win, kr, nol);
+        victory = check_2(size_for_win, kr, nol);
         if (victory == 1 || victory == 2) break;
         kr = 0;
         nol = 0;
@@ -105,8 +103,8 @@ int check(int victory,int size,int pole[10][10],int size_for_win)
 }
 
 /* Дополнительная функция проверки */
-int check_2(int victory,int size_for_win,int kr, int nol) {
-    victory = 0;
+int check_2(int size_for_win, int kr, int nol) {
+    int victory = 0;
     if (size_for_win == 3) {
         if (kr == 2) {
             victory = 1;
