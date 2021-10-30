@@ -1,4 +1,7 @@
+#include <gtk/gtk.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 char field[9];
 
@@ -19,7 +22,8 @@ _Bool EndOfField(){
 }
 
 
-void PtintField(){
+void PrintField(){
+    system("cls");
     for (int i = 0; i < 3; ++i){
         printf("%c|%c|%c\n",field[i*3],field[i*3+1],field[i*3+2]);
         printf("-----\n");
@@ -57,32 +61,55 @@ char CheckWin(){
     return 0;
 }
 
+void Bot_move(char Symbol){
+    char Position;
+
+    while(1){
+        Position = rand()%9;
+        if((field[Position])==48||(field[Position])==88){
+            continue;
+        }
+        field[Position]=Symbol;
+        break;
+    }
+}
+
+void Human_move(char Symbol){
+    char Position;
+    printf("%c's turn, enter position\n",Symbol);
+
+    while(1){
+        scanf(" %c",&Position);
+        scanf( "%*[^\n]" );
+        if((Position-49)<0 || (Position-49)>8||(field[Position-49])==48||(field[Position-49])==88){
+            printf("Please re-enter\n");
+            continue;
+        }
+        field[Position-49]=Symbol;
+        break;
+    }
+}
+
+void (*Gamer1_move)(char);
+void (*Gamer2_move)(char);
+
 void game(){
     _Bool eog =0;
     char Player = 48;
-    char Position;
-
     while (!eog){
-        PtintField();
+        PrintField();
 
         if(Player==48){
             Player=88;
-        } else Player = 48;
-
-        printf("%c's turn, enter position\n",Player);
-
-        while(1){
-            scanf(" %c",&Position);
-            scanf( "%*[^\n]" );
-            if((Position-49)<0 || (Position-49)>8||(field[Position-49])==48||(field[Position-49])==88){
-                printf("Please re-enter\n");
-                continue;
-            }
-            field[Position-49]=Player;
-            break;
+            Gamer1_move(Player);
+        } else {
+            Player = 48;
+            Gamer2_move(Player);
         }
 
         if(CheckWin()){
+            system("cls");
+            PrintField();
             printf("%c win\n",CheckWin());
             eog=1;
         }
@@ -92,12 +119,41 @@ void game(){
 
 void StartGame(){
     char key;
+    system("cls");
     printf("Enter 1 to start the game\n");
     while(1){
 
         scanf(" %c",&key);
         scanf( "%*[^\n]" );
         if(key=='1'){
+            break;
+        }
+        printf("Please re-enter\n");
+    }
+    system("cls");
+    printf("Enter the game mode number\n"
+           "1 - Two humans game\n"
+           "2 - Bot is \"X\" and human is \"0\"\n"
+           "3 - Bot is \"0\" and human is \"X\"\n"
+           "4 - Both players are bots\n");
+    while(1){
+        scanf(" %c",&key);
+        scanf( "%*[^\n]" );
+        if (key=='1') {
+            Gamer1_move = Human_move;
+            Gamer2_move = Human_move;
+            break;
+        } else if (key=='2'){
+            Gamer1_move = Bot_move;
+            Gamer2_move = Human_move;
+            break;
+        } else if (key=='3'){
+            Gamer1_move = Human_move;
+            Gamer2_move = Bot_move;
+            break;
+        } else if (key=='4') {
+            Gamer1_move = Bot_move;
+            Gamer2_move = Bot_move;
             break;
         }
         printf("Please re-enter\n");
@@ -121,6 +177,8 @@ _Bool CheckReplay(){
 }
 
 int main() {
+
+    srand(time(NULL));
     _Bool replay = 1;
     while (replay) {
         init();
