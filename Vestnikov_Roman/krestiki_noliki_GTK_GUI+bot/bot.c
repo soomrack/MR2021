@@ -46,7 +46,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                         x = i;
                         y = j + size_for_win - 1;
                         turn_is_completed = 1;
-                    } else if (pole[i][j - 1] == 0) {
+                    } else if (pole[i][j - 1] == 0 && j != 0) {
                         pole[i][j - 1] = bot_weapon;
                         turn_is_completed = 1;
                     }
@@ -72,7 +72,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                         x = i + size_for_win - 1;
                         y = j;
                         turn_is_completed = 1;
-                    } else if (pole[i - 1][j] == 0) {
+                    } else if (pole[i - 1][j] == 0 && i != 0) {
                         pole[i - 1][j] = bot_weapon;
                         x = i - 1;
                         y = j;
@@ -103,7 +103,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                         x = i + size_for_win - 1;
                         y = j + size_for_win - 1;
                         turn_is_completed = 1;
-                    } else if (pole[i - 1][j - 1] == 0) {
+                    } else if (pole[i - 1][j - 1] == 0 && i != 0 && j != 0) {
                         pole[i - 1][j - 1] = bot_weapon;
                         x = i - 1;
                         y = j - 1;
@@ -136,7 +136,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                         x = i + size_for_win - 1;
                         y = j - (size_for_win - 1);
                         turn_is_completed = 1;
-                    } else if (pole[i - 1][j + 1] == 0) {
+                    } else if (pole[i - 1][j + 1] == 0 && i != 0 ) {
                         pole[i - 1][j + 1] = bot_weapon;
                         x = i - 1;
                         y = j + 1;
@@ -198,7 +198,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                         x = i;
                         y = j + size_for_win - 1;
                         turn_is_completed = 1;
-                    } else if (pole[i][j - 1] == 0) {
+                    } else if (pole[i][j - 1] == 0 && j != 0)  {
                         pole[i][j - 1] = bot_weapon;
                         x = i;
                         y = j - 1;
@@ -226,7 +226,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                         x = i + size_for_win - 1;
                         y = j;
                         turn_is_completed = 1;
-                    } else if (pole[i - 1][j] == 0) {
+                    } else if (pole[i - 1][j] == 0 && i != 0) {
                         pole[i - 1][j] = bot_weapon;
                         x = i - 1;
                         y = j;
@@ -257,7 +257,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                         x = i + size_for_win - 1;
                         y = j + size_for_win - 1;
                         turn_is_completed = 1;
-                    } else if (pole[i - 1][j - 1] == 0) {
+                    } else if (pole[i - 1][j - 1] == 0 && i != 0&& j != 0)  {
                         pole[i - 1][j - 1] = bot_weapon;
                         x = i - 1;
                         y = j - 1;
@@ -507,7 +507,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                     victory = end(size, pole, size_for_win, grid, y, x, bot_weapon);
                     return victory;
                 }
-                if (pole[i][j - 1] == 0 && pole[i][j - 2] == 0) {
+                if (pole[i][j - 1] == 0 && pole[i][j - 2] == 0 && j != 0) {
                     pole[i][j - 1] = bot_weapon;
                     x = i;
                     y = j - 1;
@@ -521,7 +521,7 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                     victory = end(size, pole, size_for_win, grid, y, x, bot_weapon);
                     return victory;
                 }
-                if (pole[i - 1][j] == 0 && pole[i - 2][j] == 0) {
+                if (pole[i - 1][j] == 0 && pole[i - 2][j] == 0 && i != 0) {
                     pole[i - 1][j] = bot_weapon;
                     x = i - 1;
                     y = j;
@@ -535,21 +535,21 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
                     victory = end(size, pole, size_for_win, grid, y, x, bot_weapon);
                     return victory;
                 }
-                if (pole[i + 1][j - 1] == 0 && pole[i + 2][j - 2] == 0) {
+                if (pole[i + 1][j - 1] == 0 && pole[i + 2][j - 2] == 0 && j != 0) {
                     pole[i + 1][j - 1] = bot_weapon;
                     x = i + 1;
                     y = j - 1;
                     victory = end(size, pole, size_for_win, grid, y, x, bot_weapon);
                     return victory;
                 }
-                if (pole[i - 1][j - 1] == 0 && pole[i - 2][j - 2] == 0) {
+                if (pole[i - 1][j - 1] == 0 && pole[i - 2][j - 2] == 0&& i != 0&& j != 0)  {
                     pole[i - 1][j - 1] = bot_weapon;
                     x = i - 1;
                     y = j - 1;
                     victory = end(size, pole, size_for_win, grid, y, x, bot_weapon);
                     return victory;
                 }
-                if (pole[i - 1][j + 1] == 0 && pole[i - 2][j + 2] == 0) {
+                if (pole[i - 1][j + 1] == 0 && pole[i - 2][j + 2] == 0 && i != 0) {
                     pole[i - 1][j + 1] = bot_weapon;
                     x = i - 1;
                     y = j + 1;
@@ -563,13 +563,18 @@ int Bot_move(int step, int size, int pole[10][10], int size_for_win,
 
 int end(int size, int pole[10][10], int size_for_win, GtkWidget *grid, int x, int y, int bot_weapon) {
     int victory = 0;
+    GtkWidget *cross_image, *zero_image;
+    cross_image = gtk_image_new_from_file ("Pictures\\cross.png");
+    zero_image = gtk_image_new_from_file ("Pictures\\zero.png");
     if (bot_weapon==1)
     {
-        gtk_button_set_label(GTK_BUTTON(gtk_grid_get_child_at(GTK_GRID(grid), x, y)), "X");
+        gtk_button_set_label((GtkButton *) gtk_grid_get_child_at(GTK_GRID(grid), x, y), NULL);
+        gtk_button_set_image((GtkButton *) gtk_grid_get_child_at(GTK_GRID(grid), x, y), cross_image);
     }
     else if (bot_weapon==2)
     {
-        gtk_button_set_label(GTK_BUTTON(gtk_grid_get_child_at(GTK_GRID(grid), x, y)), "0");
+        gtk_button_set_label((GtkButton *) gtk_grid_get_child_at(GTK_GRID(grid), x, y), NULL);
+        gtk_button_set_image((GtkButton *) gtk_grid_get_child_at(GTK_GRID(grid), x, y), zero_image);
     }
 
     victory = check(size, pole, size_for_win);

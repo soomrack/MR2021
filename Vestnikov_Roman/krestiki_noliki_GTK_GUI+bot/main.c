@@ -28,7 +28,6 @@ int size_for_win;
 int victory = 0;
 GtkWidget *window;
 int step = 0;
-char *winner_announcement;
 GtkWidget *label_winner;
 
 identifier id[10 * 10];
@@ -46,6 +45,7 @@ void play() {
     victory = 0;
 
     for (step = 1; victory != 1 && victory != 2 && victory != 3; step++) {
+    if (step == 2) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\finish_him.png");
 
         switch (choice1) {
             case 1:
@@ -75,11 +75,10 @@ void play() {
             default:
                 break;
         }
-
+        //visual();
         victory = Gamer02_move(step, size, pole, size_for_win, human_weapon, bot_weapon, grid);     //Ход нолика
     }
     congratulation();
-    gtk_label_set_label((GtkLabel *) label_winner, winner_announcement);
 }
 
 
@@ -94,6 +93,9 @@ int Human_move() { //Крестик
 void callback_button(GtkButton *button, gpointer data) {
 
     identifier *id_button = data;                                   //Передача данных о координатах
+    GtkWidget *cross_image, *zero_image;
+    cross_image = gtk_image_new_from_file ("Pictures\\cross.png");
+    zero_image = gtk_image_new_from_file ("Pictures\\zero.png");
 
     if (victory != 1 && victory != 2) {                             //Заполнение поля при условии отсутствия победителя
         if (pole[id_button->y - 1][id_button->x - 1] == 0) {        //Заполнение поля при условии пустоты клетки
@@ -101,11 +103,13 @@ void callback_button(GtkButton *button, gpointer data) {
 
             if (human_weapon == 1)                                  //Ставит Х
             {
-                gtk_button_set_label(button, "X");
+                gtk_button_set_label(button, NULL);
+                gtk_button_set_image(button, cross_image);
                 pole[id_button->y - 1][id_button->x - 1] = 1;
             } else if (human_weapon == 2)                           //Ставит 0
             {
-                gtk_button_set_label(button, "0");
+                gtk_button_set_label(button, NULL);
+                gtk_button_set_image(button, zero_image);
                 pole[id_button->y - 1][id_button->x - 1] = 2;
             }
 
@@ -160,7 +164,7 @@ void callback_reset(GtkButton *button_reset, gpointer data) {
     completion();
     gtk_button_set_label(button_reset, "Reset");
 
-    gtk_label_set_label((GtkLabel *) label_winner, "Good Luck");
+    gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\good_luck.png");
     play();
 }
 
@@ -211,8 +215,9 @@ void create_window(int argc, char *argv[]) {
 
     /* Определяем обработчика сигналов delete_event* для выхода из GTK. */
     g_signal_connect (G_OBJECT(window), "destroy", gtk_main_quit, NULL);
-    gtk_window_set_default_size(GTK_WINDOW(window), 900, 600);
+    gtk_window_set_default_size(GTK_WINDOW(window), 1200, 600);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+
     /* Устанавливаем ширину окантовки окна программы */
     gtk_container_set_border_width(GTK_CONTAINER (window), 10);
     GtkWidget *hbox_main;
@@ -224,7 +229,8 @@ void create_window(int argc, char *argv[]) {
     vbox_left = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     GtkWidget *label_player1, *label_player2;
     hbox_gamer1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    label_player1 = gtk_label_new("Gamer 1 →");
+    //label_player1 = gtk_label_new("Gamer 1 →");
+    label_player1 = gtk_image_new_from_file ("Pictures\\gamer1.png");
     radio_button_player1 = gtk_radio_button_new_with_label(NULL, "Human");
     radio_button_bot1 = gtk_radio_button_new_with_label(
             gtk_radio_button_get_group(GTK_RADIO_BUTTON (radio_button_player1)), "Bot");
@@ -233,7 +239,8 @@ void create_window(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(hbox_gamer1), radio_button_bot1, TRUE, FALSE, 0);
 
     hbox_gamer2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    label_player2 = gtk_label_new("Gamer 2 →");
+    //label_player2 = gtk_label_new("Gamer 2 →");
+    label_player2 = gtk_image_new_from_file ( "Pictures\\gamer2.png");
     radio_button_player2 = gtk_radio_button_new_with_label(NULL, "Human");
     radio_button_bot2 = gtk_radio_button_new_with_label(
             gtk_radio_button_get_group(GTK_RADIO_BUTTON (radio_button_player2)), "Bot");
@@ -241,8 +248,9 @@ void create_window(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(hbox_gamer2), radio_button_player2, TRUE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox_gamer2), radio_button_bot2, TRUE, FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(vbox_left), hbox_gamer1, TRUE, FALSE, 10);
-    gtk_box_pack_start(GTK_BOX(vbox_left), hbox_gamer2, TRUE, FALSE, 10);
+    gtk_box_pack_start(GTK_BOX(vbox_left), hbox_gamer1, FALSE, FALSE, 10);
+    gtk_box_pack_start(GTK_BOX(vbox_left), hbox_gamer2, FALSE, FALSE, 10);
+    gtk_widget_set_valign(vbox_left, GTK_ALIGN_CENTER);
 
 
     /* Создаём правую часть экрана */
@@ -252,23 +260,29 @@ void create_window(int argc, char *argv[]) {
     vbox_right = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     size_label = gtk_label_new("What field size do you want?\n(enter 3 for the standard game): ");
     size_entry = gtk_entry_new();
-    gtk_box_pack_start(GTK_BOX(vbox_right), size_label, TRUE, FALSE, 10);
-    gtk_box_pack_start(GTK_BOX(vbox_right), size_entry, TRUE, FALSE, 10);
+    gtk_box_pack_start(GTK_BOX(vbox_right), size_label, FALSE, FALSE, 10);
+    gtk_box_pack_start(GTK_BOX(vbox_right), size_entry, FALSE, FALSE, 10);
+    gtk_widget_set_valign(vbox_right, GTK_ALIGN_CENTER);
 
 
     /* Создаём центральную часть экрана */
     GtkWidget *label_name;
     GtkWidget *vbox_center;
+    GtkWidget *title;
     GtkButton *button_reset;
     vbox_center = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    label_name = gtk_label_new("***Tic-Tac-Toe***");
+    //label_name = gtk_label_new("***Tic-Tac-Toe***");
+    title=gtk_image_new_from_file ( "Pictures\\title.png");
     grid = gtk_grid_new();
     gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
     button_reset = (GtkButton *) gtk_button_new_with_label("Start");
     g_signal_connect (button_reset, "clicked", G_CALLBACK(callback_reset), size_entry);
-    label_winner = gtk_label_new("Good Luck");
-    gtk_box_pack_start(GTK_BOX(vbox_center), label_name, TRUE, FALSE, 10);
+    label_winner = gtk_image_new_from_file ( "Pictures\\good_luck.png");
+
+    /* Упаковка */
+    gtk_box_pack_start(GTK_BOX(vbox_center), title, TRUE, FALSE, 10);
+   // gtk_box_pack_start(GTK_BOX(vbox_center), main_image, TRUE, FALSE, 10);
     gtk_box_pack_start(GTK_BOX(vbox_center), grid, TRUE, FALSE, 10);
     gtk_box_pack_start(GTK_BOX(vbox_center), label_winner, TRUE, FALSE, 10);
     gtk_box_pack_start(GTK_BOX(vbox_center), (GtkWidget *) button_reset, TRUE, FALSE, 10);
@@ -285,16 +299,15 @@ void create_window(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     create_window(argc, argv);
     gtk_widget_show_all(window);
-    /* Входим в gtk_main и ждем событий X сервера для начала выполнения действий! */
     gtk_main();
     return 0;
 }
 
 /* Функция вывода поздравления */
 void congratulation() {
-    if (victory == 1) winner_announcement = "Congratulations to the CROSS with the victory!";
-    if (victory == 2) winner_announcement = "Congratulations to the ZERO with the victory!";
-    if (victory == 3) winner_announcement = "Drawn game!";
+    if (victory == 1) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\cross_wins.png");
+    if (victory == 2) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\zero_wins.png");
+    if (victory == 3) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\drawn_game.png");
 }
 
 /* Функция первоначального заполнения поля пустыми клетками */
