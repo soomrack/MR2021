@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "check_library.h"
 #include "bot.h"
+#include "types.h"
 
 void congratulation();
 void completion();
@@ -11,11 +12,8 @@ int for_win();
 static void create_field();
 void remove_field();
 void callback_button(GtkButton *button, gpointer data);
-void closeApp() {
-    gtk_main_quit();
-}
 
-typedef struct _identifier {
+typedef struct  {
     int x;
     int y;
 } identifier;
@@ -23,60 +21,60 @@ typedef struct _identifier {
 int human_weapon, bot_weapon;
 int choice1, choice2;
 int size = 0;
-int pole[10][10];
+Cell pole[10][10];
 int size_for_win;
-int victory = 0;
-GtkWidget *window;
+Victory_result victory = NOTHING;
 int step = 0;
+GtkWidget *window;
 GtkWidget *label_winner;
-
-identifier id[10 * 10];
+GtkWidget *size_error;
 GtkWidget *radio_button_player1, *radio_button_player2;
 GtkWidget *radio_button_bot1, *radio_button_bot2;
 GtkWidget *grid;
 
-int (*Gamer01_move)();
+identifier id[10 * 10];
 
+int (*Gamer01_move)();
 int (*Gamer02_move)();
 
 /* Функция основного процесса игры */
 void play() {
 
-    victory = 0;
+    victory = NOTHING;
 
-    for (step = 1; victory != 1 && victory != 2 && victory != 3; step++) {
+    for (step = 1; victory != CROSS_WIN && victory != ZERO_WIN && victory != DRAW; step++) {
     if (step == 2) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\finish_him.png");
 
         switch (choice1) {
             case 1:
-                human_weapon = 1;
-                bot_weapon = 2;
+                human_weapon = CROSS;
+                bot_weapon = ZERO;
                 break;
             case 2:
-                bot_weapon = 1;
-                human_weapon = 2;
+                bot_weapon = CROSS;
+                human_weapon = ZERO;
                 break;
             default:
                 break;
         }
 
         victory = Gamer01_move(step, size, pole, size_for_win, human_weapon, bot_weapon, grid);     //Ход крестика
-        if (victory == 1 || victory == 3) break;
+        if (victory == CROSS_WIN || victory == DRAW) break;
         /* Выставление нужных позиций боту и игроку */
         switch (choice2) {
             case 1:
-                bot_weapon = 1;
-                human_weapon = 2;
+                bot_weapon = CROSS;
+                human_weapon = ZERO;
                 break;
             case 2:
-                human_weapon = 1;
-                bot_weapon = 2;
+                human_weapon = CROSS;
+                bot_weapon = ZERO;
                 break;
             default:
                 break;
         }
-        //visual();
         victory = Gamer02_move(step, size, pole, size_for_win, human_weapon, bot_weapon, grid);     //Ход нолика
+        //visual();
     }
     congratulation();
 }
@@ -97,24 +95,21 @@ void callback_button(GtkButton *button, gpointer data) {
     cross_image = gtk_image_new_from_file ("Pictures\\cross.png");
     zero_image = gtk_image_new_from_file ("Pictures\\zero.png");
 
-    if (victory != 1 && victory != 2) {                             //Заполнение поля при условии отсутствия победителя
-        if (pole[id_button->y - 1][id_button->x - 1] == 0) {        //Заполнение поля при условии пустоты клетки
+    if (victory != CROSS_WIN && victory != ZERO_WIN) {                             //Заполнение поля при условии отсутствия победителя
+        if (pole[id_button->y - 1][id_button->x - 1] == EMPTY) {        //Заполнение поля при условии пустоты клетки
 
-
-            if (human_weapon == 1)                                  //Ставит Х
+            if (human_weapon == CROSS)                                  //Ставит Х
             {
                 gtk_button_set_label(button, NULL);
                 gtk_button_set_image(button, cross_image);
-                pole[id_button->y - 1][id_button->x - 1] = 1;
-            } else if (human_weapon == 2)                           //Ставит 0
+                pole[id_button->y - 1][id_button->x - 1] = CROSS;
+            } else if (human_weapon == ZERO)                           //Ставит 0
             {
                 gtk_button_set_label(button, NULL);
                 gtk_button_set_image(button, zero_image);
-                pole[id_button->y - 1][id_button->x - 1] = 2;
+                pole[id_button->y - 1][id_button->x - 1] = ZERO;
             }
-
             victory = check(size, pole, size_for_win);
-
             gtk_main_quit();
         }
     }
@@ -142,14 +137,14 @@ void callback_reset(GtkButton *button_reset, gpointer data) {
     }
 
     step = 0;
-    victory = 0;
+    victory = NOTHING;
     /* Установка выбранного размера поля */
     const char *size_text = gtk_entry_get_text(GTK_ENTRY((GtkWidget *) data));
     size = atoi(size_text);
     if (size < 3 || size > 10) {
-        gtk_label_set_label((GtkLabel *) label_winner, "Sorry, the field can only have a size from 3 to 10");
+        gtk_label_set_label((GtkLabel *) size_error, "Sorry, the field can only have a size from 3 to 10");
         return;
-    }
+    } else gtk_label_set_label((GtkLabel *) size_error, " ");
 
     remove_field();
     create_field();
@@ -163,6 +158,7 @@ void callback_reset(GtkButton *button_reset, gpointer data) {
     }
     completion();
     gtk_button_set_label(button_reset, "Reset");
+
 
     gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\good_luck.png");
     play();
@@ -179,6 +175,7 @@ void create_field() {
             id[counter].x = i;      //Передаём данные для определения позиции нажатой кнопки
             id[counter].y = j;
             button = (GtkButton *) gtk_button_new_with_label("");  //Создаём пустую кнопку
+            gtk_widget_set_size_request ((GtkWidget *) button,  40,  40);
             /* Ставим выполнение функции при нажатии на кнопку */
             g_signal_connect (button, "clicked", G_CALLBACK(callback_button), &id[counter]);
             counter++;
@@ -186,7 +183,6 @@ void create_field() {
             gtk_widget_show((GtkWidget *) button);
         }
     }
-
 }
 
 /* Функция удаления сетки по столбцам */
@@ -260,13 +256,14 @@ void create_window(int argc, char *argv[]) {
     vbox_right = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     size_label = gtk_label_new("What field size do you want?\n(enter 3 for the standard game): ");
     size_entry = gtk_entry_new();
+    size_error = gtk_label_new("");
     gtk_box_pack_start(GTK_BOX(vbox_right), size_label, FALSE, FALSE, 10);
     gtk_box_pack_start(GTK_BOX(vbox_right), size_entry, FALSE, FALSE, 10);
+    gtk_box_pack_start(GTK_BOX(vbox_right), size_error, FALSE, FALSE, 10);
     gtk_widget_set_valign(vbox_right, GTK_ALIGN_CENTER);
 
 
     /* Создаём центральную часть экрана */
-    GtkWidget *label_name;
     GtkWidget *vbox_center;
     GtkWidget *title;
     GtkButton *button_reset;
@@ -305,17 +302,17 @@ int main(int argc, char *argv[]) {
 
 /* Функция вывода поздравления */
 void congratulation() {
-    if (victory == 1) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\cross_wins.png");
-    if (victory == 2) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\zero_wins.png");
-    if (victory == 3) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\drawn_game.png");
+    if (victory == CROSS_WIN) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\cross_wins.png");
+    if (victory == ZERO_WIN) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\zero_wins.png");
+    if (victory == DRAW) gtk_image_set_from_file ( GTK_IMAGE(label_winner), "Pictures\\drawn_game.png");
 }
 
 /* Функция первоначального заполнения поля пустыми клетками */
 void completion() {
     int i, j;
-    for (i = 0; i < size; i++) {
-        for (j = 0; j < size; j++)
-            pole[i][j] = 0;
+    for (i = 0; i < 10; i++) {
+        for (j = 0; j < 10; j++)
+            pole[i][j] = EMPTY;
     }
 }
 
@@ -325,9 +322,9 @@ void visual() // Отображает поле (отключено, нужна �
     printf("=\n");
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            if (pole[i][j] == 0) printf("| ");
-            if (pole[i][j] == 1) printf("|X");
-            if (pole[i][j] == 2) printf("|0");
+            if (pole[i][j] == EMPTY) printf("| ");
+            if (pole[i][j] == CROSS) printf("|X");
+            if (pole[i][j] == ZERO) printf("|0");
         }
         printf("| %d\n", i + 1);
         for (int t = 0; t < size; t++) printf("==");
