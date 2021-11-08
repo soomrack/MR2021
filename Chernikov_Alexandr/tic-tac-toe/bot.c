@@ -1,5 +1,4 @@
 #include "game_logic.h"
-#include <stdio.h>
 const int MAX_DEPTH = 5;    // max num of players move which is considered by bot
 
 int max(int a, int b){

@@ -1,7 +1,7 @@
 #ifndef TIC_TAC_TOE_GAME_LOGIC_H
 #define TIC_TAC_TOE_GAME_LOGIC_H
 
-#include <stdbool.h>
+// #include <stdbool.h>
 // state of one cell
 typedef enum{
     EMPTY,
@@ -44,11 +44,8 @@ typedef struct{
 } Field;
 
 void init_field(Field* field, int field_size);
-
 void check_field(Field* field);
-
 int update_field(Field* field, int x, int y);
-
 void clear_field(Field *field);
 
 #endif
