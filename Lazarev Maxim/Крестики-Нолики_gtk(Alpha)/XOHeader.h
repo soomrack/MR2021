@@ -15,11 +15,11 @@ enum GAMEMODE {
 };
 
 extern int turn;																							            //Номер хода
-
 extern PLAYERTURN playerTurn;
+extern PLAYERTURN player1;
 extern GAMEMODE gameMode;
 
-extern void (*game)();
+
 
 
 

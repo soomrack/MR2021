@@ -41,11 +41,23 @@ GtkWidget *MyWindow::get_widget() {
 
 
 
-MyLabelButton::MyLabelButton(char *name) {
+MyLabelButton::MyLabelButton(const char *name) {
     label_button = gtk_button_new_with_label(name);
 }
 
-void MyLabelButton::set_signal(char *event ,void (*signal)(void), gpointer data) {
+MyLabelButton::MyLabelButton(GtkButton *label_button){
+    this->label_button=(GtkWidget*)label_button;
+};
+
+void MyLabelButton::set_label(const char *name){
+    gtk_button_set_label(GTK_BUTTON(label_button), name);
+}
+
+gchar* MyLabelButton::get_label(){
+    return (gchar*)gtk_button_get_label(GTK_BUTTON(label_button));
+};
+
+void MyLabelButton::set_signal(const char *event ,void (*signal)(void), gpointer data) {
     g_signal_connect(GTK_BUTTON(label_button),event, signal, data);
 }
 

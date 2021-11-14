@@ -1,9 +1,9 @@
 #include "XOHeader.h"
 
 int turn;
-
-PLAYERTURN playerTurn;
+PLAYERTURN playerTurn = X;
+PLAYERTURN player1;
 GAMEMODE gameMode;
 
-void (*game)();
+
 

@@ -27,8 +27,11 @@ private:
 
 class MyLabelButton:public MyWidget {
 public:
-    MyLabelButton(char *name = "Button");
-    void set_signal(char *event ,void (*signal)(void), gpointer data);
+    MyLabelButton(const char *name = "Button");
+    MyLabelButton(GtkButton *label_button);
+    void set_label(const char *name);
+    void set_signal(const char *event ,void (*signal)(void), gpointer data);
+    gchar* get_label();
     GtkWidget* get_widget();
 
 private:
@@ -52,7 +55,7 @@ private:
 class MyVBox:public MyWidget {
 public:
     MyVBox(gint spacing=10);
-    void pack_start(MyWidget *widget,gboolean expand, gboolean fill, guint padding);
+    void pack_start(MyWidget *widget,gboolean expand = TRUE, gboolean fill = FALSE, guint padding = 5);
     GtkWidget* get_widget();
 private:
     GtkWidget *v_box;
