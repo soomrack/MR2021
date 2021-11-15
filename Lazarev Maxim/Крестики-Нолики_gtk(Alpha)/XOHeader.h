@@ -1,6 +1,5 @@
 #define WIDTH 3
 #define HEIGHT 3
-
 #ifndef XOHEADER_H
 #define XOHEADER_H
 
@@ -17,6 +16,7 @@ enum GAMEMODE {
 extern int turn;																							            //Номер хода
 extern PLAYERTURN playerTurn;
 extern PLAYERTURN player1;
+extern PLAYERTURN player2;
 extern GAMEMODE gameMode;
 
 

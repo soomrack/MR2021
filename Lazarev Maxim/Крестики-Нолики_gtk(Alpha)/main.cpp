@@ -1,6 +1,5 @@
 #include <iostream>
 #include "XOHeader.h"
-#include "logic.h"
 #include "gui.h"
 #include "BotIO.h"
 using namespace std;
@@ -13,7 +12,6 @@ using namespace std;
 int main(int argc, char* argv[]) {
     //Setup();
     gtk_init(&argc,&argv);
-
     gui_main();
 
     return 0;

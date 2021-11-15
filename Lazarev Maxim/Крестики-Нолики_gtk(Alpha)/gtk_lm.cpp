@@ -53,13 +53,21 @@ void MyLabelButton::set_label(const char *name){
     gtk_button_set_label(GTK_BUTTON(label_button), name);
 }
 
-gchar* MyLabelButton::get_label(){
-    return (gchar*)gtk_button_get_label(GTK_BUTTON(label_button));
-};
-
 void MyLabelButton::set_signal(const char *event ,void (*signal)(void), gpointer data) {
     g_signal_connect(GTK_BUTTON(label_button),event, signal, data);
 }
+
+void MyLabelButton::set_active() {
+    gtk_widget_set_sensitive (label_button, TRUE);
+}
+
+void MyLabelButton::set_unactive() {
+    gtk_widget_set_sensitive (label_button, FALSE);
+}
+
+gchar* MyLabelButton::get_label(){
+    return (gchar*)gtk_button_get_label(GTK_BUTTON(label_button));
+};
 
 GtkWidget* MyLabelButton::get_widget() {
     return label_button;
@@ -109,4 +117,17 @@ void MyHBox::pack_start(MyWidget *widget,gboolean expand, gboolean fill, guint p
 
 GtkWidget *MyHBox::get_widget() {
     return h_box;
+}
+
+///////////////////////////////////////////////////////MyDialog/////////////////////////////////////////////////////////
+
+MyDialog::MyDialog(char* name) {
+    dialog = gtk_dialog_new();
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    label = gtk_label_new(name);
+    gtk_container_add(GTK_CONTAINER(content_area), label);
+    gtk_widget_show(label);
+}
+void MyDialog::show(){
+    gtk_dialog_run(GTK_DIALOG(dialog));
 }

@@ -31,6 +31,8 @@ public:
     MyLabelButton(GtkButton *label_button);
     void set_label(const char *name);
     void set_signal(const char *event ,void (*signal)(void), gpointer data);
+    void set_unactive();
+    void set_active();
     gchar* get_label();
     GtkWidget* get_widget();
 
@@ -65,10 +67,22 @@ private:
 class MyHBox:public MyWidget {
 public:
     MyHBox(gint spacing=10);
-    void pack_start(MyWidget *widget,gboolean expand, gboolean fill, guint padding);
+    void pack_start(MyWidget *widget,gboolean expand = TRUE, gboolean fill = FALSE, guint padding = 5);
     GtkWidget* get_widget();
 private:
     GtkWidget *h_box;
 };
+
+///////////////////////////////////////////////////////MyDialog/////////////////////////////////////////////////////////
+class MyDialog:public MyWidget {
+public:
+    MyDialog(char* name);
+    void show();
+private:
+    GtkWidget *dialog;
+    GtkWidget *label;
+    GtkWidget *content_area;
+};
+
 
 #endif //!GTKLM
