@@ -12,6 +12,7 @@ int for_win();
 static void create_field();
 void remove_field();
 void callback_button(GtkButton *button, gpointer data);
+void create_window(int argc, char *argv[]);
 
 typedef struct  {
     int x;
@@ -36,6 +37,14 @@ identifier id[10 * 10];
 
 int (*Gamer01_move)();
 int (*Gamer02_move)();
+
+/* Основная функция */
+int main(int argc, char *argv[]) {
+    create_window(argc, argv);
+    gtk_widget_show_all(window);
+    gtk_main();
+    return 0;
+}
 
 /* Функция основного процесса игры */
 void play() {
@@ -292,13 +301,7 @@ void create_window(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER (window), hbox_main);
 }
 
-/* Основная функция */
-int main(int argc, char *argv[]) {
-    create_window(argc, argv);
-    gtk_widget_show_all(window);
-    gtk_main();
-    return 0;
-}
+
 
 /* Функция вывода поздравления */
 void congratulation() {
