@@ -9,7 +9,6 @@ enum InterfaceType{
 enum InterfaceType current_interface_type = GUI;
 
 int main(int argc, char **argv) {
-
     switch(current_interface_type) {
         case GUI:
             gui_main(argc, argv);

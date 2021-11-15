@@ -8,16 +8,6 @@ typedef enum{
     CROSS
 } CellState;
 
-// type of the state of the application
-typedef enum{
-    INTRO,
-    SIZE_INPUT,
-    DEFINE_BOT_NUM,
-    GAME,
-    OUTRO,
-    EXIT,
-} AppState;
-
 // type of the state of the game field
 typedef enum{
     GAME_IS_IN_PROCESS,     // game continues
@@ -41,6 +31,14 @@ typedef struct{
     Player players[2];              // array of 2 players info
     int current_player;             // number of which player now is doing a step
 } Field;
+
+
+static bool check_line(Field *field, int x, int y, int step_x, int step_y, int num_of_steps);
+static bool check_horizontal_lines(Field *field);
+static bool check_vertical_lines(Field *field);
+static bool check_diagonal_lines(Field *field);
+static bool check_cells_filling(Field *field);
+
 
 void init_field(Field* field, int field_size){
 
@@ -73,98 +71,6 @@ void init_field(Field* field, int field_size){
 
     // current player
     field->current_player = 0;
-}
-
-
-// check one line (horizontal, vertical or diagonal)
-// return true if line filled by the same signs
-// otherwise return false
-bool check_line(Field *field,
-                int x, int y,
-                int step_x, int step_y,
-                int num_of_steps){
-    if (num_of_steps == 0){
-        return true;
-    }
-    bool cell_is_empty = field->cell_state_array[x][y] == EMPTY;
-
-    CellState current_cell_state = field->cell_state_array[x][y];
-    CellState next_cell_state = field->cell_state_array[x + step_x][y + step_y];
-    bool current_is_not_next = current_cell_state != next_cell_state;
-
-    if (cell_is_empty || current_is_not_next) {
-        return false;
-    }
-    return check_line(field,
-                      x + step_x, y + step_y,
-                      step_x, step_y,
-                      num_of_steps - 1);
-}
-
-// true if all cells is not empty
-// otherwise false
-bool check_cells_filling(Field *field){
-
-    for (int x = 0; x < field->field_size; x++){
-        for (int y = 0; y < field->field_size; y++){
-            if (field->cell_state_array[x][y] == EMPTY) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool check_horizontal_lines(Field *field){
-    int x = 0;
-    int step_x = 1;
-    int step_y = 0;
-    int num_of_steps = field->field_size - 1;
-    for (int y = 0; y < field->field_size; y++){
-        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool check_vertical_lines(Field *field){
-    int y = 0;
-    int step_x = 0;
-    int step_y = 1;
-    int num_of_steps = field->field_size - 1;
-    for (int x = 0; x < field->field_size; x++){
-        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool check_diagonal_lines(Field *field){
-
-    int x = 0;
-    int y = 0;
-    int step_x = 1;
-    int step_y = 1;
-    int num_of_steps = field->field_size - 1;
-    if (check_line(field, x, y,
-                   step_x, step_y,
-                   num_of_steps)) {
-        return true;
-    }
-
-    x = field->field_size - 1;
-    y = 0;
-    step_x = -1;
-    step_y = 1;
-    num_of_steps = field->field_size - 1;
-    if (check_line(field, x, y,
-                   step_x, step_y,
-                   num_of_steps)) {
-        return true;
-    }
-    return false;
 }
 
 void check_field(Field* field){
@@ -236,3 +142,94 @@ void clear_field(Field *field){
     field->current_player = 0;
 }
 
+
+// check one line (horizontal, vertical or diagonal)
+// return true if line filled by the same signs
+// otherwise return false
+static bool check_line(Field *field,
+                int x, int y,
+                int step_x, int step_y,
+                int num_of_steps){
+    if (num_of_steps == 0){
+        return true;
+    }
+    bool cell_is_empty = field->cell_state_array[x][y] == EMPTY;
+
+    CellState current_cell_state = field->cell_state_array[x][y];
+    CellState next_cell_state = field->cell_state_array[x + step_x][y + step_y];
+    bool current_is_not_next = current_cell_state != next_cell_state;
+
+    if (cell_is_empty || current_is_not_next) {
+        return false;
+    }
+    return check_line(field,
+                      x + step_x, y + step_y,
+                      step_x, step_y,
+                      num_of_steps - 1);
+}
+
+// true if all cells is not empty
+// otherwise false
+static bool check_cells_filling(Field *field){
+
+    for (int x = 0; x < field->field_size; x++){
+        for (int y = 0; y < field->field_size; y++){
+            if (field->cell_state_array[x][y] == EMPTY) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+static bool check_horizontal_lines(Field *field){
+    int x = 0;
+    int step_x = 1;
+    int step_y = 0;
+    int num_of_steps = field->field_size - 1;
+    for (int y = 0; y < field->field_size; y++){
+        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool check_vertical_lines(Field *field){
+    int y = 0;
+    int step_x = 0;
+    int step_y = 1;
+    int num_of_steps = field->field_size - 1;
+    for (int x = 0; x < field->field_size; x++){
+        if (check_line(field, x, y, step_x, step_y, num_of_steps)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool check_diagonal_lines(Field *field){
+
+    int x = 0;
+    int y = 0;
+    int step_x = 1;
+    int step_y = 1;
+    int num_of_steps = field->field_size - 1;
+    if (check_line(field, x, y,
+                   step_x, step_y,
+                   num_of_steps)) {
+        return true;
+    }
+
+    x = field->field_size - 1;
+    y = 0;
+    step_x = -1;
+    step_y = 1;
+    num_of_steps = field->field_size - 1;
+    if (check_line(field, x, y,
+                   step_x, step_y,
+                   num_of_steps)) {
+        return true;
+    }
+    return false;
+}

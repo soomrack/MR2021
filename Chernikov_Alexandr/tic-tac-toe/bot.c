@@ -1,4 +1,5 @@
 #include "game_logic.h"
+
 const int MAX_DEPTH = 5;    // max num of players move which is considered by bot
 
 int max(int a, int b){
@@ -64,7 +65,8 @@ int minimax(Field field, int depth, int alpha, int beta){
 }
 
 // function for bot's game move
-void bot_move(int *x, int *y, Field field){
+void bot_move(int *x, int *y, void* data){
+    Field field = *((Field*) data);
     int best_eval;
     int new_eval;
 
@@ -84,6 +86,7 @@ void bot_move(int *x, int *y, Field field){
 
             // if current cell is empty then evaluate it's profitability for move
             if (field.cell_state_array[i][j] == EMPTY) {
+
                 // filling the cell with correct sign and get eval
                 field.cell_state_array[i][j] = cell_state;
                 new_eval = minimax(field, MAX_DEPTH, alpha, beta);

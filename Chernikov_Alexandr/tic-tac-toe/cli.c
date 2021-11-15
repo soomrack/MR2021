@@ -2,13 +2,23 @@
 #include "game_logic.h"
 #include "bot.h"
 
+// type of the state of the application
+typedef enum{
+    INTRO,
+    SIZE_INPUT,
+    DEFINE_BOT_NUM,
+    GAME,
+    OUTRO,
+    EXIT,
+} AppState;
+
 int field_size;
 
 // type of function that defines player's move
-typedef void (*Move) (int*, int*, Field field);
+typedef void (*Move) (int*, int*, void* data);
 
 // function for realization of human move in the game, when you need to input coordinates
-void human_move(int *x, int *y, Field field){
+void human_move(int *x, int *y, void* data){
     printf("Write two coordinates (horizontal and vertical)\nthrough the space: ");
     scanf("%d %d", x, y);
 }
@@ -168,7 +178,7 @@ void game(AppState* app_state){
 
         player_move = players_move[field.current_player];// player_move assignment
 
-        player_move(&x, &y, field);                     // current coordinates input
+        player_move(&x, &y, &field);                    // current coordinates input
         update_result = update_field(&field, x, y);     // update field with chosen coordinates
         output_game(&field);                            // output game field
 

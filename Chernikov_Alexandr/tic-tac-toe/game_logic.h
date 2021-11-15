@@ -9,16 +9,6 @@ typedef enum{
     CROSS
 } CellState;
 
-// type of the state of the application
-typedef enum{
-    INTRO,
-    SIZE_INPUT,
-    DEFINE_BOT_NUM,
-    GAME,
-    OUTRO,
-    EXIT,
-} AppState;
-
 // type of the state of the game field
 typedef enum{
     GAME_IS_IN_PROCESS,     // game continues
