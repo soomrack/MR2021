@@ -3,7 +3,7 @@ using namespace std;
 
 int score = 0;
 
-class player {
+class human {
     public:
         void set_name();
         void check_player();
@@ -28,14 +28,14 @@ class question {
         void add_score();
 };
 
-void player :: set_name() {
+void human :: set_name() {
     string name;
     cout << "Input your name: ";
     cin >> name;
     player_name = name;
 }
 
-void player :: check_player() {
+void human :: check_player() {
     bool next_step = false;
     int years = 0;
     cout << "How many years have you been familiar with Smesharki?" << endl;
@@ -52,11 +52,11 @@ void player :: check_player() {
     }
 }
 
-string player :: get_name() {
+string human :: get_name() {
     return player_name;
 }
 
-int player :: get_years_with_sm() {
+int human :: get_years_with_sm() {
     return familiar_with_sm;
 }
 
@@ -119,13 +119,13 @@ void get_the_answer() {
 }
 
 int main() {
-    player man;
+    human player;
 
-    man.set_name();
-    man.check_player();
+    player.set_name();
+    player.check_player();
 
-    cout << endl << man.get_name() << ", you have been familiar with Smeshariki"
-    << " for " << man.get_years_with_sm() << " years" << endl
+    cout << endl << player.get_name() << ", you have been familiar with Smeshariki"
+    << " for " << player.get_years_with_sm() << " years" << endl
     << "It's the time to find out who you are from Smeshariki!" << endl
     << endl << "Let's get started!" << endl << endl;
 
