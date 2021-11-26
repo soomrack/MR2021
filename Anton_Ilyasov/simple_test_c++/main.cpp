@@ -1,4 +1,4 @@
-#include <iostream> //объ€вление класса и объекта
+#include <iostream>
 #include <string.h>
 
 #define COUNTQUESTION 5
@@ -71,13 +71,15 @@ void Test::print_question() {
 	cout<< endl << question<< endl<<endl;
 }
 
-int main(void)
-{
-	User User1;
+User User1;
+void greeting() {
 	cout << "Yours name" << endl;
 	cin >> User1.name;
 	cout << "Let's go!" << endl;
 	cout << "Please, enter the answers from the keyboard :)" << endl;
+}
+
+void test() {
 	Test Test1;
 	for (int i = 1; i < COUNTQUESTION; i++)
 	{
@@ -93,9 +95,12 @@ int main(void)
 			User1.incorrect_answer++;
 		}
 	}
+}
+
+void get_results() {
 	if (User1.correct_answer >= 3)
 	{
-		cout << "\nyou're good!"<<endl;
+		cout << "\nyou're good!" << endl;
 	}
 	else
 	{
@@ -103,4 +108,11 @@ int main(void)
 	}
 	cout << "correct answers= " << User1.correct_answer << endl;
 	cout << "incorrect answers= " << User1.incorrect_answer << endl;
+}
+
+int main(void)
+{
+	greeting();
+	test();
+	get_results();
 }
