@@ -118,17 +118,18 @@ void get_the_answer() {
     }
 }
 
-int main() {
+void player_info () {
     human player;
 
     player.set_name();
     player.check_player();
-
     cout << endl << player.get_name() << ", you have been familiar with Smeshariki"
-    << " for " << player.get_years_with_sm() << " years" << endl
-    << "It's the time to find out who you are from Smeshariki!" << endl
-    << endl << "Let's get started!" << endl << endl;
+         << " for " << player.get_years_with_sm() << " years" << endl
+         << "It's the time to find out who you are from Smeshariki!" << endl
+         << endl << "Let's get started!" << endl << endl;
+}
 
+void conduct_quiz () {
     question q1;
     question q2;
     question q3;
@@ -137,11 +138,11 @@ int main() {
 
     q1.set_question("Your comrades going on a dangerous and distant journey."
                     "They are calling you to come with them. What will you do?",
-                     "I'm a little scared. I'll go, of course, but I need to take"
-                     " a book and a first aid kit",
-                     "Haha, I thought of all this myself",
-                     "I'll take everyone, but who will be left with my garden",
-                     "I'll go, but I'm afraid of getting my beautiful new dress dirty");
+                    "I'm a little scared. I'll go, of course, but I need to take"
+                    " a book and a first aid kit",
+                    "Haha, I thought of all this myself",
+                    "I'll take everyone, but who will be left with my garden",
+                    "I'll go, but I'm afraid of getting my beautiful new dress dirty");
 
     q2.set_question("What will you do on your trip?",
                     "Read, think about something, or compose a poem",
@@ -175,7 +176,12 @@ int main() {
     q3.ask_question();
     q4.ask_question();
     q5.ask_question();
+}
 
+int main() {
+
+    player_info();
+    conduct_quiz();
     get_the_answer();
 
     return 0;
