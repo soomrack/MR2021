@@ -4,13 +4,14 @@
 #include "Bot.h"
 
 
-char a[9];
+char a[9] = "\0\0\0\0\0\0\0\0\0" ;
 const char * name1[20], * name2[20];
-int result;
+int result = 0;
 int queue = 1;
 
 
-static GtkWidget  * entry1, * entry2, *label3, *button2, * grid, * window,  * label4, * label5 , * button4, * cell1,  * cell2, * cell3, * cell4, * cell5, * cell6, * cell7, * cell8,* cell, * cell9;
+static GtkWidget  * entry1, * entry2, *label3, *button2, * grid, * window,  * label4, * label5 , * cell1,  * cell2, * cell3, * cell4, * cell5, * cell6, * cell7, * cell8,* cell, * cell9;
+
 
 
 void definition_of_players(){
@@ -72,6 +73,7 @@ void Who_is_the_winner(int g){
         gtk_label_set_label(GTK_LABEL(label5), "Winner");
         gtk_label_set_label(GTK_LABEL(label4), *name1);
         result = 1;
+
     }
     if ( g == 8){
         result = 1;
@@ -105,25 +107,11 @@ void Draft(int x){
     }
 }
 
-int move1(GtkWidget * cell, gpointer number){
-    const char * symbol_inside_cell;
-    if (queue % 2 == 1){
-        symbol_inside_cell = "X";
-        a[(intptr_t)number] = 1;
-        gtk_label_set_label(GTK_LABEL(label4), *name2);
-    } else{
-        symbol_inside_cell = "0";
-        a[(intptr_t)number] = 2;
-        gtk_label_set_label(GTK_LABEL(label4), *name1);
-    }
-    gtk_button_set_label(GTK_BUTTON(cell), symbol_inside_cell);
-    gtk_widget_set_sensitive(cell, FALSE);
-    queue++;
-    determining_the_winner();
-    Draft(queue);
-}
 
-/*GtkWidget definition_cell(int b){
+
+
+
+GtkWidget definition_cell(int b){
     switch (b) {
         case'0':{
             (gpointer)(intptr_t)(0);
@@ -168,19 +156,25 @@ int move1(GtkWidget * cell, gpointer number){
     }
 }
 
-void Bot_move_first(){
+
+
+
+/*void Bot_move_first(){
     *cell = definition_cell(Bot(a[0]));
-    gtk_test_widget_click(cell, );
+    //gtk_test_widget_click(cell, );
+    gtk_button_clicked(GTK_BUTTON(cell));
 
 
 }
 void Bot_move_second(){
+    *cell = definition_cell(Bot(a[0]));
+    //gtk_test_widget_click(cell, );
+    gtk_button_clicked(GTK_BUTTON(cell));
 
 }
 void Battle_of_Bots(){
 
 }
-
 
 void game_mode(){
     if ( strcmp(name1[0], "Bot") == 0 || strcmp(name2[0], "Bot") != 0 ){
@@ -190,13 +184,140 @@ void game_mode(){
             Bot_move_first();
         } else{
             if (strcmp(name1[0], "Bot") == 0 || strcmp(name2[0], "Bot") == 0 ){
-                Battle_of_Bots();
+                //Battle_of_Bots();
             }
         }
     }
 
 }*/
 
+
+
+int move2(GtkWidget *cell){
+    const char * symbol_inside_cell;
+    if (queue % 2 == 1){
+        symbol_inside_cell = "X";
+        a[Bot()] = 1;
+        gtk_label_set_label(GTK_LABEL(label4), *name2);
+    } else{
+        symbol_inside_cell = "0";
+        a[Bot()] = 2;
+        gtk_label_set_label(GTK_LABEL(label4), *name1);
+    }
+    gtk_button_set_label(GTK_BUTTON(cell), symbol_inside_cell);
+    gtk_widget_set_sensitive(cell, FALSE);
+    queue++;
+    determining_the_winner();
+    Draft(queue);
+}
+
+void Bot_move(int c){
+    switch (c){
+        case 0:{
+            move2(cell1);
+            break;
+        }
+        case 1: {
+            move2(cell2);
+            break;
+        }
+        case 2: {
+            move2(cell3);
+            break;
+        }
+        case 3: {
+            move2(cell4);
+            break;
+        }
+        case 4: {
+            move2(cell5);
+            break;
+        }
+        case 5: {
+            move2(cell6);
+            break;
+        }
+        case 6: {
+            move2(cell7);
+            break;
+        }
+        case 7: {
+            move2(cell8);
+            break;
+        }
+        case 8: {
+            move2(cell9);
+            break;
+        }
+        default:{};
+        printf("gbcz");
+    }
+}
+
+void Bot_set(){
+    if (queue % 2 == 1 && strcmp(*name1, "Bot") == 0 ){
+        Bot_move(Bot());
+
+    } else{
+        if (queue % 2 == 0 && strcmp(*name2, "Bot") == 0){
+            Bot_move(Bot());
+        }
+    }
+
+
+
+}
+int move1(GtkWidget * cell, gpointer number){
+    const char * symbol_inside_cell;
+    if (queue % 2 == 1){
+        symbol_inside_cell = "X";
+        a[(intptr_t)number] = 1;
+        gtk_label_set_label(GTK_LABEL(label4), *name2);
+    } else{
+        symbol_inside_cell = "0";
+        a[(intptr_t)number] = 2;
+        gtk_label_set_label(GTK_LABEL(label4), *name1);
+    }
+    gtk_button_set_label(GTK_BUTTON(cell), symbol_inside_cell);
+    gtk_widget_set_sensitive(cell, FALSE);
+    queue++;
+    determining_the_winner();
+    if (result == 1){
+        return 0;
+    }
+    Bot_set();
+
+    Draft(queue);
+    printf("gbcz");
+
+
+}
+void Bot_moves_first(){
+    if (queue % 2 == 1 && strcmp(*name1, "Bot") == 0 && strcmp(*name2,"Bot") != 0){
+        gtk_button_set_label(GTK_BUTTON(cell5), "X");
+        a[4] = 1;
+        gtk_widget_set_sensitive(cell5, FALSE);
+        queue++;
+        gtk_label_set_label(GTK_LABEL(label4), *name2);
+    }
+}
+void Two_bots(){
+    if(strcmp(*name1,"Bot")==0 && strcmp(*name2,"Bot")==0){
+        gtk_label_set_label(GTK_LABEL(label4), "Bots");
+        gtk_label_set_label(GTK_LABEL(label5), "agreed to a draw");
+        gtk_widget_set_sensitive(cell1, FALSE);
+        gtk_widget_set_sensitive(cell2, FALSE);
+        gtk_widget_set_sensitive(cell3, FALSE);
+        gtk_widget_set_sensitive(cell4, FALSE);
+        gtk_widget_set_sensitive(cell5, FALSE);
+        gtk_widget_set_sensitive(cell6, FALSE);
+        gtk_widget_set_sensitive(cell7, FALSE);
+        gtk_widget_set_sensitive(cell8, FALSE);
+        gtk_widget_set_sensitive(cell9, FALSE);
+
+
+    }
+}
 int canvas (int argc, char **argv)
 {
     gtk_init (&argc, &argv);
@@ -228,6 +349,7 @@ int canvas (int argc, char **argv)
     g_signal_connect ( cell5, "clicked",G_CALLBACK(move1),(gpointer)(intptr_t)(4));
     gtk_grid_attach(GTK_GRID(grid), cell5, 1, 2, 1, 1 );
 
+
     cell6 = gtk_button_new_with_label(&a[5]);
     g_signal_connect ( cell6, "clicked",G_CALLBACK(move1),(gpointer)(intptr_t)(5));
     gtk_grid_attach(GTK_GRID(grid), cell6, 1, 3, 1, 1 );
@@ -249,15 +371,12 @@ int canvas (int argc, char **argv)
 
     label5 = gtk_label_new("Which move");
     gtk_grid_attach(GTK_GRID(grid), label5, 1, 4, 1, 1 );
-
-    /*button4 = gtk_button_new_with_label("restart");
-    g_signal_connect ( button4, "clicked",G_CALLBACK(restart),(gpointer)(intptr_t)(10));
-    gtk_grid_attach(GTK_GRID(grid), button4, 1, 5, 1, 1 );*/
-
-
+    Two_bots();
+    Bot_moves_first();
     determining_the_winner();
 
     gtk_widget_show_all (window);
+
     gtk_main ();
 
     return 0;
@@ -267,4 +386,5 @@ int canvas (int argc, char **argv)
 int main (int argc, char **argv){
     Introduction(argc, argv);
     canvas(argc, argv);
+
 }
