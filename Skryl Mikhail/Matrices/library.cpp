@@ -75,11 +75,6 @@ Matrix::Matrix(Matrix &&other) noexcept {       //Конструктор пер�
     this->rows = other.rows;
     this->cols = other.cols;
     this->matrix = other.matrix;
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            this->matrix[i][j] = other.matrix[i][j];
-        }
-    }
     other.matrix = nullptr;
     other.rows = 0;
     other.cols = 0;
@@ -184,11 +179,7 @@ int Matrix::trace() {
         exit(1);
     }
     for (int i = 0; i < this->rows; ++i) {
-        for (int j = 0; j < this->cols; ++j) {
-            if (i == j) {
-                matrix_trace += matrix[i][j];
-            }
-        }
+        matrix_trace += matrix[i][i];
     }
     return matrix_trace;
 }
