@@ -179,11 +179,7 @@ int Matrix::trace() {
         exit(1);
     }
     for (int i = 0; i < this->rows; ++i) {
-        for (int j = 0; j < this->cols; ++j) {
-            if (i == j) {
-                matrix_trace += matrix[i][j];
-            }
-        }
+        matrix_trace += matrix[i][i];
     }
     return matrix_trace;
 }
