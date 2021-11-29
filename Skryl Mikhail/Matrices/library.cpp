@@ -71,7 +71,7 @@ Matrix::Matrix(const Matrix &other) {       //Конструктор копир�
     }
 }
 
-Matrix::Matrix(Matrix &&other) noexcept {       //Оператор перемещения
+Matrix::Matrix(Matrix &&other) noexcept {       //Конструктор перемещения
     this->rows = other.rows;
     this->cols = other.cols;
     this->matrix = other.matrix;
