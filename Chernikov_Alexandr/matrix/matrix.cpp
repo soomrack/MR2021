@@ -36,6 +36,10 @@ public:
 };
 
 Matrix::Matrix(int height, int width){
+    if ((this->width <= 0) || (this->height <= 0)) {
+        std::cerr << "Invalid shapes of matrix";
+        exit(1);
+    }
     this->height = height;
     this->width = width;
     data = new double* [height];
@@ -51,6 +55,10 @@ Matrix::Matrix(int height, int width){
 }
 
 Matrix::Matrix(int height, int width, SpecialType type){
+    if ((this->width <= 0) || (this->height <= 0)) {
+        std::cerr << "Invalid shapes of matrix";
+        exit(1);
+    }
     this->height = height;
     this->width = width;
     data = new double* [height];
@@ -105,6 +113,10 @@ Matrix::Matrix(int height, int width, SpecialType type){
 }
 
 Matrix::Matrix(int height, int width, double value){
+    if ((this->width <= 0) || (this->height <= 0)) {
+        std::cerr << "Invalid shapes of matrix";
+        exit(1);
+    }
     this->height = height;
     this->width = width;
     data = new double* [height];
@@ -173,14 +185,26 @@ Matrix& Matrix::operator= (const Matrix& m){
 }
 
 void Matrix::set(int i, int j, double value){
+    if ((i <= this->height) || (j <= this->width)) {
+        std::cerr << "Invalid indexes of matrix";
+        exit(1);
+    }
     this->data[i][j] = value;
 }
 
 double Matrix::get(int i, int j) {
+    if ((i <= this->height) || (j <= this->width)) {
+        std::cerr << "Invalid indexes of matrix";
+        exit(1);
+    }
     return this->data[i][j];
 }
 
 Matrix Matrix::operator+ (const Matrix& m){
+    if ((this->height != m.height) || (this->width != m.width)){
+        std::cerr << "Matrices are not compatible";
+        exit(1);
+    }
     Matrix result(this->height, this->width);
     for (int i = 0; i < this->height; i++){
         for (int j = 0; j < this->width; j++){
@@ -191,6 +215,10 @@ Matrix Matrix::operator+ (const Matrix& m){
 }
 
 Matrix Matrix::operator- (const Matrix& m){
+    if ((this->height != m.height) || (this->width != m.width)){
+        std::cerr << "Matrices are not compatible";
+        exit(1);
+    }
     Matrix result(this->height, this->width);
     for (int i = 0; i < this->height; i++){
         for (int j = 0; j < this->width; j++){
@@ -201,6 +229,10 @@ Matrix Matrix::operator- (const Matrix& m){
 }
 
 Matrix Matrix::operator* (const Matrix& m){
+    if (this->width != m.height){
+        std::cerr << "Matrices are not compatible";
+        exit(1);
+    }
     Matrix result(this->height, m.width);
     for (int i = 0; i < this->height; i++){
         for (int j = 0; j < m.width; j++){
@@ -214,6 +246,10 @@ Matrix Matrix::operator* (const Matrix& m){
 }
 
 double Matrix::tr(){
+    if (this->width != this->height) {
+        std::cerr << "Matrix is not square";
+        exit(1);
+    }
     double tr = 0.0;
     for (int i = 0; i < this->height; i++){
         tr += this->data[i][i];
@@ -222,6 +258,10 @@ double Matrix::tr(){
 }
 
 double Matrix::det(){
+    if (this->width != this->height) {
+        std::cerr << "Matrix is not square";
+        exit(1);
+    }
     if (height == 1){
         return this->data[0][0];
     }
