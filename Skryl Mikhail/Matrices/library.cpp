@@ -75,11 +75,6 @@ Matrix::Matrix(Matrix &&other) noexcept {       //Конструктор пер�
     this->rows = other.rows;
     this->cols = other.cols;
     this->matrix = other.matrix;
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            this->matrix[i][j] = other.matrix[i][j];
-        }
-    }
     other.matrix = nullptr;
     other.rows = 0;
     other.cols = 0;
