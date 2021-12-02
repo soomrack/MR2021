@@ -80,7 +80,6 @@ void op_Switch(const Matrix A, const Matrix B) {
             cout << "You make some mistake(s)//";
             break;
     }
-
 }
 
 int main() {
