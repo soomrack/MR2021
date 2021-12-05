@@ -4,28 +4,28 @@
 #include <iostream>
 
 typedef enum{
-    IDENTITY_MATRIX,
-    UPPER_TRIANG_MATRIX_OF_ONES,
-    LOWER_TRIANG_MATRIX_OF_ONES,
+    IDENTITY,
+    ONES,
+    ZEROS,
+    RANDOM,
 } SpecialType;
-
 
 class Matrix{
 private:
-    int height;
-    int width;
+    unsigned int height;
+    unsigned int width;
     double** data;
 public:
-    Matrix(int height, int width);
-    Matrix(int height, int width, SpecialType type);
-    Matrix(int height, int width, double value);
+    explicit Matrix(unsigned int height = 0, unsigned int width = 0, double value = 0.0);
+    Matrix(unsigned int height, unsigned int width, SpecialType type);
     Matrix(const Matrix& m);
     Matrix(Matrix&& m) noexcept;
     Matrix& operator= (const Matrix& m);
+    Matrix& operator= (Matrix&& m) noexcept;
     ~Matrix();
 public:
     double get(int i, int j);
-    void set(int i, int j, double value);
+    int set(int i, int j, double value);
 public:
     Matrix operator+ (const Matrix& m);
     Matrix operator- (const Matrix& m);
@@ -36,7 +36,9 @@ public:
 public:
     friend std::ostream& operator<< (std::ostream &out, const Matrix& m);
     void print();
+private:
+    double** alloc_memory(unsigned int new_height, unsigned int new_width);
+    void free_memory(double** freeing_data);
 };
-
 
 #endif //MATRIX_MATRIX_H
