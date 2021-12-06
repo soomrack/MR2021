@@ -60,10 +60,6 @@ Matrix::~Matrix() {
 Matrix::Matrix(const Matrix &other) {
     this->rows = other.rows;
     this->cols = other.cols;
-    if (this->rows != other.rows || this->cols != other.cols){
-        std::cout << "Matrix aren't equal" << std::endl;
-        exit(1);
-    }
     this->content = new int [rows*cols];
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
@@ -76,10 +72,6 @@ Matrix::Matrix(const Matrix &other) {
 Matrix::Matrix(Matrix &&other) noexcept {
     this->rows = other.rows;
     this->cols = other.cols;
-    if (this->rows != other.rows || this->cols != other.cols){
-        std::cout << "Matrix aren't equal" << std::endl;
-        exit(1);
-    }
     this->content = other.content;
     other.content = nullptr;
     other.rows = 0;
@@ -93,10 +85,6 @@ Matrix & Matrix::operator = (const Matrix &other){
     }
     this->rows = other.rows;
     this->cols = other.cols;
-    if (this->rows != other.rows || this->cols != other.cols){
-        std::cout << "Matrix aren't equal" << std::endl;
-        exit(1);
-    }
     this->content = new int [rows*cols];
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
@@ -108,10 +96,6 @@ Matrix & Matrix::operator = (const Matrix &other){
 
 //Перегрузка оператора присваивания для оператора перемещения
 Matrix & Matrix::operator = (Matrix &&other) noexcept {
-    if (this->rows != other.rows || this->cols != other.cols){
-        std::cout << "Matrix aren't equal" << std::endl;
-        exit(1);
-    }
     this->rows = other.rows;
     this->cols = other.cols;
     delete [] this->content;
