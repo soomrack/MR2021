@@ -7,16 +7,19 @@ class matrix {
 public:
     matrix(int rows, int columns);
     matrix(const matrix &);
+    matrix(matrix &&) noexcept;
     ~matrix();
 
     matrix operator + (const matrix &);
     matrix operator - (const matrix &);
     matrix operator * (const matrix &);
-    void operator = (const matrix &);
+    matrix operator = (matrix &&) noexcept;
+    matrix operator = (const matrix &);
 
     double get_det();
     int get_rows();
     int get_columns();
+    double get_value(int,int);
     void get_matrix();
     matrix get_transpose();
     void set_cells_cmd();
@@ -52,9 +55,16 @@ matrix::matrix(const matrix &other) {
     }
 }
 
+matrix::matrix(matrix && other) noexcept{
+    rows = other.rows;
+    columns = other.columns;
+    data = other.data;
+    vector<vector<double> >().swap(other.data);
+}
+
 matrix::~matrix() = default;
 
-void matrix::operator = (const matrix &other) {
+matrix matrix::operator = (const matrix &other) {
     this -> rows = other.rows;
     this -> columns = other.columns;
     this -> data = vector<vector<double> > (rows, vector<double> (columns));
@@ -64,6 +74,20 @@ void matrix::operator = (const matrix &other) {
             this -> data[row][col] = other.data[row][col];
         }
     }
+    return *this;
+}
+
+matrix matrix::operator = (matrix &&other) noexcept {
+    if (this == &other){
+        return *this;
+    }
+    rows = other.rows;
+    columns = other.columns;
+    data.resize(rows,vector<double>(columns));
+
+    data = other.data;
+    vector<vector<double> >().swap(other.data);
+    return *this;
 }
 
 matrix matrix::operator + (const matrix &other) {
@@ -131,6 +155,14 @@ int matrix::get_rows() {
 
 int matrix::get_columns() {
     return columns;
+}
+
+double matrix::get_value(int row, int column) {
+    if (row > rows || column > columns) {
+        cout << "Cell " << row << ";" << column << "doesn't exist" << endl;
+        return 0;
+    }
+    return data[row][column];
 }
 
 //returns determinant of matrix

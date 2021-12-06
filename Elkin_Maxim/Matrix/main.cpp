@@ -25,5 +25,9 @@ int main() {
     cout << "multiplication of A and B" << endl;
     C.get_matrix();
 
+    matrix D = B;
+    cout << "matrix D is the same as B" << endl;
+    D.get_matrix();
+
     return 0;
 }

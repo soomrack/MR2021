@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1638768042 source:d:\quest\main.cpp
+	<iostream>
+	<cstring>
+
