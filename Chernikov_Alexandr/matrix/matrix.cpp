@@ -91,20 +91,6 @@ Matrix::Matrix(Matrix&& m) noexcept{
 }
 
 // overload of operator "=" for copying
-Matrix& Matrix::operator= (Matrix&& m) noexcept{
-    if (this == &m){
-        return *this;
-    }
-    free_memory(data);
-    height = m.height;
-    width = m.width;
-
-    data = m.data;
-    m.data = nullptr;
-    return *this;
-}
-
-// overload of operator "=" for moving
 Matrix& Matrix::operator= (const Matrix& m){
     if (this == &m){
         return *this;
@@ -123,25 +109,39 @@ Matrix& Matrix::operator= (const Matrix& m){
     return *this;
 }
 
+// overload of operator "=" for moving
+Matrix& Matrix::operator= (Matrix&& m) noexcept{
+    if (this == &m){
+        return *this;
+    }
+    free_memory(data);
+    height = m.height;
+    width = m.width;
+
+    data = m.data;
+    m.data = nullptr;
+    return *this;
+}
+
 // set the value in corresponding coordinates
 // if this coordinates exists, return 0
 // else return 1
-int Matrix::set(int i, int j, double value){
-    if ((i >= this->height) || (j >= this->width)) {
+int Matrix::set(unsigned int row, unsigned int col, double value){
+    if ((row >= this->height) || (col >= this->width)) {
         return 1;
     }
-    this->data[i][j] = value;
+    this->data[row][col] = value;
     return 0;
 }
 
 // get the value from corresponding coordinates
 // if this coordinates exists, return value, placed in matrix
 // else return NaN
-double Matrix::get(int i, int j) {
-    if ((i >= this->height) || (j >= this->width)) {
+double Matrix::get(unsigned int row, unsigned int col) {
+    if ((row >= this->height) || (col >= this->width)) {
         return std::nan("1");
     }
-    return this->data[i][j];
+    return this->data[row][col];
 }
 
 // overload of operator "+" for two matrices

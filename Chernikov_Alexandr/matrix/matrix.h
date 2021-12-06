@@ -24,8 +24,8 @@ public:
     Matrix& operator= (Matrix&& m) noexcept;
     ~Matrix();
 public:
-    double get(int i, int j);
-    int set(int i, int j, double value);
+    double get(unsigned int row, unsigned int col);
+    int set(unsigned int row, unsigned int col, double value);
 public:
     Matrix operator+ (const Matrix& m);
     Matrix operator- (const Matrix& m);
