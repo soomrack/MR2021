@@ -3,31 +3,34 @@
 #include <vector>
 #include <algorithm>
 
-class matrix {
-public:
-    matrix(int rows, int columns);
-    matrix(const matrix &);
-    matrix(matrix &&) noexcept;
-    ~matrix();
-
-    matrix operator + (const matrix &);
-    matrix operator - (const matrix &);
-    matrix operator * (const matrix &);
-    matrix operator = (matrix &&) noexcept;
-    matrix operator = (const matrix &);
-
-    double get_det();
-    int get_rows();
-    int get_columns();
-    double get_value(int,int);
-    void get_matrix();
-    matrix get_transpose();
-    void set_cells_cmd();
-    void set_cell(int,int,double);
-    void sort_rows(int);
-
+class Matrix {
 private:
-    int rows;
-    int columns;
-    std::vector<std::vector<double> > data;
+    unsigned int rows;
+    unsigned int columns;
+    double** data;
+public:
+    Matrix(unsigned int rows = 0, unsigned int columns = 0);
+    Matrix(const Matrix&);
+    Matrix(Matrix&&) noexcept;
+    ~Matrix();
+
+    Matrix operator+ (const Matrix &);
+    Matrix operator- (const Matrix &);
+    Matrix operator* (const Matrix &);
+    Matrix & operator= (Matrix &&) noexcept;
+    Matrix & operator= (const Matrix &);
+
+    double** allocate_mem(unsigned int, unsigned int);
+    void clear_mem(double**);
+    double get_det();
+    unsigned int get_rows();
+    unsigned int get_columns();
+    double get_value(unsigned int,unsigned int);
+    void print_matrix();
+    Matrix get_transpose();
+    template<unsigned int lines, unsigned int cols>
+    void set_matrix(double (&arr)[lines][cols]);
+    void set_values_cmd();
+    void set_value(unsigned int,unsigned int,double);
+    void sort_rows(unsigned int);
 };
