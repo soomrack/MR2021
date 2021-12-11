@@ -4,8 +4,10 @@
 
 char field[10] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'}; //Field array. X or 0
 
+///// BUG
+int A;
 
-char mark = 'X';
+const char *mark = "X";
 
 static GtkWidget *Cell1;
 static GtkWidget *Cell2;
@@ -20,8 +22,6 @@ static GtkWidget *header;
 static GtkWidget *footer;
 static GtkWidget *window;
 static GtkWidget *grid;
-
-int A=1;
 
 // All possible situations to win
 int checkWin() {
@@ -48,23 +48,23 @@ int checkWin() {
 
 void Foolproof(int Position, char Mark, int *player) { //Foolproof for mistakes
     if (Position == 1 && field[0] == '1')
-        gtk_button_set_label(GTK_BUTTON(Cell1), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell1), mark);
     else if (Position == 2 && field[1] == '2')
-        gtk_button_set_label(GTK_BUTTON(Cell2), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell2), mark);
     else if (Position == 3 && field[2] == '3')
-        gtk_button_set_label(GTK_BUTTON(Cell3), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell3), mark);
     else if (Position == 4 && field[3] == '4')
-        gtk_button_set_label(GTK_BUTTON(Cell4), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell4), mark);
     else if (Position == 5 && field[4] == '5')
-        gtk_button_set_label(GTK_BUTTON(Cell5), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell5), mark);
     else if (Position == 6 && field[5] == '6')
-        gtk_button_set_label(GTK_BUTTON(Cell6), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell6), mark);
     else if (Position == 7 && field[6] == '7')
-        gtk_button_set_label(GTK_BUTTON(Cell7), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell7), mark);
     else if (Position == 8 && field[7] == '8')
-        gtk_button_set_label(GTK_BUTTON(Cell8), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell8), mark);
     else if (Position == 9 && field[8] == '9')
-        gtk_button_set_label(GTK_BUTTON(Cell9), Mark);
+        gtk_button_set_label(GTK_BUTTON(Cell9), mark);
     else {
         //Motivational message!
         gtk_label_set_text(GTK_LABEL(footer), "Try again");
@@ -72,14 +72,17 @@ void Foolproof(int Position, char Mark, int *player) { //Foolproof for mistakes
     }
 }
 
-int move(GtkWidget *Cell, gpointer data) {
+int move(GtkWidget *button, gpointer data) {
     int player = 1;
-    int *Position2 = data;
-    int Position = *Position2;
+    int Position = data;
     int win;
-    gtk_label_set_text(GTK_LABEL(footer), A);
-    gtk_label_set_text(GTK_LABEL(footer), Position);
-    while (TRUE)
+
+//////// BUG
+    printf("\n\n\n ERROR!!!\n");
+    printf("   A = %p \n", &A);
+    printf("Data = %p \n", data);
+    printf("butt = %p \n", button);
+    
     win = checkWin();
     player = (player % 2) ? 1 : 2;
     if (player % 2 == 1) {
@@ -122,41 +125,42 @@ void field3x3() {  //Create a tic-tac-toe field  \x1B - color
         }
     }
     */
-    A=1;
-    Cell1 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell1, "button-press-event", G_CALLBACK(move), (gpointer)1);
+
+    A = 1;
+    Cell1 = gtk_button_new_with_label("W");
+    g_signal_connect(G_OBJECT(Cell1), "clicked", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell1, 0, 1, 1, 1);
 
     Cell2 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell2, "button-press-event", G_CALLBACK(move), (gpointer)2);
+    g_signal_connect (Cell2, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell2, 1, 1, 1, 1);
 
     Cell3 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell3, "button-press-event", G_CALLBACK(move), (gpointer)3);
+    g_signal_connect (Cell3, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell3, 2, 1, 1, 1);
 
     Cell4 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell4, "button-press-event", G_CALLBACK(move), (gpointer)4);
+    g_signal_connect (Cell4, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell4, 0, 2, 1, 1);
 
     Cell5 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell5, "button-press-event", G_CALLBACK(move), (gpointer)5);
+    g_signal_connect (Cell5, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell5, 1, 2, 1, 1);
 
     Cell6 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell6, "button-press-event", G_CALLBACK(move), (gpointer)6);
+    g_signal_connect (Cell6, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell6, 2, 2, 1, 1);
 
     Cell7 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell7, "button-press-event", G_CALLBACK(move), (gpointer)7);
+    g_signal_connect (Cell7, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell7, 0, 3, 1, 1);
 
     Cell8 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell8, "button-press-event", G_CALLBACK(move), (gpointer)8);
+    g_signal_connect (Cell8, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell8, 1, 3, 1, 1);
 
     Cell9 = gtk_button_new_with_label(" ");
-    g_signal_connect(Cell9, "button-press-event", G_CALLBACK(move), (gpointer)9);
+    g_signal_connect (Cell9, "button-press-event", G_CALLBACK(move), &A);
     gtk_grid_attach(GTK_GRID(grid), Cell9, 2, 3, 1, 1);
 
     header = gtk_label_new("Tic-Tac-Toe");

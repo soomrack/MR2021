@@ -157,42 +157,6 @@ GtkWidget definition_cell(int b){
 }
 
 
-
-
-/*void Bot_move_first(){
-    *cell = definition_cell(Bot(a[0]));
-    //gtk_test_widget_click(cell, );
-    gtk_button_clicked(GTK_BUTTON(cell));
-
-
-}
-void Bot_move_second(){
-    *cell = definition_cell(Bot(a[0]));
-    //gtk_test_widget_click(cell, );
-    gtk_button_clicked(GTK_BUTTON(cell));
-
-}
-void Battle_of_Bots(){
-
-}
-
-void game_mode(){
-    if ( strcmp(name1[0], "Bot") == 0 || strcmp(name2[0], "Bot") != 0 ){
-        Bot_move_second();
-    } else{
-        if(strcmp(name1[0], "Bot") != 0 || strcmp(name2[0], "Bot") == 0){
-            Bot_move_first();
-        } else{
-            if (strcmp(name1[0], "Bot") == 0 || strcmp(name2[0], "Bot") == 0 ){
-                //Battle_of_Bots();
-            }
-        }
-    }
-
-}*/
-
-
-
 int move2(GtkWidget *cell){
     const char * symbol_inside_cell;
     if (queue % 2 == 1){
@@ -255,13 +219,8 @@ void Bot_move(int c){
 }
 
 void Bot_set(){
-    if (queue % 2 == 1 && strcmp(*name1, "Bot") == 0 ){
+    if (strcmp(*name1, "Bot") == 0 || strcmp(*name2, "Bot") == 0 ){
         Bot_move(Bot());
-
-    } else{
-        if (queue % 2 == 0 && strcmp(*name2, "Bot") == 0){
-            Bot_move(Bot());
-        }
     }
 
 

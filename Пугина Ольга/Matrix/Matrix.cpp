@@ -1,35 +1,36 @@
-#include "MatrixART.h"
+#include "Matrix.h"
 #include <math.h>
 #include <cstdlib>
 #include <iostream>
 
- double Mat::trace(const Mat A) // След
+ double Matrix::trace(const Mat A) // След
 {
-    double summ = 0;
+    double summ = 0.0;
     for (int i = 0; i < A.rows; i++)
     {
-        summ += A.data[i*A.cols+i];
+        summ += A.data[i * A.cols + i];
     }
     return summ;
 }
 
 
-Mat Mat::sum(const Mat A, const Mat B) // Сумма матриц
+Matrix Matrix::sum(const Mat A, const Mat B) // Сумма матриц
 {
     if ((A.rows != B.rows) || (A.cols != B.cols))
     {
-        std::cout << "Матрицы разного размера! \n";
+        double M1[0][0] = {};
+        Matrix A=(0,0,*M1)
         return A;
     }
     else
     {
-        Mat result = {A.rows, A.cols};
+        Matrix result = {A.rows, A.cols};
         result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
         for (int i = 0; i < A.rows; i++)
         {
             for (int j = 0; j < A.cols; j++)
             {
-                result.data[i*A.cols+j] = A.data[i*A.cols+j] + B.data[i*A.cols+j];
+                result.data[i * A.cols + j] = A.data[i * A.cols + j] + B.data[i * A.cols + j];
             }
 
         }
@@ -39,11 +40,12 @@ Mat Mat::sum(const Mat A, const Mat B) // Сумма матриц
 }
 
 
-Mat Mat::mult(const Mat A, const Mat B)// Умножение матриц
+Matrix Matrix::mult(const Mat A, const Mat B)// Умножение матриц
 {
     if (A.cols != B.rows)
     {
-        std::cout << "Multiplication error \n";
+        double M1[0][0] = {};
+        Matrix A=(0,0,*M1)
         return A;
     }
     else
@@ -66,7 +68,7 @@ Mat Mat::mult(const Mat A, const Mat B)// Умножение матриц
 }
 
 
-Mat Mat::mult_const(const double constt, const Mat A) // Умножение матрицы на константу
+Matrix Matrix::mult_const(const double constt, const Mat A) // Умножение матрицы на константу
 {
     Mat result = {A.rows, A.cols};
     result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
@@ -82,7 +84,7 @@ Mat Mat::mult_const(const double constt, const Mat A) // Умножение ма
 }
 
 
-extern Mat Mat::transp(const Mat A) {
+extern Matrix Matrix::transp(const Mat A) {
     Mat result = {A.cols, A.rows};
     result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
     for (int i = 0; i < A.rows; i++) {
@@ -94,7 +96,7 @@ extern Mat Mat::transp(const Mat A) {
     return result;
 }
 
-Mat Mat::minor(int row, int col, const Mat A)// Минор
+Matrix Matrix::minor(int row, int col, const Mat A)// Минор
 {
     Mat result = {A.rows-1, A.cols-1};
     result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
@@ -115,7 +117,7 @@ Mat Mat::minor(int row, int col, const Mat A)// Минор
 }
 
 
-Mat Mat::dop(const Mat A)// Алгебраические дополнения
+Matrxi Matrix::dop(const Mat A)// Алгебраические дополнения
 {
     Mat result = {A.rows, A.cols};
     result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
@@ -129,7 +131,7 @@ Mat Mat::dop(const Mat A)// Алгебраические дополнения
     return result;
 }
 
-double Mat::det(const Mat A) // Определитель матрицы
+double Matrix::det(const Mat A) // Определитель матрицы
 {
     double D = 0;
     switch (A.rows)
@@ -151,7 +153,7 @@ double Mat::det(const Mat A) // Определитель матрицы
 }
 
 // Единичная матрица
-Mat Mat::one(const unsigned int size)
+Matrxi Matrix::one(const unsigned int size)
 {
     Mat result = {size, size};
     result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
@@ -196,7 +198,7 @@ double norm (const Mat A)
     return max_sum;
 }
 
-Mat all_one(const unsigned int rows, const unsigned int cols) {
+Matrix all_one(const unsigned int rows, const unsigned int cols) {
     Mat result = {rows, cols};
     result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
     for (int i = 0; i < result.rows; i++) {
@@ -208,7 +210,7 @@ Mat all_one(const unsigned int rows, const unsigned int cols) {
     return result;
 }
 
-Mat Mat::power(const Mat A, const unsigned int power)// Возведение матрицы в степень
+Matrix Matrix::power(const Mat A, const unsigned int power)// Возведение матрицы в степень
 {
     if (power == 0)
     {
@@ -220,7 +222,9 @@ Mat Mat::power(const Mat A, const unsigned int power)// Возведение м�
     }
     if (A.rows != A.cols)
     {
-        std::cout << "only square matrix \n";
+        double M1[0][0] = {};
+        Matrix A=(0,0,*M1)
+        return A;
         return A;
     }
     Mat result = A;
@@ -246,7 +250,7 @@ double factorial (int n)
     return result;
 }
 
-extern Mat Mat::exp(const Mat A)
+extern Matrix Matrix::exp(const Mat A)
 {
     Mat result = all_one(A.rows, A.cols);
     Mat element = all_one(A.rows, A.cols);
@@ -261,9 +265,9 @@ extern Mat Mat::exp(const Mat A)
     return result;
 }
 
-extern void Mat::print(const Mat A) // Вывести матрицу на экран
+extern void Matrix::print(const Mat A) // Вывести матрицу на экран
 {
-    //std::cout << "matrix \n";
+
     for (int i = 0; i < (A.cols * A.rows); i++)
     {
         printf ("%5.2lf     ", A.data[i]);

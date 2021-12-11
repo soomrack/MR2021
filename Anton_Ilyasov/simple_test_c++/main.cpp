@@ -1,7 +1,7 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string.h>
 
-#define COUNTQUESTION 5
+#define COUNTQUESTION 4
 using namespace std;
 
 class User
@@ -41,26 +41,26 @@ void Test::fill_question(int number) {
 	{
 	case 1:
 	{
-		question = "You cross a bridge over a river that flows from right to left. \n"
-				   "All oncoming cars are going north.In which direction does the river flow ? ";
-		correct_answer = "East";
+		question = "Вы пересекаете мост через реку, которая течет справа налево. \n"
+			"Все встречные машины едут на север. В каком направлении течет река? ";
+		correct_answer = "восток";
 		break;
 	}
 	case 2:
 	{
-		question = "Continue the sequence of numbers: 41, 34, 28, 23, 19...";
+		question = "Введите следующее число: 41, 34, 28, 23, 19...";
 		correct_answer = "16";
 		break;
 	}
 	case 3:
 	{
-		question = "How many pairs of paws do 3 pigeons and 4 dogs have in total?";
+		question = "Сколько пар лап всего у 3 голубей и 4 собак?";
 		correct_answer = "11";
 		break;
 	}
 	case 4:
 	{
-		question = "If 1+1=10, how much is 1+10?";
+		question = "Если 1+1=10, то чему равно 1+10?";
 		correct_answer = "11";
 		break;
 	}
@@ -68,20 +68,20 @@ void Test::fill_question(int number) {
 }
 
 void Test::print_question() {
-	cout<< endl << question<< endl<<endl;
+	cout << endl << question << endl << endl;
 }
 
 User User1;
 void greeting() {
-	cout << "Yours name" << endl;
+	cout << "Введите ваше имя" << endl;
 	cin >> User1.name;
-	cout << "Let's go!" << endl;
-	cout << "Please, enter the answers from the keyboard :)" << endl;
+	cout << "Поехали!" << endl;
+	cout << "Пожалуйста, вводите ответ с клавиатуры с маленькой буквы :)" << endl;
 }
 
 void test() {
 	Test Test1;
-	for (int i = 1; i < COUNTQUESTION; i++)
+	for (int i = 1; i <= COUNTQUESTION; i++)
 	{
 		Test1.fill_question(i);
 		Test1.print_question();
@@ -100,18 +100,19 @@ void test() {
 void get_results() {
 	if (User1.correct_answer >= 3)
 	{
-		cout << "\nyou're good!" << endl;
+		cout << "\nВы молодец!" << endl;
 	}
 	else
 	{
-		cout << "\nwork harder!" << endl;
+		cout << "\nНу что ж, работайте над собой!" << endl;
 	}
-	cout << "correct answers= " << User1.correct_answer << endl;
-	cout << "incorrect answers= " << User1.incorrect_answer << endl;
+	cout << "Правильных ответов = " << User1.correct_answer << endl;
+	cout << "Неправильных ответов = " << User1.incorrect_answer << endl;
 }
 
 int main(void)
 {
+	setlocale(LC_ALL, "ru");
 	greeting();
 	test();
 	get_results();
