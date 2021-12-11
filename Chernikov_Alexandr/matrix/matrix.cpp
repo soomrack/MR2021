@@ -1,110 +1,117 @@
 #include <iostream>
-#include <ctime>
 #include <cmath>
 #include "matrix.h"
 
-// Matrix constructor, which creates a matrix with shape (height, width)
-// and fills it with the parameter value.
+
 Matrix::Matrix(unsigned int height,unsigned int width, double value){
-    this->height = height;
-    this->width = width;
-    data = alloc_memory(height, width);
+    // try to allocate memory
+    alloc_memory(height, width);
 
-    for (int row = 0; row < height; row++){
-        for (int col = 0; col < width; col++){
-            data[row][col] = value;
+    // if allocating was successful then initialize height, width
+    // and all elements of array with the "value"
+    if (data_1d != nullptr){
+        this->height = height;
+        this->width = width;
+        for (int i = 0; i < height * width; i++) {
+            data_1d[i] = value;
         }
     }
 }
 
 
-// Matrix constructor, which creates a matrix with shape (height, width)
-// and fills it using special type.
-Matrix::Matrix(unsigned int height, unsigned int width, SpecialType type){
-    this->height = height;
-    this->width = width;
-    data = alloc_memory(height, width);
+Matrix::Matrix(unsigned int height, unsigned int width, MatrixType type){
 
-    switch (type){
-        case IDENTITY:
-            for (int row = 0; row < height; row++){
-                for (int col = 0; col < width; col++){
-                    if (row == col){
-                        data[row][col] = 1.0;
-                    }
-                    else{
-                        data[row][col] = 0.0;
-                    }
-                }
-            }
-            break;
-        case ONES:
-            for (int row = 0; row < height; row++){
-                for (int col = 0; col < width; col++){
-                    data[row][col] = 1.0;
-                }
-            }
-            break;
-        case RANDOM:
-            srand(time(nullptr));
-            for (int row = 0; row < height; row++){
-                for (int col = 0; col < width; col++){
-                    data[row][col] = rand();
-                }
-            }
-            break;
-        case ZEROS:
-        default:
-            for (int row = 0; row < height; row++){
-                for (int col = 0; col < width; col++){
-                    data[row][col] = 0.0;
-                }
-            }
-            break;
+    // try to allocate memory
+    alloc_memory(height, width);
+
+    // if allocating was successful then initialize height, width
+    // and all elements of array according to matrix type
+    if (data_1d != nullptr) {
+        this->height = height;
+        this->width = width;
+
+        switch (type){
+            case IDENTITY:
+                set_identity();
+                break;
+            case ONES:
+                set_ones();
+                break;
+            case RANDOM:
+                set_random();
+                break;
+            case ZEROS:
+            default:
+                set_zeros();
+                break;
+        }
     }
 }
 
-// Destructor
+Matrix::Matrix(unsigned int height, unsigned int width, double *arr){
+    // try to allocate memory
+    alloc_memory(height, width);
+
+    // if allocating was successful then initialize height, width
+    // and copying array in a new allocated place
+    if (data_1d != nullptr){
+        this->height = height;
+        this->width = width;
+        memcpy(data_1d, arr, height * width * sizeof(double));
+    }
+}
+
 Matrix::~Matrix(){
-    free_memory(data);
+    free_memory();
 }
 
-// Copy constructor
-Matrix::Matrix(const Matrix &m){
-    height = m.height;
-    width = m.width;
-    data = alloc_memory(height, width);
+Matrix::Matrix(const Matrix &other){
 
-    for (int row = 0; row < height; row++){
-        for (int col = 0; col < width; col++){
-            data[row][col] = m.data[row][col];
-        }
+    // try to allocate memory
+    alloc_memory(other.height, other.width);
+
+    // if allocating was successful then copy height, width
+    // and copying array in a new allocated place
+    if (data_1d != nullptr) {
+        height = other.height;
+        width = other.width;
+        memcpy(data_1d, other.data_1d, height * width * sizeof(double)); // check it !!!
     }
 }
 
-// Move constructor
-Matrix::Matrix(Matrix&& m) noexcept{
-    height = m.height;
-    width = m.width;
-    data = m.data;
-    m.data = nullptr;
+Matrix::Matrix(Matrix&& other) noexcept{
+    height = other.height;
+    width = other.width;
+
+    // giving right to access the moving memory
+    data_1d = other.data_1d;
+    data_2d = other.data_2d;
+
+    //
+    other.data_1d = nullptr;
+    other.data_2d = nullptr;
 }
 
 // overload of operator "=" for copying
-Matrix& Matrix::operator= (const Matrix& m){
-    if (this == &m){
+Matrix& Matrix::operator= (const Matrix& other){
+
+    // if is the same matrix then return its pointer
+    if (this == &other){
         return *this;
     }
 
-    free_memory(data);
-    this->height = m.height;
-    this->width = m.width;
-    data = alloc_memory(height, width);
+    // free old memory
+    free_memory();
 
-    for (int row = 0; row < height; row++){
-        for (int col = 0; col < width; col++){
-            data[row][col] = m.data[row][col];
-        }
+    // try to allocate memory
+    alloc_memory(height, width);
+
+    // if allocating was successful then copy height, width
+    // and copying array in a new allocated place
+    if (data_1d != nullptr) {
+        height = other.height;
+        width = other.width;
+        memcpy(data_1d, other.data_1d, height * width * sizeof(double)); // check it !!!
     }
     return *this;
 }
@@ -114,83 +121,107 @@ Matrix& Matrix::operator= (Matrix&& m) noexcept{
     if (this == &m){
         return *this;
     }
-    free_memory(data);
+    free_memory();
+
     height = m.height;
     width = m.width;
 
-    data = m.data;
-    m.data = nullptr;
+    data_1d = m.data_1d;
+    data_2d = m.data_2d;
+
+    m.data_1d = nullptr;
+    m.data_2d = nullptr;
     return *this;
 }
 
-// set the value in corresponding coordinates
-// if this coordinates exists, return 0
-// else return 1
+// set the value of matrix in corresponding coordinates
 int Matrix::set(unsigned int row, unsigned int col, double value){
+
+    // if row or col is out of borders of the array then do nothing and return 1
     if ((row >= this->height) || (col >= this->width)) {
         return 1;
     }
-    this->data[row][col] = value;
+
+    // else set value in a correct cell and return 0
+    this->data_2d[row][col] = value;
     return 0;
 }
 
+
 // get the value from corresponding coordinates
-// if this coordinates exists, return value, placed in matrix
-// else return NaN
 double Matrix::get(unsigned int row, unsigned int col) {
+
+    // if row or col is out of borders of the array then return NaN
     if ((row >= this->height) || (col >= this->width)) {
         return std::nan("1");
     }
-    return this->data[row][col];
+    // else return the correct value of the cell
+    return this->data_2d[row][col];
 }
 
 // overload of operator "+" for two matrices
-// if the matrices are compatible, return result of addition
-// else return matrix with shapes (0, 0)
 Matrix Matrix::operator+ (const Matrix& m){
+
+    // if these matrices are not compatible then return an empty matrix
     if ((this->height != m.height) || (this->width != m.width)){
         return Matrix();
     }
+
+    // create result variable
     Matrix result(this->height, this->width);
 
+    // apply addition for each element
     for (int row = 0; row < this->height; row++){
         for (int col = 0; col < this->width; col++){
-            result.data[row][col] = this->data[row][col] + m.data[row][col];
+            result.data_2d[row][col] = this->data_2d[row][col] + m.data_2d[row][col];
         }
     }
     return result;
 }
 
+unsigned int Matrix::get_height(){
+    return height;
+}
+unsigned int Matrix::get_width(){
+    return width;
+}
+
 // overload of operator "-" for two matrices
-// if the matrices are compatible, return result of subtraction
-// else return matrix with shapes (0, 0)
 Matrix Matrix::operator- (const Matrix& m){
+
+    // if these matrices are not compatible then return an empty matrix
     if ((this->height != m.height) || (this->width != m.width)){
         return Matrix();
     }
+
+    // create result variable
     Matrix result(this->height, this->width);
 
+    // apply substraction for each element
     for (int row = 0; row < this->height; row++){
         for (int col = 0; col < this->width; col++){
-            result.data[row][col] = this->data[row][col] - m.data[row][col];
+            result.data_2d[row][col] = this->data_2d[row][col] - m.data_2d[row][col];
         }
     }
     return result;
 }
 
 // overload of operator "*" for two matrices
-// if the matrices are compatible, return result of multiplication
-// else return matrix with shapes (0, 0)
 Matrix Matrix::operator* (const Matrix& m){
+    // if these matrices are not compatible then return an empty matrix
     if (this->width != m.height){
         return Matrix();
     }
+
+    // create result variable
     Matrix result(this->height, m.width);
+
+    // multiply
     for (int row = 0; row < this->height; row++){
         for (int col = 0; col < m.width; col++){
-            result.data[row][col] = 0;
+            result.data_2d[row][col] = 0;
             for (int i = 0; i < m.height; i++){
-                result.data[row][col] += this->data[row][i] * m.data[i][col];
+                result.data_2d[row][col] += this->data_2d[row][i] * m.data_2d[i][col];
             }
         }
     }
@@ -199,45 +230,68 @@ Matrix Matrix::operator* (const Matrix& m){
 
 // find trace of matrix
 double Matrix::tr(){
-    if (this->height == 0 || this->width == 0){
-        return 0.0;
-    }
-
     double tr = 0.0;
-    for (int i = 0; i < std::min(this->height, this->width); i++){
-        tr += this->data[i][i];
+    for (int i = 0; i < std::min(this->height, this->width); i++){ // check it!!!
+        tr += this->data_2d[i][i];
     }
     return tr;
 }
 
 // find determinant of matrix using recursive algorithm
+//double Matrix::det(){
+//    if (this->width != this->height) {
+//        return std::nan("1");
+//    }
+//    if (height == 1){
+//        return this->data_2d[0][0];
+//    }
+//    Matrix minor_matrix(this->height - 1, this->width - 1);
+//    double determinant = 0;
+//
+//    for (int orig_col = 0; orig_col < this->width; orig_col++){
+//        for (int row = 1; row < this->width; row++){
+//            for (int col = 0; col < this->width; col++){
+//
+//                if (col < orig_col)
+//                    minor_matrix.data_2d[row - 1][col] = this->data_2d[row][col];
+//                if (col > orig_col)
+//                    minor_matrix.data_2d[row - 1][col - 1] = this->data_2d[row][col];
+//            }
+//        }
+//
+//        if (orig_col % 2 == 0){
+//            determinant += this->data_2d[0][orig_col] * minor_matrix.det();
+//        }
+//        else{
+//            determinant -= this->data_2d[0][orig_col] * minor_matrix.det();
+//        }
+//    }
+//    return determinant;
+//}
+
+// find determinant of matrix using forward elimination of Gaussian elimination
 double Matrix::det(){
+
+    // if the matrix is not square, assume that determinant can not be found
     if (this->width != this->height) {
         return std::nan("1");
     }
-    if (height == 1){
-        return this->data[0][0];
+
+    // if width is zero, computation is not needed, and it can be assumed that det is zero
+    if (width == 0){
+        return 0.0;
     }
-    Matrix minor_matrix(this->height - 1, this->width - 1);
-    double determinant = 0;
 
-    for (int orig_col = 0; orig_col < this->width; orig_col++){
-        for (int row = 1; row < this->width; row++){
-            for (int col = 0; col < this->width; col++){
+    // create temporary matrix in order not to change values in original matrix
+    Matrix tmp_matrix(*this);
 
-                if (col < orig_col)
-                    minor_matrix.data[row - 1][col] = this->data[row][col];
-                if (col > orig_col)
-                    minor_matrix.data[row - 1][col - 1] = this->data[row][col];
-            }
-        }
+    // apply forward elimination
+    tmp_matrix.apply_forward_elimination();
 
-        if (orig_col % 2 == 0){
-            determinant += this->data[0][orig_col] * minor_matrix.det();
-        }
-        else{
-            determinant -=  this->data[0][orig_col] * minor_matrix.det();
-        }
+    // fing determinant as multiplying of elements of the main diagonal of the resulting matrix
+    double determinant = 1.0;
+    for (int diag_elem = 0; diag_elem < width; diag_elem++){
+        determinant *= tmp_matrix.data_2d[diag_elem][diag_elem];
     }
     return determinant;
 }
@@ -246,7 +300,7 @@ double Matrix::det(){
 std::ostream& operator<< (std::ostream &out, const Matrix& m){
     for (int i = 0; i < m.height; i++){
         for (int j = 0; j < m.width; j++){
-            out << m.data[i][j] << " ";
+            out << m.data_2d[i][j] << " ";
         }
         out << '\n';
     }
@@ -257,27 +311,98 @@ std::ostream& operator<< (std::ostream &out, const Matrix& m){
 void Matrix::print(){
     for (int i = 0; i < height; i++){
         for (int j = 0; j < width; j++){
-            std::cout << data[i][j] << " ";
+            std::cout << data_2d[i][j] << " ";
         }
         std::cout << '\n';
     }
 }
 
+void Matrix::set_identity(){
+    for (int i = 0; i < height * width; i++){
+        if ((i % height == i / height)){
+            data_1d[i] = 1.0;
+        }
+        else{
+            data_1d[i] = 0.0;
+        }
+    }
+}
+
+void Matrix::set_ones(){
+    for (int i = 0; i < height * width; i++){
+        data_1d[i] = 1.0;
+    }
+}
+
+void Matrix::set_zeros(){
+    for (int i = 0; i < height * width; i++){
+        data_1d[i] = 0.0;
+    }
+}
+
+void Matrix::set_random(){
+    for (int i = 0; i < height * width; i++){
+        data_1d[i] = rand();
+    }
+}
+
+// apply the part of the Gaussian elimination called forward elimination
+// in order to transform the square matrix into an upper triangular matrix
+void Matrix::apply_forward_elimination(){
+    // go through each element of the main diagonal
+    for (int diag_elem = 0; diag_elem < width; diag_elem++){
+
+        // if diagonal element is zero, computation can not continue
+        // and because of that this situation dont have impact on determinant
+        // (for this matrix determinant is zero) function just stops (may be it is needed to be improved)
+        if (data_2d[diag_elem][diag_elem] == 0){
+            return;
+        }
+
+        // go through each row placed bottom diagonal element
+        for (int row = diag_elem + 1; row < height; row++){
+            // create coefficient that will be multiplied with row,
+            // that consists current diagonal element
+            double coef = data_2d[row][diag_elem] / data_2d[diag_elem][diag_elem];
+
+            // subtract from considered row another row, that consists current diagonal element
+            // and which multiplied with coefficient
+            for (int col = diag_elem; col < width; col++){
+                data_2d[row][col] -= coef * data_2d[diag_elem][col];
+            }
+        }
+    }
+}
+
 // allocate memory for matrix
-double** Matrix:: alloc_memory(unsigned int new_height, unsigned int new_width){
-    if (new_width == 0 || new_height == 0){
-        return nullptr;
+void Matrix:: alloc_memory(unsigned int height, unsigned int width){
+
+    // if any dimension is zero then not to allocate memory
+    // and leave data_1d and data_2d with default value (nullptr)
+    if (width == 0 || height == 0){
+        return;
     }
-    double* tmp_data_ptr = new double [new_height * new_width];
-    double** new_data = new double* [new_height];
-    for (int row = 0; row < new_height; row++){
-        new_data[row] = &tmp_data_ptr[row * new_width];
+
+    // try to allocate new memory
+    try{
+        data_1d = new double [height * width];
+        data_2d = new double* [height];
     }
-    return new_data;
+    // if something is wrong then make data_1d and data_2d nullptr and return
+    catch (std::bad_alloc const&){
+        data_1d =  nullptr;
+        data_2d =  nullptr;
+        return;
+    }
+
+    // if it was ok, make data_2d a correct 2d array
+    for (int row = 0; row < height; row++) {
+        data_2d[row] = &data_1d[row * width];
+    }
 }
 
 // free memory for matrix
-void Matrix::free_memory(double** freeing_data){
-    if (height != 0 && width != 0 && data != nullptr)
-        delete[] *freeing_data;
+void Matrix::free_memory(){
+    if (data_1d != nullptr)
+        delete[] data_1d;
 }
