@@ -48,15 +48,15 @@ Matrix::Matrix(unsigned int height, unsigned int width, MatrixType type){
     }
 }
 
-Matrix::Matrix(unsigned int height, unsigned int width, double *arr){
+Matrix::Matrix(double* arr, unsigned int lines, unsigned int cols){
     // try to allocate memory
-    alloc_memory(height, width);
+    alloc_memory(lines, cols);
 
     // if allocating was successful then initialize height, width
     // and copying array in a new allocated place
     if (data_1d != nullptr){
-        this->height = height;
-        this->width = width;
+        height = lines;
+        width = cols;
         memcpy(data_1d, arr, height * width * sizeof(double));
     }
 }
@@ -75,7 +75,7 @@ Matrix::Matrix(const Matrix &other){
     if (data_1d != nullptr) {
         height = other.height;
         width = other.width;
-        memcpy(data_1d, other.data_1d, height * width * sizeof(double)); // check it !!!
+        memcpy(data_1d, other.data_1d, height * width * sizeof(double));
     }
 }
 
@@ -83,11 +83,11 @@ Matrix::Matrix(Matrix&& other) noexcept{
     height = other.height;
     width = other.width;
 
-    // giving right to access the moving memory
+    // giving rights to access the moving memory
     data_1d = other.data_1d;
     data_2d = other.data_2d;
 
-    //
+    // prohibit other matrix to access the memory
     other.data_1d = nullptr;
     other.data_2d = nullptr;
 }
@@ -111,26 +111,26 @@ Matrix& Matrix::operator= (const Matrix& other){
     if (data_1d != nullptr) {
         height = other.height;
         width = other.width;
-        memcpy(data_1d, other.data_1d, height * width * sizeof(double)); // check it !!!
+        memcpy(data_1d, other.data_1d, height * width * sizeof(double));
     }
     return *this;
 }
 
 // overload of operator "=" for moving
-Matrix& Matrix::operator= (Matrix&& m) noexcept{
-    if (this == &m){
+Matrix& Matrix::operator= (Matrix&& other) noexcept{
+    if (this == &other){
         return *this;
     }
     free_memory();
 
-    height = m.height;
-    width = m.width;
+    height = other.height;
+    width = other.width;
 
-    data_1d = m.data_1d;
-    data_2d = m.data_2d;
+    data_1d = other.data_1d;
+    data_2d = other.data_2d;
 
-    m.data_1d = nullptr;
-    m.data_2d = nullptr;
+    other.data_1d = nullptr;
+    other.data_2d = nullptr;
     return *this;
 }
 
@@ -160,10 +160,10 @@ double Matrix::get(unsigned int row, unsigned int col) {
 }
 
 // overload of operator "+" for two matrices
-Matrix Matrix::operator+ (const Matrix& m){
+Matrix Matrix::operator+ (const Matrix& other){
 
     // if these matrices are not compatible then return an empty matrix
-    if ((this->height != m.height) || (this->width != m.width)){
+    if ((this->height != other.height) || (this->width != other.width)){
         return Matrix();
     }
 
@@ -173,7 +173,7 @@ Matrix Matrix::operator+ (const Matrix& m){
     // apply addition for each element
     for (int row = 0; row < this->height; row++){
         for (int col = 0; col < this->width; col++){
-            result.data_2d[row][col] = this->data_2d[row][col] + m.data_2d[row][col];
+            result.data_2d[row][col] = this->data_2d[row][col] + other.data_2d[row][col];
         }
     }
     return result;
@@ -187,10 +187,10 @@ unsigned int Matrix::get_width(){
 }
 
 // overload of operator "-" for two matrices
-Matrix Matrix::operator- (const Matrix& m){
+Matrix Matrix::operator- (const Matrix& other){
 
     // if these matrices are not compatible then return an empty matrix
-    if ((this->height != m.height) || (this->width != m.width)){
+    if ((this->height != other.height) || (this->width != other.width)){
         return Matrix();
     }
 
@@ -200,28 +200,28 @@ Matrix Matrix::operator- (const Matrix& m){
     // apply substraction for each element
     for (int row = 0; row < this->height; row++){
         for (int col = 0; col < this->width; col++){
-            result.data_2d[row][col] = this->data_2d[row][col] - m.data_2d[row][col];
+            result.data_2d[row][col] = this->data_2d[row][col] - other.data_2d[row][col];
         }
     }
     return result;
 }
 
 // overload of operator "*" for two matrices
-Matrix Matrix::operator* (const Matrix& m){
+Matrix Matrix::operator* (const Matrix& other){
     // if these matrices are not compatible then return an empty matrix
-    if (this->width != m.height){
+    if (this->width != other.height){
         return Matrix();
     }
 
     // create result variable
-    Matrix result(this->height, m.width);
+    Matrix result(this->height, other.width);
 
     // multiply
     for (int row = 0; row < this->height; row++){
-        for (int col = 0; col < m.width; col++){
+        for (int col = 0; col < other.width; col++){
             result.data_2d[row][col] = 0;
-            for (int i = 0; i < m.height; i++){
-                result.data_2d[row][col] += this->data_2d[row][i] * m.data_2d[i][col];
+            for (int i = 0; i < other.height; i++){
+                result.data_2d[row][col] += this->data_2d[row][i] * other.data_2d[i][col];
             }
         }
     }
@@ -231,43 +231,11 @@ Matrix Matrix::operator* (const Matrix& m){
 // find trace of matrix
 double Matrix::tr(){
     double tr = 0.0;
-    for (int i = 0; i < std::min(this->height, this->width); i++){ // check it!!!
+    for (int i = 0; i < std::min(this->height, this->width); i++){
         tr += this->data_2d[i][i];
     }
     return tr;
 }
-
-// find determinant of matrix using recursive algorithm
-//double Matrix::det(){
-//    if (this->width != this->height) {
-//        return std::nan("1");
-//    }
-//    if (height == 1){
-//        return this->data_2d[0][0];
-//    }
-//    Matrix minor_matrix(this->height - 1, this->width - 1);
-//    double determinant = 0;
-//
-//    for (int orig_col = 0; orig_col < this->width; orig_col++){
-//        for (int row = 1; row < this->width; row++){
-//            for (int col = 0; col < this->width; col++){
-//
-//                if (col < orig_col)
-//                    minor_matrix.data_2d[row - 1][col] = this->data_2d[row][col];
-//                if (col > orig_col)
-//                    minor_matrix.data_2d[row - 1][col - 1] = this->data_2d[row][col];
-//            }
-//        }
-//
-//        if (orig_col % 2 == 0){
-//            determinant += this->data_2d[0][orig_col] * minor_matrix.det();
-//        }
-//        else{
-//            determinant -= this->data_2d[0][orig_col] * minor_matrix.det();
-//        }
-//    }
-//    return determinant;
-//}
 
 // find determinant of matrix using forward elimination of Gaussian elimination
 double Matrix::det(){
@@ -276,16 +244,14 @@ double Matrix::det(){
     if (this->width != this->height) {
         return std::nan("1");
     }
-
     // if width is zero, computation is not needed, and it can be assumed that det is zero
     if (width == 0){
         return 0.0;
     }
-
     // create temporary matrix in order not to change values in original matrix
     Matrix tmp_matrix(*this);
 
-    // apply forward elimination
+    // apply forward elimination (make matrix upper triangular)
     tmp_matrix.apply_forward_elimination();
 
     // fing determinant as multiplying of elements of the main diagonal of the resulting matrix
@@ -349,6 +315,7 @@ void Matrix::set_random(){
 // apply the part of the Gaussian elimination called forward elimination
 // in order to transform the square matrix into an upper triangular matrix
 void Matrix::apply_forward_elimination(){
+
     // go through each element of the main diagonal
     for (int diag_elem = 0; diag_elem < width; diag_elem++){
 
@@ -361,6 +328,7 @@ void Matrix::apply_forward_elimination(){
 
         // go through each row placed bottom diagonal element
         for (int row = diag_elem + 1; row < height; row++){
+
             // create coefficient that will be multiplied with row,
             // that consists current diagonal element
             double coef = data_2d[row][diag_elem] / data_2d[diag_elem][diag_elem];

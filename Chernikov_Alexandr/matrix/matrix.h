@@ -19,11 +19,11 @@ private:
 public:
     explicit Matrix(unsigned int height = 0, unsigned int width = 0, double value = 0.0);
     Matrix(unsigned int height, unsigned int width, MatrixType type);
-    Matrix(unsigned int height, unsigned int width, double *arr);
+    Matrix(double* arr, unsigned int lines, unsigned int cols);
     Matrix(const Matrix& other);
     Matrix(Matrix&& other) noexcept;
     Matrix& operator= (const Matrix& other);
-    Matrix& operator= (Matrix&& m) noexcept;
+    Matrix& operator= (Matrix&& other) noexcept;
     ~Matrix();
 public:
     double get(unsigned int row, unsigned int col);
@@ -32,9 +32,9 @@ public:
     unsigned int get_height();
     unsigned int get_width();
 public:
-    Matrix operator+ (const Matrix& m);
-    Matrix operator- (const Matrix& m);
-    Matrix operator* (const Matrix& m);
+    Matrix operator+ (const Matrix& other);
+    Matrix operator- (const Matrix& other);
+    Matrix operator* (const Matrix& other);
 public:
     double tr();
     double det();
