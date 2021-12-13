@@ -210,5 +210,8 @@ int Matrix::det(){
     for (int diagonal = 0; diagonal < cols; diagonal++){
         det *= tmp.data[diagonal + diagonal * rows];
     }
+    tmp.data = nullptr;
+    tmp.rows = 0;
+    tmp.cols = 0;
     return det;
 }
