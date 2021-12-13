@@ -6,7 +6,6 @@ typedef enum{
     ZEROS,
     IDENTITY,
     TEMPORARY,
-    ONES,
     RANDOM,
 } Matrix_Type;
 
