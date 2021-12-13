@@ -14,7 +14,7 @@ void assigningValues(int *a_rows, int *a_columns, int *b_rows, int *b_columns) {
     cin >> *b_columns;
 }
 
-void operationChoice(const Matrix A, const Matrix B) {
+/*void operationChoice(const Matrix A, const Matrix B) {
     char operation;
     cout << "Choose a matrix operation:\n"
             "\"+\" - addition (A+B)\n"
@@ -24,7 +24,7 @@ void operationChoice(const Matrix A, const Matrix B) {
     cin >> operation;
     switch (operation) {
         case '+':
-            MatrixSum(A, B);
+            Matrix C = A + B;
             break;
         case '-':
             MatrixSub(A, B);
@@ -39,19 +39,32 @@ void operationChoice(const Matrix A, const Matrix B) {
             break;
     }
 
-}
+}*/
 
 int main() {
     int a_rows, a_columns, b_rows, b_columns;
     assigningValues(&a_rows, &a_columns, &b_rows, &b_columns);
     Matrix A(a_rows, a_columns);
     Matrix B(b_rows, b_columns);
-    A.MatrixRandom(a_rows, a_columns);
-    B.MatrixRandom(b_rows, b_columns);
+    A.random_input(a_rows, a_columns);
+    B.random_input(b_rows, b_columns);
     cout << "\n Matrix A:\n";
-    A.MatrixOut(a_columns, a_rows);
+    A.out();
     cout << "\n Matrix B:\n";
-    B.MatrixOut(b_columns, b_rows);
-    operationChoice(A, B);
+    B.out();
+    //operationChoice(A, B);
+
+    cout << "\n Matrix C (A+B):\n";
+    Matrix C = A + B;
+
+    cout << "\n Matrix D (A-B):\n";
+    Matrix D = A - B;
+
+    cout << "\n Matrix E (A*B):\n";
+    Matrix E = A * B;
+
+    cout << "\n Matrix F=A :\n";
+    Matrix F = A;
+    F.out();
     return 0;
 }
