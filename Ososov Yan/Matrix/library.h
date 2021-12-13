@@ -20,10 +20,10 @@ public:
     Matrix(int rows, int cols, int *arr, unsigned int size);
     Matrix(int rows, int cols, Matrix_Type type, int value);
     ~Matrix();
-    Matrix(const Matrix &other);
-    Matrix(Matrix &&other) noexcept;
-    Matrix& operator= (const Matrix &other);
-    Matrix& operator= (Matrix &&other) noexcept;
+    Matrix(const Matrix &source);
+    Matrix(Matrix &&source) noexcept;
+    Matrix& operator= (const Matrix &source);
+    Matrix& operator= (Matrix &&source) noexcept;
     Matrix operator+ (const Matrix &other);
     Matrix operator- (const Matrix &other);
     Matrix operator* (const Matrix &other);
