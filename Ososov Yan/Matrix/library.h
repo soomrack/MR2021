@@ -2,27 +2,38 @@
 #ifndef UNTITLED24_LIBRARY_H
 #define UNTITLED24_LIBRARY_H
 
+typedef enum{
+    ZEROS,
+    IDENTITY,
+    TEMPORARY,
+    ONES,
+    RANDOM,
+} Matrix_Type;
 
 class Matrix {
 private:
-    int rows = 0;
-    int cols = 0;
-    int *content;
+    int rows;
+    int cols;
+    int *data;
 public:
-    Matrix(int rows, int cols);
-    Matrix(int rows, int cols, int type);
+    Matrix();
+    Matrix(int rows, int cols, int *arr, unsigned int size);
+    Matrix(int rows, int cols, Matrix_Type type, int value);
     ~Matrix();
     Matrix(const Matrix &other);
     Matrix(Matrix &&other) noexcept;
-    Matrix& operator = (const Matrix &other);
-    Matrix operator + (const Matrix &other);
-    Matrix operator - (const Matrix &other);
+    Matrix& operator= (const Matrix &other);
     Matrix& operator= (Matrix &&other) noexcept;
-    Matrix operator * (const Matrix &other);
+    Matrix operator+ (const Matrix &other);
+    Matrix operator- (const Matrix &other);
+    Matrix operator* (const Matrix &other);
     int tr();
     void print();
-    double det();
-
+    int det();
+    void set_zeros( int value );
+    void set_identity(int value);
+    void set_temporary(int rows, int cols);
+    void set_random(int value);
 };
 
 #endif //UNTITLED24_LIBRARY_H
