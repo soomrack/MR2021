@@ -28,19 +28,11 @@ Matrix::Matrix(unsigned int height, unsigned int width, MatrixType type){
         this->width = width;
 
         switch (type){
-            case IDENTITY:
-                set_identity();
-                break;
-            case ONES:
-                set_ones();
-                break;
-            case RANDOM:
-                set_random();
-                break;
+            case IDENTITY: set_identity(); break;
+            case ONES: set_ones(); break;
+            case RANDOM: set_random(); break;
             case ZEROS:
-            default:
-                set_zeros();
-                break;
+            default: set_zeros(); break;
         }
     }
 }
@@ -92,7 +84,7 @@ Matrix& Matrix::operator= (const Matrix& other){
         return *this;
     }
 
-    // free old memory
+    // free old memory // change it
     free_memory();
 
     // try to allocate memory
@@ -127,6 +119,7 @@ Matrix& Matrix::operator= (Matrix&& other) noexcept{
 }
 
 // set the value of matrix in corresponding coordinates
+// return 0 - success, return 1 - failure
 int Matrix::set(unsigned int row, unsigned int col, double value){
 
     // if row or col is out of borders of the array then do nothing and return 1
@@ -141,11 +134,12 @@ int Matrix::set(unsigned int row, unsigned int col, double value){
 
 
 // get the value from corresponding coordinates
+// return 0.0 - row or col out of range
 double Matrix::get(unsigned int row, unsigned int col) {
 
     // if row or col is out of borders of the array then return NaN
     if ((row >= this->height) || (col >= this->width)) {
-        return std::nan("1");
+        return 0.0;
     }
     // else return the correct value of the cell
     return this->data_2d[row][col];
@@ -155,43 +149,33 @@ double Matrix::get(unsigned int row, unsigned int col) {
 Matrix Matrix::operator+ (const Matrix& other){
 
     // if these matrices are not compatible then return an empty matrix
-    if ((this->height != other.height) || (this->width != other.width)){
+    if ((height != other.height) || (width != other.width)){
         return Matrix();
     }
 
-    Matrix result(this->height, this->width);
+    Matrix result(height, width);
 
     // apply addition for each element
-    for (int row = 0; row < this->height; row++){
-        for (int col = 0; col < this->width; col++){
-            result.data_2d[row][col] = this->data_2d[row][col] + other.data_2d[row][col];
-        }
+    for (int i = 0; i < height * width; i++){
+        result.data_1d[i] = data_1d[i] + other.data_1d[i];
     }
     return result;
-}
-
-unsigned int Matrix::get_height(){
-    return height;
-}
-unsigned int Matrix::get_width(){
-    return width;
+    return Matrix();
 }
 
 // overload of operator "-" for two matrices
 Matrix Matrix::operator- (const Matrix& other){
 
     // if these matrices are not compatible then return an empty matrix
-    if ((this->height != other.height) || (this->width != other.width)){
+    if ((height != other.height) || (width != other.width)){
         return Matrix();
     }
 
-    Matrix result(this->height, this->width);
+    Matrix result(height, width);
 
     // apply subtraction for each element
-    for (int row = 0; row < this->height; row++){
-        for (int col = 0; col < this->width; col++){
-            result.data_2d[row][col] = this->data_2d[row][col] - other.data_2d[row][col];
-        }
+    for (int i = 0; i < height * width; i++){
+        result.data_1d[i] = data_1d[i] - other.data_1d[i];
     }
     return result;
 }
@@ -200,18 +184,18 @@ Matrix Matrix::operator- (const Matrix& other){
 Matrix Matrix::operator* (const Matrix& other){
 
     // if these matrices are not compatible then return an empty matrix
-    if (this->width != other.height){
+    if (width != other.height){
         return Matrix();
     }
 
-    Matrix result(this->height, other.width);
+    Matrix result(height, other.width);
 
     // multiply
-    for (int row = 0; row < this->height; row++){
+    for (int row = 0; row < height; row++){
         for (int col = 0; col < other.width; col++){
             result.data_2d[row][col] = 0;
             for (int i = 0; i < other.height; i++){
-                result.data_2d[row][col] += this->data_2d[row][i] * other.data_2d[i][col];
+                result.data_2d[row][col] += data_2d[row][i] * other.data_2d[i][col];
             }
         }
     }
@@ -222,7 +206,7 @@ Matrix Matrix::operator* (const Matrix& other){
 double Matrix::tr(){
 
     double tr = 0.0;
-    for (int i = 0; i < std::min(this->height, this->width); i++){
+    for (int i = 0; i < std::min(height, width); i++){
         tr += this->data_2d[i][i];
     }
     return tr;
@@ -233,7 +217,7 @@ double Matrix::det(){
 
     // if the matrix is not square, assume that determinant can not be found
     if (this->width != this->height) {
-        return std::nan("1");
+        return 0.0;
     }
     // if width is zero, computation is not needed, and it can be assumed that det is zero
     if (width == 0){
@@ -255,11 +239,11 @@ double Matrix::det(){
 
 // overload of operator "<<" for matrix output
 std::ostream& operator<< (std::ostream &out, const Matrix& m){
-    for (int i = 0; i < m.height; i++){
-        for (int j = 0; j < m.width; j++){
-            out << m.data_2d[i][j] << " ";
+    for (int row = 0; row < m.height; row++){
+        for (int cols = 0; cols < m.width; cols++){
+            out << m.data_2d[row][cols] << " ";
         }
-        out << '\n';
+        out << "\n";
     }
     return out;
 }
@@ -275,13 +259,9 @@ void Matrix::print(){
 }
 
 void Matrix::set_identity(){
-    for (int i = 0; i < height * width; i++){
-        if ((i % height == i / height)){
-            data_1d[i] = 1.0;
-        }
-        else{
-            data_1d[i] = 0.0;
-        }
+    set_zeros();
+    for (int i = 0; i < std::min(height, width); i++){
+        data_2d[i][i] = 1.0;
     }
 }
 
@@ -307,14 +287,43 @@ void Matrix::set_random(){
 // in order to transform the square matrix into an upper triangular matrix
 void Matrix::apply_forward_elimination(){
 
+    double tmp_row[width];          // temporary array for storing a row during swapping
+    double swap_coefficient = 1;    // coef for taking into account that swapping two rows leads
+                                    // to change in the sign of the determinant
+
     // go through each element of the main diagonal
     for (int diag_elem = 0; diag_elem < width; diag_elem++){
 
-        // if diagonal element is zero, computation stop, because,
-        // anyway, determinant of this matrix is zero (maybe it is needed to be improved)
-        if (data_2d[diag_elem][diag_elem] == 0){
+        // for increasing accuracy we need to have a diagonal element as more as possible
+        // here finding of maximal diagonal element
+        int max_diag_elem = diag_elem;
+        for (int row = diag_elem + 1; row < height; row++){
+            if (std::abs(data_2d[row][diag_elem]) > std::abs(data_2d[row][max_diag_elem])){
+                max_diag_elem = diag_elem;
+            }
+        }
+
+        // if maximal diagonal element is approximately equal to zero
+        // then computation has no more sense to continue
+        double max_zero_diff = pow(10, -10);
+        if (std::abs(data_2d[max_diag_elem][diag_elem]) < max_zero_diff){
             return;
         }
+
+        // maximal diagonal element is not equal to current diagonal element
+        // then swap the rows
+        if (max_diag_elem > diag_elem){
+            swap_coefficient *= -1;
+            memcpy(tmp_row, data_2d[max_diag_elem], width * sizeof(double));
+            memcpy(data_2d[max_diag_elem], data_2d[diag_elem], width * sizeof(double));
+            memcpy(data_2d[diag_elem], tmp_row, width * sizeof(double));
+        }
+//
+//        // if diagonal element is zero, computation stop, because,
+//        // anyway, determinant of this matrix is zero (maybe it is needed to be improved)
+//        if (data_2d[diag_elem][diag_elem] == 0){
+//            return;
+//        }
 
         // go through each row placed bottom diagonal element
         for (int row = diag_elem + 1; row < height; row++){
@@ -330,6 +339,11 @@ void Matrix::apply_forward_elimination(){
             }
         }
     }
+
+    // accounting the swap_coefficient
+    for (int col = 0; col < width; col++){
+        data_2d[0][col] *= swap_coefficient;
+    }
 }
 
 // allocate memory for matrix
@@ -341,19 +355,29 @@ void Matrix:: alloc_memory(unsigned int height, unsigned int width){
         return;
     }
 
-    // try to allocate new memory
+    // try to allocate memory for data_1d
     try{
         data_1d = new double [height * width];
-        data_2d = new double* [height];
     }
-    // if something is wrong then make data_1d and data_2d nullptr and return
+    // if something is wrong then make data_1d nullptr and return
     catch (std::bad_alloc const&){
-        data_1d =  nullptr;
-        data_2d =  nullptr;
+        data_1d =  nullptr; //
         return;
     }
 
-    // if it was ok, make data_2d a correct 2d array
+    // try to allocate memory for data_2d
+    try{
+        data_2d = new double* [height];
+    }
+    // if something is wrong then free data_1d, make data_1d and data_2d nullptr and return
+    catch (std::bad_alloc const&){
+        delete[] data_1d;
+        data_1d =  nullptr;
+        data_2d =  nullptr; //
+        return;
+    }
+
+    // if allocating was ok, make data_2d a correct 2d array
     for (int row = 0; row < height; row++) {
         data_2d[row] = &data_1d[row * width];
     }
@@ -361,6 +385,10 @@ void Matrix:: alloc_memory(unsigned int height, unsigned int width){
 
 // free memory for matrix
 void Matrix::free_memory(){
-    if (data_1d != nullptr)
-        delete[] data_1d;
+
+    delete[] data_2d;
+    delete[] data_1d;
+
+    height = 0;
+    width = 0;
 }

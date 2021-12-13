@@ -26,26 +26,26 @@ public:
     Matrix& operator= (Matrix&& other) noexcept;
     ~Matrix();
 public:
-    double get(unsigned int row, unsigned int col);
-    int set(unsigned int row, unsigned int col, double value);
+    double get(unsigned int row, unsigned int col);             // return 0.0 - row or col out of range
+    int set(unsigned int row, unsigned int col, double value);  // return 0 - success, return 1 - failure
 public:
-    unsigned int get_height();
-    unsigned int get_width();
+    unsigned int get_height() const {return height;}
+    unsigned int get_width() const {return width;}
 public:
-    Matrix operator+ (const Matrix& other);
-    Matrix operator- (const Matrix& other);
-    Matrix operator* (const Matrix& other);
+    Matrix operator+ (const Matrix& other);     // return Matrix() - not compatible, return result - compatible
+    Matrix operator- (const Matrix& other);     // return Matrix() - not compatible, return result - compatible
+    Matrix operator* (const Matrix& other);     // return Matrix() - not compatible, return result - compatible
 public:
-    double tr();
-    double det();
+    double tr();    // if height or width is zero - return 0.0
+    double det();   // if height or width is zero or the matrix is not square - return 0.0
 public:
-    friend std::ostream& operator<< (std::ostream &out, const Matrix& m);
-    void print();
-private:
     void set_identity();
     void set_ones();
     void set_zeros();
     void set_random();
+public:
+    friend std::ostream& operator<< (std::ostream &out, const Matrix& m);
+    void print();
 private:
     void apply_forward_elimination();
     void alloc_memory(unsigned int height, unsigned int width);
