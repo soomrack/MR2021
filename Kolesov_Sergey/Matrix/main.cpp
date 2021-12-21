@@ -22,6 +22,9 @@ int main ()
     Matrix M3;
     M3 = M1 + M2;
     M3.print();
+    M3.normalization();
+    M3.print();
+    std::cout << M3(2,2) << "\n";
     std::cout << M2.det()   << "\n"
               << M2.trace() << "\n"
               << M2.minorij(2,2) << "\n"

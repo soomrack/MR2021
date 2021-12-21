@@ -70,6 +70,13 @@ Matrix& Matrix::operator= (const Matrix& clone){
     return *this;
 }
 
+double Matrix::operator() (unsigned int row, unsigned int col)
+{
+    if (row > this->rows || col > this->cols)
+        return 0;
+    return this->ptr_d[this->cols*row + col];
+}
+
 Matrix::~Matrix(){
     rid_memory();
 }
@@ -114,6 +121,14 @@ void Matrix::reverse() {
             }
         }
     }
+}
+
+void Matrix::normalization() {
+    double sum = 0;
+    for (int i = 0; i < this->rows * this->cols; i++)
+        sum += this->ptr_d[i];
+    for (int i = 0; i < this->rows * this->cols; i++)
+        this->ptr_d[i] /= sum;
 }
 
 void Matrix::swap_rows(unsigned int row1, unsigned int row2){

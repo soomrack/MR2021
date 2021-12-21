@@ -6,14 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/cygdrive/c/Users/Master/CLionProjects/Matrix/Matrix.cpp
-Matrix.h
-/cygdrive/c/Users/Master/CLionProjects/Matrix/Matrix.h
-iostream
--
-cstring
--
-
 /cygdrive/c/Users/Master/CLionProjects/Matrix/Matrix.h
 
 /cygdrive/c/Users/Master/CLionProjects/Matrix/main.cpp

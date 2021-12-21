@@ -33,11 +33,13 @@ public:
     Matrix operator- (const Matrix& val);
     Matrix operator* (double val);
     Matrix operator* (const Matrix& val);
+    double operator() (unsigned int row, unsigned int col);// instead [i][j] use (i, j)
 
 public:
     void print();
     void transposition();
     void reverse();
+    void normalization();
     void swap_rows(unsigned int row1, unsigned int row2);
     void swap_cols(unsigned int col1, unsigned int col2);
     void rid_memory();
