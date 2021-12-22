@@ -2,6 +2,16 @@
 #include <iostream>
 #include <iomanip>
 
+// ЗАМЕЧАНИЯ: (к предыдущей версии кода)
+// - Убрать комментарии в Заголовочном файле
+// - Осуществить копирование через memcpy
+// - Убрать лишний цикл при сложении
+// - Убрать Exit(1), вместо этого возвращать значение
+// - Убрать ограничения на квадратные матрицы
+// - Создание единичной и нулевой матрицы вынести как отдельные функции
+// - Значение double задавать с точкой
+// - Сравнение double с нулем осуществлять как (num < eps)
+
 
 Matrix::Matrix(int rows, int cols) { //Простой конструктор
     this -> rows = rows;
@@ -12,17 +22,12 @@ Matrix::Matrix(int rows, int cols) { //Простой конструктор
 Matrix::Matrix(int rows, int cols, int type) { //Конструктор единичной и нулевой матрицы (type = 0; type = 1)
     this -> rows = rows;
     this -> cols = cols;
-    if(cols != rows) {
-        type = 1;
-        cols = 3;
-        cols = 3;
-    }
     data = new double [rows * cols];
     switch(type){
         case 0: //создание нулевой матрицы
             for(int i = 0; i < rows; i++){
                 for(int j = 0; j < cols; j++){
-                    data[cols * i + j] = 0;
+                    data[cols * i + j] = 0.;
                 }
             }
             break;
@@ -30,9 +35,9 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
             for(int i = 0; i < rows; i++){
                 for(int j = 0; j < cols; j++){
                     if(i == j) {
-                        data[cols * i + j]= 1;
+                        data[cols * i + j]= 1.;
                     } else {
-                        data[cols * i + j]= 0;
+                        data[cols * i + j]= 0.;
                     }
                 }
             }
@@ -61,7 +66,6 @@ Matrix & Matrix::operator = (const Matrix &other){ //Перегрузка опе
     this -> cols = other.cols;
     delete[] this -> data;
     this -> data = new double [rows * cols];
-
     for(int i = 0; i < (rows * cols); i++) {
         this -> data[i] = other.data[i];
     }
@@ -72,11 +76,7 @@ Matrix::Matrix(const Matrix &other) { //Конструктор копирова�
     this -> rows = other.rows;
     this -> cols = other.cols;
     this -> data = new double [rows * cols];
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < cols; j++){
-            this -> data[cols * i + j] = other.data[cols * i + j];
-        }
-    }
+    memcpy(this -> data, other.data,sizeof(double)* rows * cols);
 }
 
 Matrix::~Matrix() { //Деструктор
@@ -104,24 +104,22 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept { //Перезагрузк
 }
 
 Matrix Matrix::operator + (const Matrix &other) { //Перезагрузка оператора сложения
-    if((this->rows != other.rows)&&(this->cols != other.cols)){
-        exit(1);
-    }
     Matrix temp(this->rows, this->cols, 0);
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < cols; j++){
-            temp.data[cols * i + j] = this -> data[cols * i + j] + other.data[cols * i + j];
-        }
+    if((this->rows != other.rows)&&(this->cols != other.cols)){ //В случае несовпадения размера вернем нулевую матрицу
+        return temp;
+    }
+    for(int i = 0; i < rows*cols; i++){
+        temp.data[i] = this -> data[i] + other.data[i];
     }
     return temp;
 }
 
 Matrix Matrix::operator * (const Matrix &other) { //Перезагрузка оператора умножения
-    //Число столбцов первой матрицы должно совпадать с числом строк второй
-    if (this -> cols != other.rows) {
-        exit(1);
-    }
     Matrix temp(this->rows, other.cols, 0); //Число строк первой и число столбцов второй
+    //Число столбцов первой матрицы должно совпадать с числом строк второй
+    if (this -> cols != other.rows) { //В случае несовпадения вернем нулевую матрицу
+        return temp;
+    }
     for(int i = 0; i < this->rows; i++) {
         for(int j = 0; j < other.cols; j++) {
             for(int k = 0; k < other.cols; k++) {
@@ -132,41 +130,66 @@ Matrix Matrix::operator * (const Matrix &other) { //Перезагрузка о�
     return temp;
 }
 
+void Matrix::setnulls() {
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j < cols; j++){
+            data[cols * i + j] = 0.;
+        }
+    }
+}
+
+void Matrix::setones() {
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j < cols; j++){
+            if(i == j) {
+                data[cols * i + j]= 1.;
+            } else {
+                data[cols * i + j]= 0.;
+            }
+        }
+    }
+}
+
+
 int Matrix::tr() { //След матрицы
     int trace = 0;
-    if (this -> rows != this -> cols) {
-        exit(1);
-    }
     for (int i = 0; i < this -> rows; i++) {
         trace += this->data[cols * i + i];
     }
     return trace;
 }
 
+
 double Matrix::det() { //Определитель матрицы методом Гаусса
-    double determinant = 1;
-    double element = 0;
+    double determinant = 1.;
+    double element = 0.;
+    double epss = 0.0000001;
+    int change = 0;
     Matrix temp = *this;
     //Цикл уменьшения размера матрицы по главной диагонали
     for(int k = 0; k < (temp.cols); k++){
         //Циклы деления элементов строк на первый элемент
         for(int i = k; i < temp.cols; i++){
             element = temp.data[cols * i + k];
-            if (element) {
+            if ((element < -epss) || (element > epss)) {
                 for (int j = k; j < temp.cols; j++) {
                     temp.data[cols * i + j] /= element;
                 }
                 determinant *= element;
+                change = 1;
             }
         }
         //Циклы вычитания первой строки из последующих строк
         for(int i = k+1; i < temp.cols; i++){
-            if(temp.data[cols * i + k]) {
+            if((temp.data[cols * i + k] < -epss) || (temp.data[cols * i + k] > epss)) {
                 for (int j = k; j < temp.cols; j++) {
                     temp.data[cols * i + j] -= temp.data[cols * k + j];
                 }
             }
         }
+    }
+    if(change == 0) {
+        return 0.;
     }
     return determinant;
 }
