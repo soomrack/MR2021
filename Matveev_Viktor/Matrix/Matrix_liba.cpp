@@ -4,151 +4,184 @@ using namespace std;
 
 double** Matrix::alloc(unsigned int length, unsigned int height)
 {
-    if (length == 0 || height == 0){
+    if (length == 0 || height == 0)
+    {
         return nullptr;
     }
-    double** array = new double*[length];
-    array[0] = new double[length * height];
-    for (int row = 1; row < length; row++) {
-        array[row] = array[row - 1] + height;
+    try
+    {
+        string = new double [length * height];
     }
-    return array;
+    catch (bad_alloc const&)
+    {
+        string = nullptr;
+        return nullptr;
+    }
+    try
+    {
+        Matr = new double* [length];
+    }
+    catch (bad_alloc const&)
+    {
+        string =  nullptr;
+        Matr =  nullptr;
+        delete[] string;
+        return Matr;
+    }
+    for (unsigned int row = 0; row < length; row++)
+    {
+        Matr[row] = &string[row * height];
+    }
+    return Matr;
 }
-void Matrix::vanish(double** array)
+void Matrix::clear_memory()
 {
     if (Matr != nullptr)
     {
-        delete[] array[0];
-        delete[] array;
+        delete[] string;
+        delete[] Matr;
     }
 }
 
 Matrix ::Matrix()
 {
-    length = 3;
-    height = 3;
+    length = 0;
+    height = 0;
     Matr = alloc(length, height);
-    for (unsigned int row = 0; row < length; row++)
+    for (unsigned int pos = 0; pos < length*height; pos++)
     {
-        for (unsigned int col = 0; col < height; col++)
-            Matr[row][col] = 0;
+        string[pos]=0;
     }
 }
-Matrix::Matrix(unsigned int length, unsigned int height) {
+Matrix::Matrix(unsigned int length, unsigned int height)
+{
     this -> length = length;
     this -> height = height;
     this -> Matr = alloc(length, height);
-    for (unsigned int row = 0; row < length; row++)
+    for (unsigned int pos = 0; pos < length*height; pos++)
     {
-        for (unsigned int col = 0; col < height; col++)
-            Matr[row][col] = 0;
+        string[pos]=0;
     }
 }
-Matrix::Matrix(Matrix && other) noexcept {
+Matrix::Matrix(const Matrix & other)
+{
+    Matr= alloc(other.length,other.height);
+
+    if (string != nullptr)
+    {
+        length = other.length;
+        height = other.height;
+        memcpy(string,other.string,length * height * sizeof(double));
+    }
+}
+Matrix::Matrix(Matrix && other) noexcept
+{
     length = other.length;
     height = other.height;
-    Matr = alloc(length, height);
-    memcpy(Matr[0],other.Matr[0],length * height * sizeof(double));
+    Matr = other.Matr;
+    string = other.string;
+    other.Matr = nullptr;
+    other.string = nullptr;
 }
 Matrix :: ~Matrix()
 {
-    vanish(Matr);
+    clear_memory();
 }
 
-Matrix & Matrix :: operator=(const Matrix &other)
+// Copy constructor
+Matrix & Matrix :: operator = (const Matrix &other)
 {
-    this -> length = other.length;
-    this -> height = other.height;
-    this -> Matr = other.Matr;
-    memcpy(this -> Matr[0],other.Matr[0],length * height * sizeof(double));
+    if (this == &other)
+    {
+        return *this;
+    }
+    clear_memory();
+    this->Matr= alloc(length, height);
+    if (string != nullptr)
+    {
+        this -> length = other.length;
+        this -> height = other.height;
+        memcpy(this -> string,other.string,length * height * sizeof(double));
+    }
+    return *this;
 }
+//Transfer constructor
 Matrix & Matrix::operator = (Matrix &&other) noexcept
 {
     if (this == &other)
     {
         return *this;
     }
-    vanish(Matr);
+    clear_memory();
     length = other.length;
     height = other.height;
-
     Matr = other.Matr;
+    string = other.string;
     other.Matr = nullptr;
+    other.string = nullptr;
     return *this;
 }
 Matrix Matrix :: operator+(const Matrix &other)
 {
-    Matrix Answer (0, 0);
-    if ((this -> length == other.length) && (this -> height == other.height))
+
+    if ((this -> length != other.length) || (this -> height != other.height))
     {
-        Answer.length = other.length;
-        Answer.height = other.height;
-        Answer.Matr = other.Matr;
-        for (int row = 0; row < other.length; row++)
-        {
-            for (int col = 0; col < other.height; col++)
-                Answer.Matr[row][col] = this -> Matr[row][col] + other.Matr[row][col];
-        }
-    }
-    else
-    {
+        Matrix Answer (0, 0);
         cout << "Something wrong with sizes" << endl;
+        return Answer;
+    }
+
+    Matrix Answer (length, height);
+    for (unsigned int pos = 0; pos < length*height; pos++)
+    {
+        Answer.string[pos] = string[pos] + other.string[pos];
     }
     return Answer;
 }
 Matrix Matrix :: operator-(const Matrix &other)
 {
-    Matrix Answer (0, 0);
-    if ((this -> length == other.length) && (this -> height == other.height))
+
+    if ((this -> length != other.length) || (this -> height != other.height))
     {
-        Answer.length = other.length;
-        Answer.height = other.height;
-        Answer.Matr = other.Matr;
-        for (int row = 0; row < other.length; row++)
-        {
-            for (int col = 0; col < other.height; col++)
-                Answer.Matr[row][col] = this -> Matr[row][col] - other.Matr[row][col];
-        }
-    }
-    else
-    {
+        Matrix Answer (0, 0);
         cout << "Something wrong with sizes" << endl;
+        return Answer;
     }
+
+    Matrix Answer (length, height);
+    for (unsigned int pos = 0; pos < length*height; pos++)
+    {
+        Answer.string[pos] = string[pos] - other.string[pos];
+    }
+    return Answer;
     return Answer;
 }
 Matrix Matrix :: operator*(const Matrix &other)
 {
-    Matrix Answer (0, 0);
-    if (this -> height == other.length)
+    if(this -> height != other.length)
     {
-        Answer.length = this -> length;
-        Answer.height = other.height;
-        Answer.Matr = new double *[Answer.length];
-        for (int z = 0; z < Answer.length; z++)
-        {
-            Answer.Matr[z] = new double[Answer.height];
-        }
-
-        for (int row = 0; row < this -> length; row++)
-        {
-            for (int col = 0; col < other.height; col++)
-            {
-                int cell = 0;
-                for (int k = 0; k < this -> height; k++) {
-                    cell += ((this -> Matr[row][k]) * other.Matr[k][col]);
-                }
-                Answer.Matr[row][col] = cell;
-            }
-        }
-    }
-    else
-    {
+        Matrix Answer (0, 0);
         cout << "Something wrong with sizes" << endl;
+        return Answer;
+    }
+
+    Matrix Answer (length, other.height);
+
+    for (unsigned int row = 0; row < this -> length; row++)
+    {
+        for (unsigned int col = 0; col < other.height; col++)
+        {
+            int cell = 0;
+            for (unsigned int k = 0; k < this -> height; k++) {
+                cell += ((this -> Matr[row][k]) * other.Matr[k][col]);
+            }
+            Answer.Matr[row][col] = cell;
+        }
     }
     return Answer;
 }
 
-template<size_t N> void Matrix :: Create_Matrix(double (&arr)[N])
+void Matrix :: create_matrix(double *arr)
 {
     int count=0;
     for (int row = 0; row < length; row++)
@@ -161,24 +194,18 @@ template<size_t N> void Matrix :: Create_Matrix(double (&arr)[N])
     }
 }
 
-void Matrix :: Create_Matrix_One()
+void Matrix :: create_matrix_one()
 {
-    for (int row = 0; row < length; row++)
+    for (unsigned int pos = 0; pos < length; pos++)
     {
-        for (int col = 0; col < height; col++)
-        {
-            if (row == col)
-            {
-                Matr[row][col] = 1;
-            }
-        }
+        Matr[pos][pos] = 1;
     }
 }
-void Matrix :: Display()
+void Matrix :: display()
 {
-    for (int row = 0; row < length; row++)
+    for (unsigned int row = 0; row < length; row++)
     {
-        for (int col = 0; col < height; col++)
+        for (unsigned int col = 0; col < height; col++)
         {
             cout.width(4);
             cout << Matr[row][col];
@@ -187,22 +214,22 @@ void Matrix :: Display()
     }
     cout << endl;
 }
-int Matrix :: Trace()
+int Matrix :: trace()
 {
     double trace_res = 0.0;
-    for (int row = 0; row < length; row++)
+    if(height != length)
     {
-        for (int col = 0; col < height; col++)
-        {
-            if (row == col)
-            {
-                trace_res += Matr[row][col];
-            }
-        }
+        cout << "The matrix is not square" << endl;
+        return trace_res;
     }
-    cout << trace_res << endl;
+
+    for (unsigned int pos = 0; pos < length; pos++)
+    {
+        trace_res += Matr[pos][pos];
+    }
+    return trace_res;
 }
-double Matrix :: Determinant()
+double Matrix :: determinant()
 {
     double det = 0.0;
 
@@ -232,7 +259,15 @@ double Matrix :: Determinant()
         {
             if (Sup_Matrix.Matr[col][col] && Sup_Matrix.Matr[row][col])
             {
-                double k = Sup_Matrix.Matr[row][col]/Sup_Matrix.Matr[col][col];
+                double k = 0.0;
+                if (Sup_Matrix.Matr[col][col] != 0)
+                {
+                    k = Sup_Matrix.Matr[row][col]/Sup_Matrix.Matr[col][col];
+                }
+                else
+                {
+                    k = Sup_Matrix.Matr[row][col]/0.001;
+                }
                 for (unsigned int l = col; l < Sup_Matrix.height; l++)
                 {
                     Sup_Matrix.Matr[row][l] = Sup_Matrix.Matr[row][l] - (k * Sup_Matrix.Matr[col][l]);

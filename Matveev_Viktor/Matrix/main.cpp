@@ -9,25 +9,27 @@ int main()
 
     Matrix F (3,3);
 
-    F.Create_Matrix(test_arr1);
+    F.create_matrix(test_arr1);
 
-    F.Display();
+    F.display();
 
-    double k = F.Determinant();
+    double k = F.determinant();
+    double g = F.trace();
 
-    cout << k << endl;
+    cout << k << endl ;
+    cout << g << endl;
 
     double test_arr2[6] = {6,5,4,3,2,1};
 
     Matrix S (3,2);
 
-    S.Create_Matrix(test_arr2);
+    S.create_matrix(test_arr2);
 
-    S.Display();
+    S.display();
 
     Matrix Th=F*S;
 
-    Th.Display();
+    Th.display();
 
     return 0;
 }

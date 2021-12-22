@@ -4,33 +4,31 @@ using namespace std;
 
 class Matrix
 {
-private:
-    double **Matr;
-    int length;
-    int height;
-
-public:
-
-    // Constructors and destructor
+private:   //Useful things
+    double *string = nullptr;
+    double **Matr = nullptr;
+    int length = 0;
+    int height = 0;
+private:   // Private methods
+    double** alloc(unsigned int length, unsigned int height);
+    void clear_memory();
+    void sort_rows(unsigned int col);
+public:    // Constructors and destructor
     Matrix();
-    Matrix(unsigned int length, unsigned int height);
-    Matrix(Matrix&&) noexcept;
+    Matrix(unsigned int length=0, unsigned int height=0);
+    Matrix(const Matrix& other);
+    Matrix(Matrix&& other) noexcept;
     ~Matrix();
-
-    // Overloaded operators
+public:    // Overloaded operators
     Matrix operator + (const Matrix &);
     Matrix operator - (const Matrix &);
     Matrix operator * (const Matrix &);
     Matrix & operator = (Matrix &&) noexcept;
     Matrix & operator = (const Matrix &);
-
-    // Various methods
-    double** alloc(unsigned int length, unsigned int height);
-    void vanish(double**);
-    template<size_t N> void Create_Matrix(double (&arr)[N]);
-    void Create_Matrix_One();
-    void Display();
-    int Trace();
-    double Determinant ();
-    void sort_rows(unsigned int col);
+public:    // Various methods
+    void create_matrix(double *arr);
+    void create_matrix_one();
+    void display();
+    int trace();
+    double determinant ();
 };
