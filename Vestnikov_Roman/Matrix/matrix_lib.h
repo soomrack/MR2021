@@ -1,36 +1,40 @@
 #include <iostream>
+#include <cstring>
 
-#ifndef MAIN_CPP_MATRIX_LIB_H
-#define MAIN_CPP_MATRIX_LIB_H
+#ifndef MATRIX_LIB_H
+#define MATRIX_LIB_H
 
 class Matrix {
 private:
-    int m_height;
-    int m_width;
-    double **data;
-
+    unsigned int height=0;
+    unsigned int width=0;
+    double *data_1=nullptr;
+    double **data_2=nullptr;
 public:
-    Matrix(int height, int width);
-    explicit Matrix(int height=2);
-
-    ~Matrix() { delete data ; };
-
-    Matrix(Matrix &&matrix) noexcept ;
-
-    void creator();
+    explicit Matrix(unsigned int height=0, unsigned int width=0);
+    Matrix (const Matrix &matrix);
+    Matrix(Matrix &&matrix) noexcept;
+    ~Matrix();
+public:
+    void set(double *array);
     void random();
     void print();
     void identity();
     void zero();
-    void determinant();
-    void trace();
-    void memory_update ();
-
+public:
+    double det();
+    double trace();
+public:
     Matrix &operator= (const Matrix &matrix);
+    Matrix &operator= (Matrix &&) noexcept;
     Matrix operator+ (const Matrix &matrix);
     Matrix operator- (const Matrix &matrix);
     Matrix operator* (const Matrix &matrix);
-
+private:
+    void sort_rows(unsigned int col);
+    void memory_allocation(unsigned int height, unsigned int width);
+    void memory_clearing();
 };
 
-#endif //MAIN_CPP_MATRIX_LIB_H
+#endif //MATRIX_LIB_H
+
