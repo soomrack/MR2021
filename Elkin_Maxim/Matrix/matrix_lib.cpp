@@ -67,6 +67,8 @@ Matrix::Matrix(Matrix && other) noexcept {
     data = other.data;
     other.data_line = nullptr;
     other.data = nullptr;
+    other.rows = 0;
+    other.columns = 0;
 }
 
 Matrix::~Matrix() {
@@ -98,6 +100,8 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept {
     data = other.data;
     other.data_line = nullptr;
     other.data = nullptr;
+    other.rows = 0;
+    other.columns = 0;
     return *this;
 }
 
@@ -173,8 +177,8 @@ double Matrix::get_det() {
         for (unsigned int row = col+1; row < var.rows; row++) {
             if (var.data[col][col] && var.data[row][col]) {
                 double k = var.data[row][col]/var.data[col][col];
-                for (unsigned int l = col; l < var.columns; l++) {
-                    var.data[row][l] = var.data[row][l] - (k * var.data[col][l]);
+                for (unsigned int m = col; m < var.columns; m++) {
+                    var.data[row][m] = var.data[row][m] - (k * var.data[col][m]);
                 }
             }
         }
