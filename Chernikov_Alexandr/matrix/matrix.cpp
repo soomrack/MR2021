@@ -288,6 +288,7 @@ void Matrix::set_random(){
 void Matrix::apply_forward_elimination(){
 
     double tmp_row[width];          // temporary array for storing a row during swapping
+
     double swap_coefficient = 1;    // coef for taking into account that swapping two rows leads
                                     // to change in the sign of the determinant
 
@@ -318,12 +319,6 @@ void Matrix::apply_forward_elimination(){
             memcpy(data_2d[max_diag_elem], data_2d[diag_elem], width * sizeof(double));
             memcpy(data_2d[diag_elem], tmp_row, width * sizeof(double));
         }
-//
-//        // if diagonal element is zero, computation stop, because,
-//        // anyway, determinant of this matrix is zero (maybe it is needed to be improved)
-//        if (data_2d[diag_elem][diag_elem] == 0){
-//            return;
-//        }
 
         // go through each row placed bottom diagonal element
         for (int row = diag_elem + 1; row < height; row++){
@@ -373,7 +368,7 @@ void Matrix:: alloc_memory(unsigned int height, unsigned int width){
     catch (std::bad_alloc const&){
         delete[] data_1d;
         data_1d =  nullptr;
-        data_2d =  nullptr; //
+        data_2d =  nullptr;
         return;
     }
 
