@@ -80,56 +80,15 @@ void Replacement(char player, int pfield){ //вставка на поле сим
 }
 
 bool win(char cell) { //посылаем сюда 0 или X, проверка на победу
-    if (cell==pf[0]){
-        if (cell==pf[1]){
-            if (cell==pf[2]){
-                return true;
-            }
-        }
-        else if (cell==pf[3]){
-            if (cell==pf[6]){
-                return true;
-            }
-        }
-        else if (cell==pf[4]){
-            if (cell==pf[8]){
-                return true;
-            }
-        }
-    }
-    if (cell==pf[1]){
-        if (cell==pf[4]){
-            if (cell==pf[7]){
-                return true;
-            }
-        }
-    }
-    if (cell==pf[2]){
-        if (cell==pf[5]){
-            if (cell==pf[8]){
-                return true;
-            }
-        }
-        else if (cell==pf[4]){
-            if (cell==pf[6]){
-                return true;
-            }
-        }
-    }
-    if (cell==pf[3]){
-        if (cell==pf[4]){
-            if (cell==pf[5]){
-                return true;
-            }
-        }
-    }
-    if (cell==pf[6]){
-        if (cell==pf[7]){
-            if (cell==pf[8]){
-                return true;
-            }
-        }
-
+    if (((cell==pf[0])&&(cell==pf[1])&&(cell==pf[2]))||\
+        ((cell==pf[0])&&(cell==pf[3])&&(cell==pf[6]))||\
+        ((cell==pf[0])&&(cell==pf[4])&&(cell==pf[8]))||\
+        ((cell==pf[1])&&(cell==pf[4])&&(cell==pf[7]))||\
+        ((cell==pf[2])&&(cell==pf[5])&&(cell==pf[8]))||\
+        ((cell==pf[2])&&(cell==pf[4])&&(cell==pf[6]))||\
+        ((cell==pf[3])&&(cell==pf[4])&&(cell==pf[5]))||\
+        ((cell==pf[6])&&(cell==pf[7])&&(cell==pf[8]))){
+        return true;
     }
     return false;
 }
