@@ -109,12 +109,8 @@ int Matrix::Trace() {
         exit(2);
     }
     for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if (i==j) {
-                trace += data[width * i + j];
-            }
+        trace += data[width * i + 1 * i];
         }
-    }
     return trace;
 }
 
