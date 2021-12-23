@@ -22,6 +22,7 @@ public:
     Matrix operator * (const Matrix &other);
     int tr();
     double det();
+    double minor_det(int n, int m);
     void setnulls();
     void setones();
 };

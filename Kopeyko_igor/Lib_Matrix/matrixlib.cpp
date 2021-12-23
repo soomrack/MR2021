@@ -1,6 +1,7 @@
 #include "matrixlib.h"
 #include <iostream>
 #include <iomanip>
+#include <math.h>
 
 // ЗАМЕЧАНИЯ: (к предыдущей версии кода)
 // - Убрать комментарии в Заголовочном файле
@@ -130,7 +131,7 @@ Matrix Matrix::operator * (const Matrix &other) { //Перезагрузка о�
     return temp;
 }
 
-void Matrix::setnulls() {
+void Matrix::setnulls() {//Сделать матрицу нулевой
     for(int i = 0; i < rows; i++){
         for(int j = 0; j < cols; j++){
             data[cols * i + j] = 0.;
@@ -138,7 +139,7 @@ void Matrix::setnulls() {
     }
 }
 
-void Matrix::setones() {
+void Matrix::setones() {//Сделать матрицу единичной
     for(int i = 0; i < rows; i++){
         for(int j = 0; j < cols; j++){
             if(i == j) {
@@ -150,7 +151,6 @@ void Matrix::setones() {
     }
 }
 
-
 int Matrix::tr() { //След матрицы
     int trace = 0;
     for (int i = 0; i < this -> rows; i++) {
@@ -159,37 +159,39 @@ int Matrix::tr() { //След матрицы
     return trace;
 }
 
-
-double Matrix::det() { //Определитель матрицы методом Гаусса
-    double determinant = 1.;
-    double element = 0.;
-    double epss = 0.0000001;
-    int change = 0;
-    Matrix temp = *this;
-    //Цикл уменьшения размера матрицы по главной диагонали
-    for(int k = 0; k < (temp.cols); k++){
-        //Циклы деления элементов строк на первый элемент
-        for(int i = k; i < temp.cols; i++){
-            element = temp.data[cols * i + k];
-            if ((element < -epss) || (element > epss)) {
-                for (int j = k; j < temp.cols; j++) {
-                    temp.data[cols * i + j] /= element;
-                }
-                determinant *= element;
-                change = 1;
-            }
+double Matrix::minor_det(int n, int m){ //Находит определитель минора указанного элемента
+    Matrix temp((this -> rows) - 1, (this -> cols) - 1);
+    int row = 0;
+    int col = 0;
+    for(int i = 0; i < temp.rows; i++){
+        if (i == n) {
+            row++;
         }
-        //Циклы вычитания первой строки из последующих строк
-        for(int i = k+1; i < temp.cols; i++){
-            if((temp.data[cols * i + k] < -epss) || (temp.data[cols * i + k] > epss)) {
-                for (int j = k; j < temp.cols; j++) {
-                    temp.data[cols * i + j] -= temp.data[cols * k + j];
-                }
+        for(int j = 0; j < temp.cols; j++){
+            if (j == m){
+                col++;
             }
+            temp.data[temp.cols * i + j] = this -> data[cols*(row+i) + (j+col)];
         }
+        col = 0;
     }
-    if(change == 0) {
-        return 0.;
+    return temp.det();
+}
+
+double Matrix::det() {
+    if(rows != cols) { //Неквадратная
+        return -1.;
+    }
+    if(rows == 1){ //С одним элементом
+        return this -> data[0];
+    }
+    if(rows == 2){ // 2 на 2
+        return (data[0]*data[3]) - (data[2]*data[1]);
+    }
+    //Остальные виды матриц через алгебраическое дополнение
+    int determinant = 0;
+    for (int i = 0; i < cols; i++){
+        determinant = determinant + pow(-1,i+2) * data[i] * minor_det(0, i);
     }
     return determinant;
 }
