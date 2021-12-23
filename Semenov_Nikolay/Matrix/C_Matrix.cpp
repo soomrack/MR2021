@@ -110,7 +110,9 @@ int Matrix::Trace() {
     }
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            trace+=data[width * i + j];
+            if (i==j) {
+                trace += data[width * i + j];
+            }
         }
     }
     return trace;
