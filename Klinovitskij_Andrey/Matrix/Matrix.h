@@ -11,21 +11,28 @@ private:
     int height;
     int width;
     int *data;
+    int **data2;
 public:
+    Matrix();
     Matrix(int height, int width);
     Matrix(const Matrix&); //for copy
     ~Matrix();
 
-    void random_input(int height, int width);
+    int** allocate(int width, int height);
+    void set_random(int height, int width);
     void out();
     int size_height();
     int size_width ();
+    int trace();
     //int sum (const Matrix A, const Matrix B);
     //int subtraction (const Matrix A, const Matrix B);
     //int multiplication (const Matrix A, const Matrix B);
     Matrix operator+ (const Matrix &other);
     Matrix operator- (const Matrix &other);
     Matrix operator* (const Matrix &other);
+    Matrix & operator = (Matrix &&) noexcept;
+    Matrix & operator = (const Matrix &);
+
 private:
     void free(int* data);
 };

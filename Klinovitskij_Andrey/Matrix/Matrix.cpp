@@ -1,7 +1,16 @@
 #include <iostream>
 #include "Matrix.h"
+#include <cstring>
+#include <stdlib.h>
+
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+#define ANSI_COLOR_RED   "\x1b[0;91;40m"
+#define ANSI_COLOR_ORANGE "\x1b[0;93;40m"
+#define ANSI_COLOR_GREEN "\x1b[0;92;40m"
 
 #pragma once
+
 
 Matrix::Matrix(int height, int width) {
     this->height = height;
@@ -13,23 +22,20 @@ Matrix::Matrix(const Matrix &other) {
     this->height = other.height;
     this->width = other.width;
     this->data = (int *) malloc(height * width * sizeof(int));
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            this->data[width * i + j] = other.data[width * i + j];
-        }
-    }
+    std::memcpy(this->data, other.data, width * height * sizeof(int));
 }
+
 
 Matrix::~Matrix() {
     free(data);
 }
 
 void Matrix::free(int *data) {
-    if (height != 0 && width != 0 && data != NULL)
+    if (height != 0 && width != 0 && data != nullptr)
         delete[] data;
 }
 
-void Matrix::random_input(int height, int width) {
+void Matrix::set_random(int height, int width) {
     for (int i = 0; i < height * width; i++)
         data[i] = rand() % 10;
 }
@@ -96,14 +102,16 @@ int Matrix::multiplication(Matrix A, Matrix B) {
 
 Matrix Matrix::operator+(const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        std::cout << "\n\nERROR\n\nMatrix A and B must be the same size";
+        std::cout << "\n"<<ANSI_COLOR_ORANGE<<"WARNING!"<<ANSI_COLOR_RESET<<"\n\n"<<ANSI_COLOR_RED<<"Error"
+        <<ANSI_COLOR_RESET<<" in "<<ANSI_COLOR_GREEN<<"'-'"
+        <<ANSI_COLOR_RESET<<". Matrix A and B must be the same size\n\n\n";
         Matrix Error(0, 0);
         return Error;
     }
     Matrix Sum(this->height, this->width);
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            Sum.data[height * i + j] = this->data[height * i + j] + other.data[height * i + j];
+    for (int col = 0; col < width; col++) {
+        for (int row = 0; row < height; row++) {
+            Sum.data[height * col + row] = this->data[height * col + row] + other.data[height * col + row];
         }
     }
     Sum.out();
@@ -112,7 +120,9 @@ Matrix Matrix::operator+(const Matrix &other) {
 
 Matrix Matrix::operator-(const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        std::cout << "\n\nERROR\n\nMatrix A and B must be the same size";
+        std::cout << "\n"<<ANSI_COLOR_ORANGE<<"WARNING!"<<ANSI_COLOR_RESET<<"\n\n"<<ANSI_COLOR_RED<<"Error"
+        <<ANSI_COLOR_RESET<<" in "<<ANSI_COLOR_GREEN<<"'-'"
+        <<ANSI_COLOR_RESET<<". Matrix A and B must be the same size\n\n\n";
         Matrix Error(0, 0);
         return Error;
     }
@@ -129,7 +139,8 @@ Matrix Matrix::operator-(const Matrix &other) {
 Matrix Matrix::operator*(const Matrix &other) {
     int sum = 0;
     if (this->width != other.height) {
-        std::cout << "\nERROR\n\nMatrix A and B must be commutative (columns A = rows B)\n\n\n";
+        std::cout << "\n"<<ANSI_COLOR_ORANGE<<"WARNING!"<<ANSI_COLOR_RESET<<"\n\n"<<ANSI_COLOR_RED<<"Error"
+        <<ANSI_COLOR_RESET<<" in "<<ANSI_COLOR_GREEN<<"'*'"<<ANSI_COLOR_RESET<<". Must be A col = B row\n\n\n";
         Matrix Error(0, 0);
         return Error;
     }
@@ -143,4 +154,40 @@ Matrix Matrix::operator*(const Matrix &other) {
     }
     Mul.out();
     return Mul;
+}
+
+Matrix &Matrix::operator=(const Matrix &other) {
+    this->width = other.width;
+    this->height = other.height;
+    this->data = other.data;
+    std::memcpy(this->data, other.data, width * height * sizeof(int));
+}
+
+Matrix &Matrix::operator=(Matrix &&other) noexcept {
+    if (this == &other) {
+        return *this;
+    }
+    free(data);
+    width = other.width;
+    height = other.height;
+
+    data = other.data;
+    other.data = nullptr;
+    return *this;
+}
+
+int Matrix :: trace()
+{
+    int trace = 0;
+    for (int row = 0; row < width; row++)
+    {
+        for (int col = 0; col < height; col++)
+        {
+            if (row == col)
+            {
+                trace += data[row*width+col];
+            }
+        }
+    }
+    std::cout << trace << std::endl;
 }

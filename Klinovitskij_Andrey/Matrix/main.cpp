@@ -46,8 +46,8 @@ int main() {
     assigningValues(&a_rows, &a_columns, &b_rows, &b_columns);
     Matrix A(a_rows, a_columns);
     Matrix B(b_rows, b_columns);
-    A.random_input(a_rows, a_columns);
-    B.random_input(b_rows, b_columns);
+    A.set_random(a_rows, a_columns);
+    B.set_random(b_rows, b_columns);
     cout << "\n Matrix A:\n";
     A.out();
     cout << "\n Matrix B:\n";
@@ -66,5 +66,9 @@ int main() {
     cout << "\n Matrix F=A :\n";
     Matrix F = A;
     F.out();
+
+    cout << "\n A trace :\n";
+    A.trace();
     return 0;
 }
+
