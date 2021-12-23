@@ -350,25 +350,19 @@ void Matrix:: alloc_memory(unsigned int height, unsigned int width){
         return;
     }
 
-    // try to allocate memory for data_1d
+    // try to allocate memory
     try{
         data_1d = new double [height * width];
-    }
-    // if something is wrong then make data_1d nullptr and return
-    catch (std::bad_alloc const&){
-        data_1d =  nullptr; //
-        return;
-    }
-
-    // try to allocate memory for data_2d
-    try{
         data_2d = new double* [height];
     }
-    // if something is wrong then free data_1d, make data_1d and data_2d nullptr and return
+    // if something is wrong then free memory and return
     catch (std::bad_alloc const&){
         delete[] data_1d;
-        data_1d =  nullptr;
-        data_2d =  nullptr;
+        delete[] data_2d;
+
+        data_1d = nullptr;
+        data_2d = nullptr;
+
         return;
     }
 
