@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
 void field();//вывод поля
 void Replacement(char player, int pfield);//вставка на поле символа игрока
 bool win(char cell);//проверка на победу
@@ -13,31 +12,38 @@ int pfield1; //место для player 1
 int pfield2; //место для player 2
 char pf[9]={'1','2','3','4','5','6','7','8','9'}; //playing field
 int n=0;//общий счетчик ходов
+int bad=0;//ошибка - выбор заполненной клетки, если все в порядке остается = 0
 
 int main() {
     while (n<10){
         field();
-        printf("\nPlayer 1, Select the cell number:");
-        for (int i=0;((pfield1=getchar())!='\n')||(i<1);i++) {
-            Replacement(player1, pfield1);
+        while (bad<1){
+            printf("\nPlayer 1, Select the cell number:");
+            for (int i=0;((pfield1=getchar())!='\n')||(i<1);i++) {
+                Replacement(player1, pfield1);
+            }
         }
         if (win(player1)) {
             field();
             printf("\nPlayer number 1 won");
             return 0;
         }
+        bad=0;
         n++;
 
         field();
-        printf("\nPlayer 2, Select the cell number:");
-        for (int i=0;((pfield2=getchar())!='\n')||(i<1);i++) {
-            Replacement(player2, pfield2);
+        while (bad<1){
+            printf("\nPlayer 2, Select the cell number:");
+            for (int i=0;((pfield2=getchar())!='\n')||(i<1);i++) {
+                Replacement(player2, pfield2);
+            }
         }
         if (win(player2)){
             field();
             printf("\nPlayer number 2 won");
             return 0;
         }
+        bad=0;
         n++;
     }
     return 0;
@@ -54,7 +60,15 @@ void field(){//вывод поля на экран
 void Replacement(char player, int pfield){ //вставка на поле символа игрока
     for (int i=0;i<9;i++){
         if ((pfield-49)==i){
-            pf[i]=player;
+            if ((pf[i]=='1')||(pf[i]=='2')||(pf[i]=='3')||\
+            (pf[i]=='4')||(pf[i]=='5')||(pf[i]=='6')||\
+            (pf[i]=='7')||(pf[i]=='8')||(pf[i]=='9')){
+                pf[i]=player;
+                bad++;
+            }
+            else {
+                printf("Select an empty cell");
+            }
         }
     }
 }
