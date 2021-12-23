@@ -7,6 +7,8 @@ typedef enum{
     IDENTITY,
     TEMPORARY,
     RANDOM,
+    DIAGONAL,
+    NUMBER,
 } Matrix_Type;
 
 class Matrix {
@@ -16,8 +18,9 @@ private:
     int *data;
 public:
     Matrix();
-    Matrix(int rows, int cols, int *arr, unsigned int size);
-    Matrix(int rows, int cols, Matrix_Type type, int value);
+    Matrix(int rows, int cols, int *arr, unsigned int length);
+    //will copy the length elements from the arr to the matrix[row*cols].
+    Matrix(int rows, int cols, Matrix_Type type, int value = 0);
     ~Matrix();
     Matrix(const Matrix &source);
     Matrix(Matrix &&source) noexcept;
@@ -29,9 +32,10 @@ public:
     int tr();
     void print();
     int det();
-    void set_zeros( int value );
-    void set_identity(int value);
-    void set_temporary(int rows, int cols);
+    void set_zeros();
+    void set_identity();
+    void set_diagonal(int value);
+    void set_number(int value);
     void set_random(int value);
 };
 

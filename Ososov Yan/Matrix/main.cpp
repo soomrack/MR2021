@@ -11,11 +11,17 @@ int main() {
     B.print();
     Matrix C(B+A);
     C.print();
-    Matrix D(3,3, ZEROS,3);
+    Matrix D(3,3, ZEROS);
     D.print();
     Matrix E(D);
     E.print();
     printf("%d", A.det());
+
+    Matrix V(3,3,NUMBER, 4);
+    V.print();
+    Matrix G(3,3,IDENTITY);
+    G.print();
+
     //std::cout << A.det() << std::endl;
 
     return 0;
