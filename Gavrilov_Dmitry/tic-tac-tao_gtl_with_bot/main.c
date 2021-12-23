@@ -39,7 +39,7 @@ bool end_of_field() {
 
 void human_move(char p1, char p2) {
     if (field[pos - 1] == p2) {
-        gtk_label_set_text(GTK_LABEL(the_end), "Cheater detected, lose your turn!");
+        gtk_label_set_text(GTK_LABEL(the_end), "lose turn");
     }
     if (field[pos - 1] != p2){
         field[pos - 1] = p1;
@@ -75,7 +75,6 @@ void reset_func (GtkWidget *reset, gpointer data) {
     for(int i = 0; i < 9; ++i)
         gtk_button_set_label(GTK_BUTTON(Cell[i]), " ");
 
-    gtk_label_set_text(GTK_LABEL(the_end), "It's a big brain time");
     win();
     enable_field();
     if (gamer02_move == human_move) {
@@ -98,12 +97,11 @@ int gameplay_bot(GtkWidget *Cell, gpointer data) {
     }
     else {
         if(end_of_field() == true) {
-            gtk_label_set_text(GTK_LABEL(the_end), "End of the field, Game Over!");
+            gtk_label_set_text(GTK_LABEL(the_end), "Game Over!");
             disable_field();
         }
     }
     if ((win() != true)&&(end_of_field() != true)) {
-        gtk_label_set_text(GTK_LABEL(presenter),"Bot is thinking...");
         write_bot_choice();
         gtk_label_set_text(GTK_LABEL(presenter),"Your move!");
         if (win() == true) {
@@ -112,7 +110,7 @@ int gameplay_bot(GtkWidget *Cell, gpointer data) {
         }
         else {
             if (end_of_field() == true) {
-                gtk_label_set_text(GTK_LABEL(the_end), "End of the field, Game Over!");
+                gtk_label_set_text(GTK_LABEL(the_end), "Game Over!");
                 disable_field();
             }
         }
