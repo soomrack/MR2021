@@ -6,36 +6,23 @@
 
 class Matrix {
 private:
-    int height;
-    int width;
-public:
+    int height = 0;
+    int width = 0;
     int *data;
+    void erase(int* data) const;
 public:
-    Matrix(int h, int w) {
-        this->height = h;
-        this->width = w;
-        data = (int *) malloc(h * w * sizeof(int));
-    }
-
-    void M_Rand(int h, int w) const {
-        for (int i = 0; i < h * w; i++)
-            data[i] = rand()%10;
-    }
-
-    void M_Out(int w, int h) const {
-        for (int i = 0; i < h * w; i++) {
-            std::cout << data[i] << " ";
-            if ((i+1) % w == 0)
-                std::cout << std::endl;
-        }
-    }
-
-    int M_Size_H () const {
-        return height;
-    }
-
-    int M_Size_W () const {
-        return width;
-    }
+    Matrix(int height, int width); //Initialising
+    Matrix(const Matrix &Matrix); //For copying
+    Matrix(Matrix &&Matrix) noexcept; //Moving
+    ~Matrix(); //Destructor
+    void Rand(int height, int width); //Fill matrix with random values
+    void Identity();
+    void Zero();
+    void Output();
+    Matrix operator + (const Matrix &other);
+    Matrix operator - (const Matrix &other);
+    Matrix operator * (const Matrix &other);
+    int Trace();
+    double Determinant();
 };
 #endif //C_MATRIX_C_MATRIX_H
