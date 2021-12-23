@@ -12,39 +12,45 @@ int pfield1; //место для player 1
 int pfield2; //место для player 2
 char pf[9]={'1','2','3','4','5','6','7','8','9'}; //playing field
 int n=0;//общий счетчик ходов
-int bad=0;//ошибка - выбор заполненной клетки, если все в порядке остается = 0
+int bad=0;//ошибка, когда выбраннна заполненная клетка,она остается равна 0, ход повторяется, если пустая, то прибавляется единица и идет игра дальше
 
 int main() {
     while (n<10){
         field();
+        n++;
         while (bad<1){
             printf("\nPlayer 1, Select the cell number:");
             for (int i=0;((pfield1=getchar())!='\n')||(i<1);i++) {
                 Replacement(player1, pfield1);
             }
         }
+        bad=0;
         if (win(player1)) {
             field();
             printf("\nPlayer number 1 won");
             return 0;
         }
-        bad=0;
-        n++;
 
-        field();
-        while (bad<1){
-            printf("\nPlayer 2, Select the cell number:");
-            for (int i=0;((pfield2=getchar())!='\n')||(i<1);i++) {
-                Replacement(player2, pfield2);
+
+        n++;
+        if (n<10){
+            field();
+            while (bad<1){
+                printf("\nPlayer 2, Select the cell number:");
+                for (int i=0;((pfield2=getchar())!='\n')||(i<1);i++) {
+                    Replacement(player2, pfield2);
+                }
+            }
+            bad=0;
+            if (win(player2)){//конец игры,если все ячейки заполнены, но никто не победил
+                field();
+                printf("\nPlayer number 2 won");
+                return 0;
             }
         }
-        if (win(player2)){
-            field();
-            printf("\nPlayer number 2 won");
-            return 0;
+        else {
+            printf("Game is over");
         }
-        bad=0;
-        n++;
     }
     return 0;
 }
