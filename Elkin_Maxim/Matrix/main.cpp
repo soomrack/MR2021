@@ -16,7 +16,8 @@ int main() {
     cout << "New A ";
     A.print_matrix();
 
-    Matrix B;
+    Matrix B(A);
+    B.print_matrix();
     double arrayB[4][3] = {{8.8,4,6},
                            {13,5,9},
                            {13,37,41},
@@ -30,10 +31,8 @@ int main() {
     cout << "result of A sum B" << endl;
     C.print_matrix();
 
-    C = A + B;
-    C.print_matrix();
-
-    Matrix D = A - B;
+    Matrix D;
+    D = A - B;
     cout << "result of A sub B" << endl;
     D.print_matrix();
 
