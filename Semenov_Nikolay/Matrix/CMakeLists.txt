@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(C_Matrix
         C_Matrix.cpp
-        C_Matrix.h)
+        C_Matrix.h main.cpp)

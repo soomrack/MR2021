@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 void field();//вывод поля
 void Replacement(char player, int pfield);//вставка на поле символа игрока
@@ -12,7 +13,7 @@ int pfield1; //место для player 1
 int pfield2; //место для player 2
 char pf[9]={'1','2','3','4','5','6','7','8','9'}; //playing field
 int n=0;//общий счетчик ходов
-int bad=0;//ошибка, когда выбраннна заполненная клетка,она остается равна 0, ход повторяется, если пустая, то прибавляется единица и идет игра дальше
+int bad=0;//ошибка, когда выбрана заполненная клетка, она остается равна 0, ход повторяется, если пустая, то прибавляется единица и идет игра дальше
 
 int main() {
     while (n<10){
@@ -21,6 +22,7 @@ int main() {
         while (bad<1){
             printf("\nPlayer 1, Select the cell number:");
             for (int i=0;((pfield1=getchar())!='\n')||(i<1);i++) {
+                pfield1=pfield1-49;
                 Replacement(player1, pfield1);
             }
         }
@@ -36,15 +38,14 @@ int main() {
         if (n<10){
             field();
             while (bad<1){
-                printf("\nPlayer 2, Select the cell number:");
-                for (int i=0;((pfield2=getchar())!='\n')||(i<1);i++) {
-                    Replacement(player2, pfield2);
-                }
+                pfield2=rand()%(9)+1;
+                printf("\nThe bot has chosen a place: %d\n", pfield2);
+                Replacement(player2, pfield2);
             }
             bad=0;
             if (win(player2)){//конец игры,если все ячейки заполнены, но никто не победил
                 field();
-                printf("\nPlayer number 2 won");
+                printf("\nPlayer number 2 (bot) won");
                 return 0;
             }
         }
@@ -65,7 +66,7 @@ void field(){//вывод поля на экран
 
 void Replacement(char player, int pfield){ //вставка на поле символа игрока
     for (int i=0;i<9;i++){
-        if ((pfield-49)==i){
+        if (pfield==i){
             if ((pf[i]=='1')||(pf[i]=='2')||(pf[i]=='3')||\
             (pf[i]=='4')||(pf[i]=='5')||(pf[i]=='6')||\
             (pf[i]=='7')||(pf[i]=='8')||(pf[i]=='9')){
@@ -92,4 +93,3 @@ bool win(char cell) { //посылаем сюда 0 или X, проверка �
     }
     return false;
 }
-

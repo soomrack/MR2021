@@ -2,7 +2,7 @@
 #include <ctime>
 #include "Matrix_lib.h."
 
-Matrix::Matrix(unsigned int rows,unsigned int columns,unsigned int type){
+Matrix::Matrix(unsigned int rows = 0,unsigned int columns = 0,unsigned int type = 0){
     this->rows = rows;
     this->columns = columns;
     srand(time(NULL));
