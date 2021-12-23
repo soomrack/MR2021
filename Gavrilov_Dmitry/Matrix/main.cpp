@@ -14,7 +14,7 @@ int main() {
     std::cout << "Matrix C" << std::endl;
     C.print();
 
-    std::cout << C.det() << std::endl;
+    std::cout << C.determinate() << std::endl;
 
     return 0;
 }
