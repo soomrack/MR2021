@@ -7,32 +7,32 @@
 #include "stdio.h"
 #include "gtk/gtk.h"
 
-bool SwitchMove =  false;
-bool IsCellVacant[9];
+bool switch_move =  false;
+bool cell_free[9];
 
 void rand_move(char p1, char p2) {
     int RandomCell = 0;
-    for (int e = 0; e <= 8; e++) {
-        if ((field[e] == p1) || (field[e] == p2)) {
-            IsCellVacant[e] = false;
+    srand(time(NULL));
+    for (int i = 0; i <= 8; i++) {
+        if ((field[i] == p1) || (field[i] == p2)) {
+            cell_free[i] = false;
         }
         else {
-            IsCellVacant[e] = true;
+            cell_free[i] = true;
         }
     }
     do {
-        srand(time(NULL));
         RandomCell = rand() % 9;
-        if (IsCellVacant[RandomCell] == true) {
+        if (cell_free[RandomCell] == true) {
             field[RandomCell] = p1;
             pos = RandomCell;
-            SwitchMove = true;
+            switch_move = true;
         }
-    } while (SwitchMove == false);
+    } while (switch_move == false);
 }
 
 void bot_easy(char p1, char p2) {
-    SwitchMove=false;
+    switch_move=false;
     rand_move(p1,p2);
     snprintf(buffer_cell_value, sizeof(buffer_cell_value), "%c", p1);
 }

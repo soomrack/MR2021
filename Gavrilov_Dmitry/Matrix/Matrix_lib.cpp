@@ -18,7 +18,6 @@ Matrix::Matrix(unsigned int rows,unsigned int columns,unsigned int type){
                 case 1:
                     if ( rows != columns){
                         std::cout << "Matrix must be square" << std::endl;
-                        exit(1);
                     }
                     if (i == j)  data[j + rows * i] = 1;
                     else data[j + rows * i] = 0;
@@ -40,11 +39,7 @@ Matrix::Matrix(const Matrix &other) {
     this->rows = other.rows;
     this->columns = other.columns;
     this->data = new int [rows*columns];
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            this->data[j + rows * i] = other.data[j + rows * i];
-        }
-    }
+    memcpy(data,other.data,sizeof(int)*rows * columns);
 }
 
 Matrix::Matrix(Matrix &&other) noexcept {
@@ -73,11 +68,9 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept {
     this->columns = other.columns;
     delete [] this->data;
     this->data = new int [rows*columns];
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            this->data[j + rows * i] = other.data[j + rows * i];
-        }
-    }
+
+    memcpy(data,other.data,sizeof(int)*rows * columns);
+
     other.data = nullptr;
     other.rows = 0;
     other.columns = 0;
@@ -101,7 +94,7 @@ Matrix Matrix::operator- (const Matrix &other){
 
 Matrix Matrix::operator+ (const Matrix &other){
     if (this->rows != other.rows || this->columns != other.columns){
-        std::cout << "Matrix aren't equal" << std::endl;
+        std::cout << "Matrix aren't same" << std::endl;
         exit(1);
     }
     Matrix temp(this->rows, this->columns, 0);
@@ -116,7 +109,7 @@ Matrix Matrix::operator+ (const Matrix &other){
 
 Matrix Matrix::operator * (const Matrix &other){
     if (this->columns != other.rows){
-        std::cout << "It's impossible to do the operation" << std::endl;
+        std::cout << "Error, wrong size of matrix" << std::endl;
         exit(1);
     }
     Matrix temp(this->rows, this->columns, 3);
@@ -132,7 +125,7 @@ Matrix Matrix::operator * (const Matrix &other){
     return temp;
 }
 
-int Matrix::tr() {
+int Matrix::trace() {
     int matrix_trace = 0;
     if (this->rows != this->columns) {
         std::cout << "Matrix isn't square" << std::endl;
@@ -154,11 +147,11 @@ void Matrix::print() {
 }
 
 
-double Matrix::det(){
+double Matrix::determinate(){
     double det = 1;
     int tmp;
     if(this->columns != this->columns)
-        std::cout << "enter a square matrix " << std::endl;
+        std::cout << "Enter a square matrix " << std::endl;
 
     for (int k = 0; k < rows - 1; k++) {
         for (int i = k + 1; i < rows; i++) {

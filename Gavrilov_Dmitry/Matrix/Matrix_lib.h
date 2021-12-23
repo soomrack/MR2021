@@ -21,8 +21,8 @@ public:
     Matrix & operator= (Matrix &&) noexcept;
     Matrix & operator= (const Matrix &);
 
-    int tr();
-    double det();
+    int trace();
+    double determinate();
     void print();
 };
 
