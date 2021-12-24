@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-project(Matrix)
+project(untitled3)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Matrix main.cpp Matrix.h Matrix.cpp)
+add_executable(untitled3 main.cpp Matrix.cpp Matrix.h)
