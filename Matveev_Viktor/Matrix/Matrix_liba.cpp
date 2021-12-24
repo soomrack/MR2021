@@ -95,7 +95,7 @@ Matrix & Matrix :: operator = (const Matrix &other)
         return *this;
     }
     clear_memory();
-    this->data= allocation_memory(length, height);
+    this->data = allocation_memory(other.length, other.height);
     if (data_line != nullptr)
     {
         this->length = other.length;
