@@ -12,7 +12,7 @@ int main() {
                           {8,3,7},
                           {6,9,2},
                           {4,13,88}};
-    A.set_matrix(arrayA);
+    A.set_matrix_from_2d(arrayA);
     cout << "New A ";
     A.print_matrix();
 
@@ -22,7 +22,7 @@ int main() {
                            {13,5,9},
                            {13,37,41},
                            {5.5,16,3}};
-    B.set_matrix(arrayB);
+    B.set_matrix_from_2d(arrayB);
     cout << "New B ";
     B.print_matrix();
     cout << "determinant of B: " << B.get_det() << endl;
@@ -43,11 +43,11 @@ int main() {
     double mult2[2][3] = {{9,5,6},
                           {4,3,1}};
 
-    A.set_matrix(mult1);
+    A.set_matrix_from_2d(mult1);
     cout << "New A ";
     A.print_matrix();
 
-    B.set_matrix(mult2);
+    B.set_matrix_from_2d(mult2);
     cout <<"New B ";
     B.print_matrix();
 
@@ -64,9 +64,14 @@ int main() {
                          {1,8,3,4},
                          {13,3,5,7}};
 
-    F.set_matrix(det);
+    F.set_matrix_from_2d(det);
     cout <<"New F ";
     F.print_matrix();
     cout << "determinant of F: " << F.get_det() << endl;
+
+    double m[16] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    F.set_matrix_from_1d(m);
+    F.print_matrix();
+
     return 0;
 }
