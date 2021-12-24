@@ -224,7 +224,7 @@ double Matrix::determinant(const Matrix A) { // matrix determinant
     }
 }
 
-extern Matrix Matrix::transposition(const Matrix A) {
+extern Matrix Matrix::transposition(const Matrix A) { // matrix transposition
     Matrix Result (A.cols, A.rows);
     for (int i = 0; i < A.rows; i++) {
         for (int j = 0; j < A.cols; j++) {
