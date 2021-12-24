@@ -9,7 +9,7 @@ int main()
 
     Matrix F (3,3);
 
-    F.create_matrix(test_arr1);
+    F.set_matrix(test_arr1);
 
     F.display();
 
@@ -23,7 +23,7 @@ int main()
 
     Matrix S (3,2);
 
-    S.create_matrix(test_arr2);
+    S.set_matrix(test_arr2);
 
     S.display();
 

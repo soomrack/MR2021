@@ -4,17 +4,16 @@ using namespace std;
 
 class Matrix
 {
-private:   //Useful things
-    double *string = nullptr;
-    double **Matr = nullptr;
+private:
+    double *data_line = nullptr;
+    double **data = nullptr;
     int length = 0;
     int height = 0;
-private:   // Private methods
-    double** alloc(unsigned int length, unsigned int height);
+private:
+    double** allocation_memory(unsigned int length, unsigned int height);
     void clear_memory();
     void sort_rows(unsigned int col);
 public:    // Constructors and destructor
-    Matrix();
     Matrix(unsigned int length=0, unsigned int height=0);
     Matrix(const Matrix& other);
     Matrix(Matrix&& other) noexcept;
@@ -26,9 +25,9 @@ public:    // Overloaded operators
     Matrix & operator = (Matrix &&) noexcept;
     Matrix & operator = (const Matrix &);
 public:    // Various methods
-    void create_matrix(double *arr);
-    void create_matrix_one();
+    void set_matrix(double *arr);
+    void set_matrix_one(); //set 1 on main diagonal (even if matrix not square)
     void display();
-    int trace();
+    int trace(); //returns sum of numbers on main diagonal (even if matrix not square)
     double determinant ();
 };
