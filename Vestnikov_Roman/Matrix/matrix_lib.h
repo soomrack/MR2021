@@ -6,30 +6,30 @@
 
 class Matrix {
 private:
-    unsigned int height=0;
-    unsigned int width=0;
-    double *data_1=nullptr;
-    double **data_2=nullptr;
+    unsigned int height = 0;
+    unsigned int width = 0;
+    double *data_1 = nullptr;
+    double **data_2 = nullptr;
 public:
-    explicit Matrix(unsigned int height=0, unsigned int width=0);
-    Matrix (const Matrix &matrix);
+    explicit Matrix(unsigned int height = 0, unsigned int width = 0);
+    Matrix(const Matrix &matrix);
     Matrix(Matrix &&matrix) noexcept;
     ~Matrix();
 public:
-    void set(double *array);
-    void random();
+    void set_array(double *array);
+    void set_random();
+    void set_identity();
+    void set_zero();
     void print();
-    void identity();
-    void zero();
 public:
     double det();
     double trace();
 public:
-    Matrix &operator= (const Matrix &matrix);
-    Matrix &operator= (Matrix &&) noexcept;
-    Matrix operator+ (const Matrix &matrix);
-    Matrix operator- (const Matrix &matrix);
-    Matrix operator* (const Matrix &matrix);
+    Matrix &operator=(const Matrix &matrix);
+    Matrix &operator=(Matrix &&) noexcept;
+    Matrix operator+(const Matrix &matrix);
+    Matrix operator-(const Matrix &matrix);
+    Matrix operator*(const Matrix &matrix);
 private:
     void sort_rows(unsigned int col);
     void memory_allocation(unsigned int height, unsigned int width);
@@ -37,4 +37,3 @@ private:
 };
 
 #endif //MATRIX_LIB_H
-
