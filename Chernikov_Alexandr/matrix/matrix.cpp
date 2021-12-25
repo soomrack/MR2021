@@ -5,7 +5,7 @@
 
 Matrix::Matrix(unsigned int height,unsigned int width, double value){
 
-    alloc_memory(height, width);
+    allocate_memory(height, width);
 
     // if allocating was successful then start initializing
     if (data_1d != nullptr){
@@ -20,7 +20,7 @@ Matrix::Matrix(unsigned int height,unsigned int width, double value){
 
 Matrix::Matrix(unsigned int height, unsigned int width, MatrixType type){
 
-    alloc_memory(height, width);
+    allocate_memory(height, width);
 
     // if allocating was successful then start initializing
     if (data_1d != nullptr) {
@@ -37,13 +37,13 @@ Matrix::Matrix(unsigned int height, unsigned int width, MatrixType type){
     }
 }
 
-Matrix::Matrix(double* arr, unsigned int lines, unsigned int cols){
+Matrix::Matrix(double* arr, unsigned int rows, unsigned int cols){
 
-    alloc_memory(lines, cols);
+    allocate_memory(rows, cols);
 
     // if allocating was successful then start initializing
     if (data_1d != nullptr){
-        height = lines;
+        height = rows;
         width = cols;
         memcpy(data_1d, arr, height * width * sizeof(double));
     }
@@ -55,7 +55,7 @@ Matrix::~Matrix(){
 
 Matrix::Matrix(const Matrix &other){
 
-    alloc_memory(other.height, other.width);
+    allocate_memory(other.height, other.width);
 
     // if allocating was successful then start copying
     if (data_1d != nullptr) {
@@ -84,11 +84,8 @@ Matrix& Matrix::operator= (const Matrix& other){
         return *this;
     }
 
-    // free old memory // change it
     free_memory();
-
-    // try to allocate memory
-    alloc_memory(height, width);
+    allocate_memory(height, width);
 
     // if allocating was successful then start copying
     if (data_1d != nullptr) {
@@ -122,12 +119,10 @@ Matrix& Matrix::operator= (Matrix&& other) noexcept{
 // return 0 - success, return 1 - failure
 int Matrix::set(unsigned int row, unsigned int col, double value){
 
-    // if row or col is out of borders of the array then do nothing and return 1
     if ((row >= this->height) || (col >= this->width)) {
         return 1;
     }
 
-    // else set value in a correct cell and return 0
     this->data_2d[row][col] = value;
     return 0;
 }
@@ -137,11 +132,9 @@ int Matrix::set(unsigned int row, unsigned int col, double value){
 // return 0.0 - row or col out of range
 double Matrix::get(unsigned int row, unsigned int col) {
 
-    // if row or col is out of borders of the array then return NaN
     if ((row >= this->height) || (col >= this->width)) {
         return 0.0;
     }
-    // else return the correct value of the cell
     return this->data_2d[row][col];
 }
 
@@ -160,7 +153,6 @@ Matrix Matrix::operator+ (const Matrix& other){
         result.data_1d[i] = data_1d[i] + other.data_1d[i];
     }
     return result;
-    return Matrix();
 }
 
 // overload of operator "-" for two matrices
@@ -193,7 +185,7 @@ Matrix Matrix::operator* (const Matrix& other){
     // multiply
     for (int row = 0; row < height; row++){
         for (int col = 0; col < other.width; col++){
-            result.data_2d[row][col] = 0;
+            result.data_2d[row][col] = 0.0;
             for (int i = 0; i < other.height; i++){
                 result.data_2d[row][col] += data_2d[row][i] * other.data_2d[i][col];
             }
@@ -342,7 +334,7 @@ void Matrix::apply_forward_elimination(){
 }
 
 // allocate memory for matrix
-void Matrix:: alloc_memory(unsigned int height, unsigned int width){
+void Matrix:: allocate_memory(unsigned int height, unsigned int width){
 
     // if any dimension is zero then not to allocate memory
     // and leave data_1d and data_2d with default value (nullptr)

@@ -19,14 +19,14 @@ private:
 public:
     explicit Matrix(unsigned int height = 0, unsigned int width = 0, double value = 0.0);
     Matrix(unsigned int height, unsigned int width, MatrixType type);
-    Matrix(double* arr, unsigned int lines, unsigned int cols);
+    Matrix(double* arr, unsigned int rows, unsigned int cols);
     Matrix(const Matrix& other);
     Matrix(Matrix&& other) noexcept;
     Matrix& operator= (const Matrix& other);
     Matrix& operator= (Matrix&& other) noexcept;
     ~Matrix();
 public:
-    double get(unsigned int row, unsigned int col);             // return 0.0 - row or col out of range
+    double get(unsigned int row, unsigned int col);             // return 0.0 - row or col is out of range
     int set(unsigned int row, unsigned int col, double value);  // return 0 - success, return 1 - failure
 public:
     unsigned int get_height() const {return height;}
@@ -48,7 +48,7 @@ public:
     void print();
 private:
     void apply_forward_elimination();
-    void alloc_memory(unsigned int height, unsigned int width);
+    void allocate_memory(unsigned int height, unsigned int width);
     void free_memory();
 };
 
