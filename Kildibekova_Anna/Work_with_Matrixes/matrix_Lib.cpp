@@ -36,7 +36,20 @@ Matrix::~Matrix() {
     free_memory();
 }
 
-Matrix & Matrix::operator = (const Matrix &matrix) { }
+Matrix & Matrix::operator = (const Matrix &matrix) {
+    if (matrix.cleanly) {
+        std::cout<<"=> Присваевоемой матрицы не существует."<<std::endl;
+        return *this;
+    }
+    free_memory();
+    wight = matrix.wight;
+    height = matrix.height;
+    memory_allocation();
+    memcpy(data, matrix.data, height*wight*sizeof(double));
+    return *this;
+
+}
+
 Matrix & Matrix::operator + (const Matrix &matrix) { }
 Matrix & Matrix::operator * (const Matrix &matrix) { }
 

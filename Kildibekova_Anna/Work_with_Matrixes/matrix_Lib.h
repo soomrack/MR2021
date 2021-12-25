@@ -18,7 +18,7 @@ private:
     int height;
     int wight;
     double *data;
-private:
+public:
     Matrix & operator = (const Matrix &matrix);  //
     Matrix & operator + (const Matrix &matrix);  //
     Matrix & operator * (const Matrix &matrix);  //
