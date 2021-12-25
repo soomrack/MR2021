@@ -66,57 +66,39 @@ Matrix & Matrix::operator= (const Matrix &m) {
     return *this;
 }
 
-Matrix & Matrix::operator+ (const Matrix &m){
+Matrix Matrix::operator+ (const Matrix &m){
     if ((m.width != this->width) or (m.height != this->height)){
         std::cout<<"Summation error\n";
-        return * new Matrix(0,0);
+        return {0,0};
     }
 
-    auto * matrix = new Matrix();
-    matrix->width = m.width;
-    matrix->height = m.height;
-    free(matrix->data);
-    matrix->data = (double *) malloc(matrix->height * matrix->width * sizeof(double));
-    if (matrix->data == nullptr){
-        matrix->height = 0;
-        matrix->width = 0;
-    } else for (int i = 0; i < matrix->height * matrix->width; ++i) {
+    auto * matrix = new Matrix(m.height, m.width);
+    //Проверка выделения памяти производится в конструкторе
+    for (int i = 0; i < matrix->height * matrix->width; ++i) {
         matrix->data[i] = this->data[i] + m.data[i];
     }
 
     return * matrix;
 }
 
-Matrix & Matrix::operator* (const Matrix &m){
+Matrix Matrix::operator* (const Matrix &m){
     if (m.height != this->width){
         std::cout<<"Multiplication error\n";
-        return * new Matrix(0,0);
+        return {0,0};
     }
-
-    auto * matrix = new Matrix();
-    matrix->width = m.width;
-    matrix->height = this->height;
-    free(matrix->data);
-    matrix->data = (double *) malloc(matrix->height * matrix->width * sizeof(double));
-    if (matrix->data == nullptr){
-        matrix->height = 0;
-        matrix->width = 0;
-    } else {
-
-        for (int i = 0; i < this->height; ++i) {
-            for (int j = 0; j < m.width; ++j) {
-                double Temp = 0.0;
-                for (int k = 0; k < m.height; ++k) {
-                    Temp += this->data[ i * this->width + k] * m.data[m.width * k + j];
-                }
-                matrix->data[i * width + j] = Temp;
+    auto * matrix = new Matrix(this->height, m.width);
+    //Проверка выделения памяти производится в конструкторе
+    for (int i = 0; i < this->height; ++i) {
+        for (int j = 0; j < m.width; ++j) {
+            double Temp = 0.0;
+            for (int k = 0; k < m.height; ++k) {
+                Temp += this->data[ i * this->width + k] * m.data[m.width * k + j];
             }
+            matrix->data[i * width + j] = Temp;
         }
-
     }
 
     return * matrix;
-
 }
 
 void Matrix::print() {
