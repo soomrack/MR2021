@@ -5,124 +5,177 @@
 using namespace std;
 
 
-Matrix::Matrix(int rows, int cols, string name)
+Matrix::Matrix() { //матрица нулевого размера
+	rows = 0;
+	cols = 0;
+	data = nullptr;
+	arr = nullptr;
+}
+
+
+Matrix::Matrix(int rows, int cols) //обычный конструктор с параметрами
 {
 	this->rows = rows;
 	this->cols = cols;
-	this->name = name;
-	//создание динамического двумерного массива
-	this->arr = new int* [rows];
+
+	//создание последовательного динамического двумерного массива
+	data = new int[rows * cols];
+	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
-		this->arr[i] = new int[cols];
+		arr[i] = &data[i * cols];
 	}
 }
+
+
+Matrix::Matrix(int rows, int cols, int type) { //Конструктор единичной и нулевой матриц заданного размера
+	this->rows = rows;
+	this->cols = cols;
+
+	//создание последовательного динамического двумерного массива
+	data = new int[rows * cols];
+	arr = new int* [rows];
+	for (int i = 0; i < rows; i++)
+	{
+		arr[i] = &data[i * cols];
+	}
+
+	//заполнение единичной и нулевоц матриц
+	switch (type)
+	{
+	case 0: //создание нулевой матрицы
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				arr[i][j] = 0;
+			}
+		}
+		break;
+
+	case 1: //создание единичной матрицы
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				arr[i][j] = 0;
+				arr[i][i] = 1;
+			}
+		}
+		break;
+
+	default:
+		rows = 0;
+		cols = 0;
+		data = nullptr;
+		arr = nullptr;
+	}
+}
+
 
 Matrix::Matrix(const Matrix& other_matrix)	//конструктор копирования
 {
 	this->rows = other_matrix.rows;
 	this->cols = other_matrix.cols;
 
-	//создание динамического двумерного массива
+	this->data = new int[rows * cols]; //создание последовательного динамического двумерного массива
+	memcpy(this->data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
+
 	this->arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
-		this->arr[i] = new int[cols];
+		this->arr[i] = &data[i * cols];
+	}
+}
+
+
+
+Matrix::Matrix(Matrix&& other_matrix) noexcept //Конструктор перемещения
+{
+	rows = other_matrix.rows;
+	cols = other_matrix.cols;
+	data = other_matrix.data;
+	arr = other_matrix.arr;
+
+	other_matrix.rows = 0;
+	other_matrix.cols = 0;
+	other_matrix.data = nullptr;
+	other_matrix.arr = nullptr;
+} 
+
+
+Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка оператора +
+{
+	if ((this->rows != other_matrix.rows) || (this->cols != other_matrix.cols))
+	{
+		return Matrix();
 	}
 
+	Matrix result(this->rows, this->cols);
 	//инициализация динамического двумерного массива
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			this->arr[i][j] = other_matrix.arr[i][j];
-		}
-	}
-}
-
-void Matrix::Inicialization(const Matrix A) //инициализация динамического двумерного массива
-{
-	setlocale(LC_ALL, "ru");
-	cout << "Последовательно, начиная от первого элемента, введите значения матрицы " << name << ", размером " << rows << " x " << cols << endl;
-	for (int i = 0; i < rows; i++)
-	{
-		for (int j = 0; j < cols; j++)
-		{
-			cin >> arr[i][j];
-		}
-	}
-}
-
-Matrix Matrix::operator +(const Matrix& B) //перегрузка оператора +
-{
-	if ((this->rows != B.rows) || (this->cols != B.cols))
-	{
-		std::cout << "Матрицы разных размеров. Как я посчитаю их сумму? :(\n";
-	}
-
-	Matrix result(this->rows, this->cols, "result");
-
-	//инициализация динамического двумерного массива
-	for (int i = 0; i < rows; i++)
-	{
-		for (int j = 0; j < cols; j++)
-		{
-			result.arr[i][j] = this->arr[i][j] + B.arr[i][j];
+			result.arr[i][j] = this->arr[i][j] + other_matrix.arr[i][j];
 		}
 	}
 	return result;
 }
 
-Matrix Matrix::operator *(const Matrix& B) //перегрузка оператора *
+
+Matrix Matrix::operator *(const Matrix& other_matrix) //перегрузка оператора *
 {
-	if (this->cols != B.rows)
+	if (this->cols != other_matrix.rows)
 	{
-		std::cout << "Число столбцов первой матрицы не равно числу строк второй матрицы. Как я выполню умножение? :(\n";
+		return Matrix();
 	}
-	Matrix result(this->rows, B.cols, "result");
+
+	Matrix result(this->rows, other_matrix.cols);
+
 	//инициализация динамического двумерного массива
-	for (int row = 0; row < this->rows; row++) {
-		for (int col = 0; col < B.cols; col++) {
+	for (int row = 0; row < this->rows; row++)
+	{
+		for (int col = 0; col < other_matrix.cols; col++)
+		{
 			result.arr[row][col] = 0;
-			for (int i = 0; i < B.rows; i++) {
-				result.arr[row][col] += this->arr[row][i] * B.arr[i][col];
+			for (int i = 0; i < other_matrix.rows; i++)
+			{
+				result.arr[row][col] += this->arr[row][i] * other_matrix.arr[i][col];
 			}
 		}
 	}
 	return result;
 }
 
-Matrix& Matrix::operator =(const Matrix& other_matrix) //перегрузка оператора =
+Matrix& Matrix::operator =(const Matrix& other_matrix) //перегрузка оператора присваивания 
 {
+	if (&other_matrix == this)
+	{
+		return *this;
+	}
+
 	this->rows = other_matrix.rows;
 	this->cols = other_matrix.cols;
 
-	for (int i = 0; i < rows; i++)
-	{
-		delete[] arr[i];
-	}
-	delete[] arr;
+	delete[] this->data;
+	delete[] this->arr;
 
-	//создание динамического двумерного массива
+	//создание последовательного динамического двумерного массива
+	this->data = new int[rows * cols];
+	memcpy(this->data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
+
 	this->arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
-		this->arr[i] = new int[cols];
+		this->arr[i] = &data[i * cols];
 	}
 
-	//инициализация динамического двумерного массива
-	for (int i = 0; i < rows; i++)
-	{
-		for (int j = 0; j < cols; j++)
-		{
-			this->arr[i][j] = other_matrix.arr[i][j];
-		}
-	}
 	return *this;
 }
 
 
-void Matrix::Print()
+void Matrix::print()
 {
 	cout << endl;
 	for (int i = 0; i < rows; i++)
@@ -131,32 +184,24 @@ void Matrix::Print()
 		{
 			cout << arr[i][j] << ' ';
 		}
-		cout << "\n";
+		cout << endl;
 	}
 }
 
-int Matrix::Trace()
+int Matrix::trace()
 {
-	setlocale(LC_ALL, "ru");
 	int trace = 0;
-	if (rows != cols)
+	for (int i = 0; i < rows; i++)
 	{
-		cout << "Ваша матрица не квадратная. Как я Вам найду главную диагональ:( ?";
-	}
-	else
-	{
-		for (int i = 0; i < rows; i++)
-		{
-			trace += arr[i][i];
-		}
+		trace += arr[i][i];
 	}
 	return trace;
 }
 
 
-Matrix Matrix::Minor(int row, int col, const Matrix a)
+Matrix Matrix::minor(int row, int col, const Matrix a)
 {
-	Matrix result(a.rows - 1, a.cols - 1, "result");
+	Matrix result(a.rows - 1, a.cols - 1);
 
 	int offsetRow = 0; //Смещение индекса строки в матрице
 	int offsetCol = 0; //Смещение индекса столбца в матрице
@@ -184,13 +229,12 @@ Matrix Matrix::Minor(int row, int col, const Matrix a)
 	return result;
 }
 
-double Matrix::Det(const Matrix a)
+double Matrix::det(const Matrix a)
 {
-	setlocale(LC_ALL, "ru");
-	double det = 0;
+	double tempdet = 0.;
 	if (a.rows != a.cols)
 	{
-		cout << "Ваша матрица не квадратная. Как я Вам найду ее определитель:( ?";
+		return -1.;
 	}
 
 	switch (a.rows)
@@ -202,19 +246,16 @@ double Matrix::Det(const Matrix a)
 	default:
 		for (int j = 0; j < a.cols; j++)
 		{
-			det += pow(-1, j) * a.arr[0][j] * Det(Minor(0, j, a));
+			tempdet += pow(-1, j) * a.arr[0][j] * det(minor(0, j, a));
 		}
-		return det;
+		return tempdet;
 	}
 }
 
 Matrix::~Matrix()
 {
-	for (int i = 0; i < rows; i++)
-	{
-		delete[] arr[i];
-		arr[i] = nullptr;
-	}
+	delete[] data;
 	delete[] arr;
+	data = nullptr;
 	arr = nullptr;
 }

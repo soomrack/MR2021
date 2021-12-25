@@ -6,19 +6,25 @@
 
 int main()
 {
-	Matrix A(3, 3, "A");
-	Matrix B(2, 2, "B");
-	B.Inicialization(B);
-	A = B;
-	A.Print();
-	Matrix C(2, 2, "C");
-	C.Inicialization(C);
+	Matrix A(3, 3, 1);
+	A.print();
+	Matrix B(2, 2, 1);
+	Matrix C(2, 2, 1);
+
+	A = C;
+	Matrix D= A + B;
+
+	D.print();
+
+	/*A.print();
+	Matrix C(2, 2);
+
 	A = B * C;
 	A = B + C;
 
 
-	cout << A.Trace()<< endl;
-	cout << A.Det(A) << endl;
+	cout << A.trace()<< endl;
+	cout << A.det(A) << endl; */
 
 	return 0;
 }
