@@ -1,75 +1,104 @@
 #include "matrix_Lib.h"
 #include <string.h>
 
-Matrix::Matrix( int height, int wight, type_of_matrix type){
-    cleanly = true;
+
+Matrix::Matrix(uint height, uint width, type_of_matrix type){
     this->height = height;
-    this->wight = wight;
+    this->width = width;
     memory_allocation();
-    if (cleanly) {
+    if (data == NULL){     // TODO: Нужна ли проверка?
         return;
     }
-    if (type != zero && type != identity){
-        std::cout<<"=> Ошибка инициализации!\n"
-        "=> Неверно введены параметры типизированной матрицы."<<std::endl;
-        free_memory();
-        return;
-    }
-    for (int cell = 0; cell < height*wight; cell++){
-        data[cell]=(double)type;
+    switch (type) {
+        case ZERO: zero_matrix();
+            break;
+        case IDENTITY: identity_matrix();
+            break;
+        case NOT_INIT:
+            break;
+        default:
+            std::cout<<"=> Ошибка инициализации!\n"
+            "=> Неверно введены параметры типизированной матрицы."<<std::endl;
+            free_memory();
+            return;
     }
 }
 
 Matrix::Matrix(const Matrix &matrix){
-    cleanly = true;
     height = matrix.height;
-    wight = matrix.wight;
+    width = matrix.width;
     memory_allocation();
-    if (cleanly) {
+    if (data == NULL){     // TODO: Нужна ли проверка?
         return;
     }
-    memcpy(data, matrix.data, height*wight*sizeof(double));
+    memcpy(data, matrix.data, height * width * sizeof(double));
 }
-Matrix::Matrix(Matrix && matrix){ }
+Matrix::Matrix(Matrix && matrix){
+    free_memory();
+    height = matrix.height;
+    width = matrix.width;
+    data = matrix.data;
+    matrix.data = nullptr;
+}
 
 Matrix::~Matrix() {
     free_memory();
 }
 
 Matrix & Matrix::operator = (const Matrix &matrix) {
-    if (matrix.cleanly) {
-        std::cout<<"=> Присваевоемой матрицы не существует."<<std::endl;
+    if (matrix.data == NULL){     // TODO: Нужна ли проверка?
         return *this;
     }
     if (&matrix == this) {
         return *this;
     }
     free_memory();
-    wight = matrix.wight;
+    width = matrix.width;
     height = matrix.height;
     memory_allocation();
-    memcpy(data, matrix.data, height*wight*sizeof(double));
+    memcpy(data, matrix.data, height * width * sizeof(double));
     return *this;
-
 }
 
-Matrix & Matrix::operator + (const Matrix &matrix) { }
-Matrix & Matrix::operator * (const Matrix &matrix) { }
+Matrix Matrix::operator + (const Matrix &matrix) {
+    if (height != matrix.height || width != matrix.width) {
+        std::cout<<"=> Несоответствие размеров матриц."<<std::endl;
+        Matrix empty_matrix(0,0,ZERO);
+        return empty_matrix;
+    }
+    Matrix result_matrix(height, width, NOT_INIT);
+    for (uint cell = 0; cell < height * width; cell++) {
+        result_matrix.data[cell] = data[cell] + matrix.data [cell];
+    }
+    return result_matrix;
+}
+Matrix Matrix::operator * (const Matrix &matrix) {
+    if (width != matrix.height) {
+        std::cout<<"=> Несоответствие размеров матриц."<<std::endl;
+        Matrix empty_matrix(0,0,ZERO);
+        return empty_matrix;
+    }
+    Matrix result_matrix(height, matrix.width, ZERO);
+    for (uint row = 0; row < result_matrix.height; row++) {
+        for (uint col = 0; col < result_matrix.width; col++) {
+            for (uint i = 0; i < width; i++) {
+                result_matrix.data[row * result_matrix.width+col] +=
+                data[i + row * width] * matrix.data [col + i * matrix.width];
+            }
+        }
+    }
+    return result_matrix;
+}
 
 double Matrix::trace() const {
-    if (!check()) {
+    if (!is_null()) {
         return 0.0;
     }
     double trace = 0.0;
-    int min;
-    if (height < wight) {
-        min = height;
-    }
-    else {
-        min = wight;
-    }
-    for (int i = 0; i < min; i++) {
-        trace += data[i + wight];
+    uint min;
+    min = height < width ? height : width;
+    for (uint i = 0; i < min; i++) {
+        trace += data[i * (1 + width)];
     }
     return trace;
 }
@@ -77,12 +106,12 @@ double Matrix::determinant() const { }
 
 void Matrix::print(const std::string &text) const {
     std::cout<<text<<std::endl;
-    if (!check()) {
+    if (!is_null()) {
         return;
     }
-    for (int cell = 0; cell < height*wight; cell++) {
+    for (uint cell = 0; cell < height * width; cell++) {
         std::cout<<data[cell]<<"\t";
-        if ((cell+1) % wight == 0) {
+        if ((cell+1) % width == 0) {
             std::cout<<std::endl;
         }
     }
@@ -90,38 +119,40 @@ void Matrix::print(const std::string &text) const {
 }
 
 void Matrix::memory_allocation() {
-    if (height < 0 || wight < 0 || !cleanly){
-        std::cout<<"=> Ошибка выделения памяти!"<<std::endl;
-        return;
-    }
-    data = new double [height*wight];
+    data = new double [height * width];
     if (data == NULL){
         std::cout<<"=> Ошибка выделения памяти!(Возможно,затребованный"
                    "размер памяти слишком большой)"<<std::endl;
         return;
     }
-    cleanly = false;
 }
 
 void Matrix::free_memory() {
-    if(cleanly) {
-        std::cout<<"=> Ошибка double-free!"<<std::endl;
-        return;
-    }
     free(data);
     height = 0;
-    wight = 0;
-    cleanly = true;
+    width = 0;
 }
 
-bool Matrix::check() const {
-    if (cleanly) {
-        std::cout<<"=> Матрицы не существует."<<std::endl;
-        return false;
-    }
-    if (wight == 0 || height == 0) {
+bool Matrix::is_null() const {
+    if (width == 0 || height == 0) {
         std::cout<<"=> Матрица пуста."<<std::endl<<std::endl;
         return false;
     }
     return true;
+}
+
+// TODO: Может быть, лучше использовать memset(data, 0, height * width)?
+void Matrix::zero_matrix() {
+    for (uint cell = 0; cell < height * width; cell++){
+        data[cell] = 0.0;
+    }
+}
+
+void Matrix::identity_matrix() {
+    zero_matrix();
+    uint min;
+    min = height < width ? height : width;
+    for (uint i = 0; i < min; i++) {
+        data[i * (1 + width)] = 1.0;
+    }
 }

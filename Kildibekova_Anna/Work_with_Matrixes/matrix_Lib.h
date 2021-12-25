@@ -6,32 +6,33 @@
 #define WORK_WITH_MATRIXES_MATRIX_LIB_H
 #include <iostream>
 
-enum type_of_matrix {zero = 0, identity = 1};
+enum type_of_matrix {ZERO, IDENTITY, NOT_INIT};
 
 class Matrix {
-public:
-    Matrix( int height = 0, int wight = 0, type_of_matrix type = zero);  //+
-    Matrix(const Matrix &matrix);  //+
-    Matrix(Matrix && matrix);
-    ~Matrix();  //+
 private:
-    int height;
-    int wight;
+    uint height;
+    uint width;
     double *data;
 public:
-    Matrix & operator = (const Matrix &matrix);  //
-    Matrix & operator + (const Matrix &matrix);  //
-    Matrix & operator * (const Matrix &matrix);  //
+    Matrix(uint height = 0, uint width = 0, type_of_matrix type = ZERO);
+    Matrix(const Matrix &matrix);
+    Matrix(Matrix && matrix);
+    ~Matrix();
 public:
-    double trace() const;  //+
-    double determinant() const;  //
-    void print(const std::string &text = "Матрица:") const;  //+
+    Matrix & operator = (const Matrix &matrix);
+    Matrix operator + (const Matrix &matrix);
+    Matrix operator * (const Matrix &matrix);
+public:
+    double trace() const;
+    double determinant() const;  //TODO
+    void print(const std::string &text = "Матрица:") const;
 private:
-    void memory_allocation();  //+
-    void free_memory();  //+
-    bool check() const;  //+
+    void memory_allocation();
+    void free_memory();
+    bool is_null() const;
 private:
-    bool cleanly;
+    void zero_matrix();
+    void identity_matrix();
 };
 
 
