@@ -23,7 +23,6 @@ bool check(char *field) {
         ((field[0] == field[3]) && (field[3] == field[6])) ||
         ((field[1] == field[4]) && (field[4] == field[7])) ||
         ((field[2] == field[5]) && (field[5] == field[8]))) {
-        printf("Игра закончена! \n");
         ind=1;
     }
     return ind;
@@ -33,12 +32,16 @@ void Xmovement(void) {
     int number;
     printf("X move to cell: \n");
     scanf("%d", &number);
+    if ((number>9)||(number<1)){
+        printf("the cell must be 1..9\n");
+        Xmovement();
+    }else{
     if ((field[number - 1] == 'x') || (field[number - 1] == 0)) {
-
         printf("you mast to choose free cell\n");
         Xmovement();
     } else {
         field[number - 1] = 'x';
+    }
     }
 }
 
@@ -60,11 +63,13 @@ int main() {
         printer(field);
         Xmovement();
         if (check(field)){
+            printf("X wins \n");
             break;
         }
         printer(field);
         Omovement();
         if (check(field)){
+            printf("0 wins \n");
             break;
         }
         if (i==4){
