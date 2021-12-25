@@ -42,12 +42,13 @@ void assigningValues(int *a_rows, int *a_columns, int *b_rows, int *b_columns) {
 }*/
 
 int main() {
-    int a_rows, a_columns, b_rows, b_columns;
-    assigningValues(&a_rows, &a_columns, &b_rows, &b_columns);
-    Matrix A(a_rows, a_columns);
-    Matrix B(b_rows, b_columns);
-    A.set_random(a_rows, a_columns);
-    B.set_random(b_rows, b_columns);
+    //int a_rows, a_columns, b_rows, b_columns;
+    int par[4]={3,3,3,3};
+    assigningValues(&par[0], &par[1], &par[2], &par[3]); //comment for debug
+    Matrix A(par[0], par[1]);
+    Matrix B(par[2], par[3]);
+    A.set_random(par[0], par[1]);
+    B.set_random(par[2], par[3]);
     cout << "\n Matrix A:\n";
     A.out();
     cout << "\n Matrix B:\n";
