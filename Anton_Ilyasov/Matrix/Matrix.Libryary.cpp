@@ -4,22 +4,20 @@
 #include "Matrix.Libryary.h"
 using namespace std;
 
-
-Matrix::Matrix() { //матрица нулевого размера
+Matrix::Matrix() //матрица нулевого размера
+{ 
 	rows = 0;
 	cols = 0;
 	data = nullptr;
 	arr = nullptr;
 }
 
-
 Matrix::Matrix(int rows, int cols) //обычный конструктор с параметрами
 {
 	this->rows = rows;
 	this->cols = cols;
 
-	//создание последовательного динамического двумерного массива
-	data = new int[rows * cols];
+	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
@@ -27,21 +25,18 @@ Matrix::Matrix(int rows, int cols) //обычный конструктор с п
 	}
 }
 
-
 Matrix::Matrix(int rows, int cols, int type) { //Конструктор единичной и нулевой матриц заданного размера
 	this->rows = rows;
 	this->cols = cols;
 
-	//создание последовательного динамического двумерного массива
-	data = new int[rows * cols];
+	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
 		arr[i] = &data[i * cols];
 	}
-
-	//заполнение единичной и нулевоц матриц
-	switch (type)
+	
+	switch (type) //заполнение единичной и нулевоц матриц
 	{
 	case 0: //создание нулевой матрицы
 		for (int i = 0; i < rows; i++)
@@ -72,7 +67,6 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
 	}
 }
 
-
 Matrix::Matrix(const Matrix& other_matrix)	//конструктор копирования
 {
 	this->rows = other_matrix.rows;
@@ -88,8 +82,6 @@ Matrix::Matrix(const Matrix& other_matrix)	//конструктор копиро
 	}
 }
 
-
-
 Matrix::Matrix(Matrix&& other_matrix) noexcept //Конструктор перемещения
 {
 	rows = other_matrix.rows;
@@ -103,7 +95,6 @@ Matrix::Matrix(Matrix&& other_matrix) noexcept //Конструктор пере
 	other_matrix.arr = nullptr;
 } 
 
-
 Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка оператора +
 {
 	if ((this->rows != other_matrix.rows) || (this->cols != other_matrix.cols))
@@ -112,8 +103,7 @@ Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка о�
 	}
 
 	Matrix result(this->rows, this->cols);
-	//инициализация динамического двумерного массива
-	for (int i = 0; i < rows; i++)
+	for (int i = 0; i < rows; i++)				 //инициализация динамического двумерного массива
 	{
 		for (int j = 0; j < cols; j++)
 		{
@@ -122,7 +112,6 @@ Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка о�
 	}
 	return result;
 }
-
 
 Matrix Matrix::operator *(const Matrix& other_matrix) //перегрузка оператора *
 {
@@ -161,8 +150,7 @@ Matrix& Matrix::operator =(const Matrix& other_matrix) //перегрузка о
 	delete[] this->data;
 	delete[] this->arr;
 
-	//создание последовательного динамического двумерного массива
-	this->data = new int[rows * cols];
+	this->data = new int[rows * cols]; //создание последовательного динамического двумерного массива
 	memcpy(this->data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
 
 	this->arr = new int* [rows];
@@ -173,7 +161,6 @@ Matrix& Matrix::operator =(const Matrix& other_matrix) //перегрузка о
 
 	return *this;
 }
-
 
 void Matrix::print()
 {

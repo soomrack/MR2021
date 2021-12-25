@@ -2,8 +2,6 @@
 #include <string.h>
 #include"Matrix.Libryary.h"
 
-
-
 int main()
 {
 	Matrix A(3, 3, 1);
@@ -16,15 +14,13 @@ int main()
 
 	D.print();
 
-	/*A.print();
-	Matrix C(2, 2);
+	A.print();
 
 	A = B * C;
 	A = B + C;
 
-
 	cout << A.trace()<< endl;
-	cout << A.det(A) << endl; */
+	cout << A.det(A) << endl;
 
 	return 0;
 }
