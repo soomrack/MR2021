@@ -1,279 +1,224 @@
-#include "Matrix.h"
-#include <math.h>
-#include <cstdlib>
 #include <iostream>
+#include <ctime>
+#include <cstring>
+#include "Matrix.h"
 
- double Matrix::trace(const Mat A) // След
-{
-    double summ = 0.0;
-    for (int i = 0; i < A.rows; i++)
-    {
-        summ += A.data[i * A.cols + i];
-    }
-    return summ;
+
+Matrix::Matrix(){
+    this->rows = 0;
+    this->cols = 0;
+    data = nullptr;
 }
 
 
-Matrix Matrix::sum(const Mat A, const Mat B) // Сумма матриц
-{
-    if ((A.rows != B.rows) || (A.cols != B.cols))
-    {
-        double M1[0][0] = {};
-        Matrix A=(0,0,*M1)
-        return A;
+Matrix::Matrix(int rows, int cols, int *arr, unsigned int length) {
+    if (length == rows * cols){
+        this->rows = rows;
+        this->cols = cols;
+        data = new int[rows * cols];
+        if (data != nullptr){
+            memcpy(data, arr, sizeof(int) * length);
+        }else{
+            this->rows = 0;
+            this->cols = 0;
+        }
+    } else {
+        Matrix();
     }
-    else
-    {
-        Matrix result = {A.rows, A.cols};
-        result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-        for (int i = 0; i < A.rows; i++)
-        {
-            for (int j = 0; j < A.cols; j++)
-            {
-                result.data[i * A.cols + j] = A.data[i * A.cols + j] + B.data[i * A.cols + j];
+
+}
+
+
+Matrix::Matrix(int rows, int cols, Matrix_Type type, int value){
+    this->rows = rows;
+    this->cols = cols;
+    data = new int[rows * cols];
+    if (data == nullptr){
+        this->rows = 0;
+        this->cols = 0;
+    }else{
+        switch (type){
+            case ZERO: zeros(); break;
+            case IDENTITY: identity(); break;
+            case RANDOM: random(value); break;
+            case DIAGONAL: diagonal(value); break;
+            case NUMBER: number(value); break;
+            case TEMPORARY: break;
+            default: zeros(); break;
+        }
+    }
+}
+
+void Matrix::zeros(){
+    for (int i = 0; i < rows * cols; i++){
+        data[i] = 0;
+    }
+}
+
+void Matrix::identity(){
+    zeros();
+    for (int k = 0; k < rows*cols; ++k) {
+        data[k + rows * k] = 1;
+    }
+}
+
+void Matrix::diagonal(int value){
+    zeros();
+    for (int k = 0; k < rows*cols; ++k) {
+        data[k + rows * k] = value;
+    }
+}
+
+void Matrix::number(int value){
+    for (int i = 0; i < rows * cols; i++){
+        data[i] = value;
+    }
+}
+
+void Matrix::random( int value){
+    for (int i = 0; i < rows * cols; i++){
+        data[i] = rand() % value;
+    }
+}
+//Деструктор
+Matrix::~Matrix() {
+    delete [] data;
+}
+
+//Конструктор копирования
+Matrix::Matrix(const Matrix &source) {
+    this->rows = source.rows;
+    this->cols = source.cols;
+    this->data = new int[rows * cols];
+    if (data != nullptr){
+        memcpy(data,source.data,sizeof(int)*rows * cols);
+    }else{
+        this->rows = 0;
+        this->cols = 0;
+    }
+
+}
+
+//Конструктор перемещения
+Matrix::Matrix(Matrix &&source) noexcept {
+    this->rows = source.rows;
+    this->cols = source.cols;
+    this->data = source.data;
+    source.data = nullptr;
+    source.rows = 0;
+    source.cols = 0;
+}
+
+//Перегрузка оператора присваивания
+Matrix & Matrix::operator = (const Matrix &source){
+    if (&source == this) {
+        return *this;
+    }
+    this->rows = source.rows;
+    this->cols = source.cols;
+    this->data = new int[rows * cols];
+    if (data != nullptr){
+        memcpy(data,source.data,sizeof(int)*rows * cols);
+    }else{
+        this->rows = 0;
+        this->cols = 0;
+    }
+    return *this;
+}
+
+//Перегрузка оператора присваивания для оператора перемещения
+Matrix & Matrix::operator= (Matrix &&source) noexcept {
+    this->rows = source.rows;
+    this->cols = source.cols;
+    this->data = source.data;
+    source.data = nullptr;
+    source.rows = 0;
+    source.cols = 0;
+    return *this;
+}
+
+//Перегрузка оператора вычитания
+Matrix Matrix::operator- (const Matrix &other){
+    if (this->rows != other.rows || this->cols != other.cols){
+        return Matrix{};
+    }
+    Matrix result(other.rows, other.cols, TEMPORARY,0 );
+    for (int i = 0; i < cols*rows; ++i) {
+        result.data[i] = this->data[i] - other.data[i];
+    }
+    return result;
+
+}
+
+//Перегрузка оператора сложения
+Matrix Matrix::operator+ (const Matrix &other){
+    if (this->rows != other.rows || this->cols != other.cols){
+        return Matrix{};
+    }
+    Matrix result(other.rows, other.cols, TEMPORARY,0 );
+    for (int i = 0; i < cols*rows; ++i) {
+        result.data[i] = this->data[i] + other.data[i];
+    }
+    return result;
+
+}
+//Перегрузка оператора умножения
+Matrix Matrix::operator* (const Matrix &other){
+    if (this->cols != other.rows){
+        return Matrix{};
+    }
+    Matrix result(other.rows, other.cols, TEMPORARY,0 );
+    for (int row = 0; row < rows; ++row) {
+        for (int col = 0; col < cols; ++col) {
+            result.data[col + rows * row] = 0;
+            for (int k = 0; k < other.rows; ++k) {
+                result.data[col + rows * row] += this->data[k + rows * row] * other.data[col + rows * k];
+            }
+        }
+    }
+    return result;
+
+}
+//След матрицы
+int Matrix::trace() {
+    int matrix_trace = 0;
+    for (int k = 0; k < this->rows || k < this->cols ; ++k) {
+        matrix_trace += data[k + rows * k];
+    }
+    return matrix_trace;
+}
+//Вывод на экран
+void Matrix::print() {
+    for (int i = 0; i < this->rows; ++i) {
+        for (int j = 0; j < this->cols; ++j) {
+            std::cout << this->data[j + rows * i] << "\t";
+        }
+        std::cout << std::endl;
+    }
+}
+
+// Определитель меодом Гаусса
+int Matrix::det(){
+    int det = 1;
+    Matrix tmp(this->rows, this->cols, TEMPORARY,0 );
+    memcpy(tmp.data,this->data,sizeof(int)*rows*cols );
+    for (int diagonal = 0; diagonal < cols; ++diagonal) {
+        if (tmp.data[diagonal + rows*diagonal] == 0){
+            return 0;
+        }
+        for (int row = diagonal + 1; row < rows ; ++row) {
+            int c = tmp.data[diagonal+row*rows]/tmp.data[diagonal+rows*diagonal];
+            for (int col = diagonal; col < cols ; ++col) {
+                tmp.data[col+row*rows] -= c * tmp.data[col+diagonal*rows];
             }
 
         }
-
-        return result;
     }
-}
-
-
-Matrix Matrix::mult(const Mat A, const Mat B)// Умножение матриц
-{
-    if (A.cols != B.rows)
-    {
-        double M1[0][0] = {};
-        Matrix A=(0,0,*M1)
-        return A;
+    for (int diagonal = 0; diagonal < cols; diagonal++){
+        det *= tmp.data[diagonal + diagonal * rows];
     }
-    else
-    {
-        Mat result = {A.rows, B.cols};
-        result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-        for (int i = 0; i < A.rows; i++)
-        {
-            for (int j = 0; j < B.cols; j++)
-            {
-                result.data[i * B.cols + j] = 0;
-                for (int k = 0; k < A.cols; k++) {
-                    result.data[i * B.cols + j] += A.data[i * A.cols + k] * B.data[k * B.cols + j];
-                }
-            }
-        }
-
-        return result;
-    }
-}
-
-
-Matrix Matrix::mult_const(const double constt, const Mat A) // Умножение матрицы на константу
-{
-    Mat result = {A.rows, A.cols};
-    result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-    for (int i = 0; i < A.rows; i++)
-    {
-        for (int j = 0; j < A.cols; j++)
-        {
-            result.data[i * A.cols + j] = constt * A.data[i * A.cols + j];
-        }
-    }
-
-    return result;
-}
-
-
-extern Matrix Matrix::transp(const Mat A) {
-    Mat result = {A.cols, A.rows};
-    result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-    for (int i = 0; i < A.rows; i++) {
-        for (int j = 0; j < A.cols; j++) {
-            result.data[j * A.rows + i] = A.data[i * A.cols + j];
-        }
-    }
-
-    return result;
-}
-
-Matrix Matrix::minor(int row, int col, const Mat A)// Минор
-{
-    Mat result = {A.rows-1, A.cols-1};
-    result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-    int k = 0;
-    for (int i = 0; i < A.rows; i++)
-    {
-        for (int j = 0; j < A.cols; j++)
-        {
-            if ((i == row) || (j == col))
-            {
-                continue;
-            }
-            result.data[k] = A.data[i * A.cols + j];
-            k++;
-        }
-    }
-    return result;
-}
-
-
-Matrxi Matrix::dop(const Mat A)// Алгебраические дополнения
-{
-    Mat result = {A.rows, A.cols};
-    result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-    for (int i = 0; i < A.rows; i++)
-    {
-        for (int j = 0; j < A.cols; j++)
-        {
-            result.data[i*A.cols + j] = pow((-1), i + j) * det(minor(i, j, A));
-        }
-    }
-    return result;
-}
-
-double Matrix::det(const Mat A) // Определитель матрицы
-{
-    double D = 0;
-    switch (A.rows)
-    {
-        case 1:
-            return A.data[0];
-        case 2:
-            return (A.data[0] * A.data[3] - A.data[1] * A.data[2]);
-        default:
-        {
-            Mat Dop = dop(A);
-            for (int j = 0; j < A.cols; j++)
-            {
-                D += A.data[j] * Dop.data[j];
-            }
-            return D;
-        }
-    }
-}
-
-// Единичная матрица
-Matrxi Matrix::one(const unsigned int size)
-{
-    Mat result = {size, size};
-    result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-    for (int i = 0; i < result.rows; i++)
-    {
-        for (int j = 0; j < result.cols; j++)
-        {
-            if (i == j)
-            {
-                result.data[i * result.cols + j] = 1;
-            }
-            else
-            {
-                result.data[i * result.cols + j] = 0;
-            }
-        }
-
-    }
-
-    return result;
-}
-
-double norm (const Mat A)
-{
-    double max_sum = 0;
-    for (int i = 0; i < A.rows; i++)
-    {
-        double sum = 0;
-        for (int j = 0; j < A.cols; j++)
-        {
-            sum += A.data[i * A.cols + j];
-        }
-        if (i == 0)
-        {
-            max_sum = sum;
-        }
-        if (sum > max_sum)
-        {
-            max_sum = sum;
-        }
-    }
-    return max_sum;
-}
-
-Matrix all_one(const unsigned int rows, const unsigned int cols) {
-    Mat result = {rows, cols};
-    result.data = (double *) malloc(result.rows * result.cols * sizeof(double));
-    for (int i = 0; i < result.rows; i++) {
-        for (int j = 0; j < result.cols; j++) {
-            result.data[i * result.cols + j] = 1;
-        }
-    }
-
-    return result;
-}
-
-Matrix Matrix::power(const Mat A, const unsigned int power)// Возведение матрицы в степень
-{
-    if (power == 0)
-    {
-        return all_one(A.rows, A.cols);
-    }
-    if (power == 1)
-    {
-        return A;
-    }
-    if (A.rows != A.cols)
-    {
-        double M1[0][0] = {};
-        Matrix A=(0,0,*M1)
-        return A;
-        return A;
-    }
-    Mat result = A;
-    for (int i = 0; i < (power-1); i++)
-    {
-        result = mult(result, A);
-    }
-
-    return result;
-}
-
-double factorial (int n)
-{
-    if (n == 0)
-    {
-        return 1;
-    }
-    double result = 1;
-    for (int i = 1; i <= n; i++)
-    {
-        result = result * i;
-    }
-    return result;
-}
-
-extern Matrix Matrix::exp(const Mat A)
-{
-    Mat result = all_one(A.rows, A.cols);
-    Mat element = all_one(A.rows, A.cols);
-    double eps = 0.001;
-    int k = 1;
-    while (norm(element) > eps)
-    {
-        element = mult_const(1/factorial(k), power(A, k));
-        result = sum(result, element);
-        k = k + 1;
-    }
-    return result;
-}
-
-extern void Matrix::print(const Mat A) // Вывести матрицу на экран
-{
-
-    for (int i = 0; i < (A.cols * A.rows); i++)
-    {
-        printf ("%5.2lf     ", A.data[i]);
-        if ((i+1)%A.cols == 0)
-        {
-            printf("\n");
-        }
-    }
+    tmp.data = nullptr;
+    tmp.rows = 0;
+    tmp.cols = 0;
+    return det;
 }

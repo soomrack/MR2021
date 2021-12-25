@@ -2,19 +2,23 @@
 
 Matrix::Matrix(unsigned int height, unsigned int width) {
     memory_allocation(height, width);
-    this->height = height;
-    this->width = width;
-    for (unsigned int cell = 0; cell < height * width; cell++) {
-        data_1[cell] = 0.0;
+    if (data_1 != nullptr) {
+        this->height = height;
+        this->width = width;
+        for (unsigned int cell = 0; cell < height * width; cell++) {
+            data_1[cell] = 0.0;
+        }
     }
 }
 
 /* Конструктор копирования */
 Matrix::Matrix(const Matrix &matrix) {
     memory_allocation(height, width);
-    height = matrix.height;
-    width = matrix.width;
-    memcpy(data_1, matrix.data_1, height * width * sizeof(double));
+    if (data_1 != nullptr) {
+        height = matrix.height;
+        width = matrix.width;
+        memcpy(data_1, matrix.data_1, height * width * sizeof(double));
+    }
 }
 
 /* Конструктор перемещения */
@@ -39,9 +43,11 @@ Matrix &Matrix::operator=(const Matrix &matrix) {
     if (&matrix == this) return *this;
     memory_clearing();
     memory_allocation(height, width);
-    height = matrix.height;
-    width = matrix.width;
-    memcpy(data_1, matrix.data_1, height * width * sizeof(double));
+    if (data_1 != nullptr) {
+        height = matrix.height;
+        width = matrix.width;
+        memcpy(data_1, matrix.data_1, height * width * sizeof(double));
+    }
     return *this;
 }
 
@@ -64,9 +70,8 @@ Matrix &Matrix::operator=(Matrix &&matrix) noexcept {
 /* Перегрузка оператора сложения */
 Matrix Matrix::operator+(const Matrix &matrix) {
     if ((this->height != matrix.height) || (this->width != matrix.width)) {
-        return Matrix(0, 0);
+        return Matrix();
     }
-
     Matrix res(this->height, this->width);
     for (unsigned int cell = 0; cell < height * width; cell++) {
         res.data_1[cell] = data_1[cell] + matrix.data_1[cell];
@@ -120,28 +125,27 @@ void Matrix::print() {
 /***********************************СОЗДАНИЕ МАТРИЦ***********************************/
 
 /* Создание матрице по заданному массиву */
-void Matrix::set(double *array) {
+void Matrix::set_array(double *array) {
     memcpy(this->data_1, array, height * width * sizeof(double));
 }
 
 /* Создание случайной матрицы */
-void Matrix::random() {
+void Matrix::set_random() {
     for (unsigned int cell = 0; cell < height * width; cell++) {
         data_1[cell] = rand() % 100;
     }
 }
 
 /* Создание единичной матрицы */
-void Matrix::identity() {
-    width = height;
-    zero();
-    for (unsigned int cell = 0; cell < height; cell++) {
+void Matrix::set_identity() {
+    set_zero();
+    for (unsigned int cell = 0; cell < std::min(height, width); cell++) {
         data_2[cell][cell] = 1.0;
     }
 }
 
 /* Создание нулевой матрицы */
-void Matrix::zero() {
+void Matrix::set_zero() {
     for (unsigned int cell = 0; cell < height * width; cell++) {
         data_1[cell] = 0.0;
     }
@@ -153,31 +157,33 @@ void Matrix::zero() {
 /* Расчёт определителя матрицы методом Гаусса */
 double Matrix::det() {
     double det = 0.0;
+    double eps = 0.000001;
     if (height != width) {
         return 0.0;
     }
     if (height == 1) {
         return data_2[0][0];
-    }
-    else if (height == 2) {
+    } else if (height == 2) {
         return data_2[0][0] * data_2[1][1] - data_2[0][1] * data_2[1][0];
     }
 
     Matrix tmp(height, width);
     memcpy(tmp.data_2[0], data_2[0], height * width * sizeof(double));
 
-    for (unsigned int col = 0; col < tmp.height - 1; col++) {
+    for (unsigned int col = 0; col < tmp.width - 1; col++) {
         tmp.sort_rows(col);
         for (unsigned int row = col + 1; row < tmp.height; row++) {
             if (tmp.data_2[col][col] && tmp.data_2[row][col]) {
-                double k = tmp.data_2[row][col] / tmp.data_2[col][col];
+                double k = 0.0;
+                if (std::abs(tmp.data_2[col][col]) < eps) return 0.0;
+                k = tmp.data_2[row][col] / tmp.data_2[col][col];
                 for (unsigned int l = col; l < tmp.height; l++) {
                     tmp.data_2[row][l] = tmp.data_2[row][l] - (k * tmp.data_2[col][l]);
                 }
             }
         }
     }
-    det = 1;
+    det = 1.0;
     for (unsigned int row = 0; row < height; row++) {
         det = det * tmp.data_2[row][row];
     }
@@ -187,16 +193,16 @@ double Matrix::det() {
 /* Преобразование матрицы в треугольную */
 void Matrix::sort_rows(unsigned int col) {
     bool toggle = false;
-    double eps=0.00001;
+    double eps = 0.000001;
     unsigned int null_counter = 0;
     for (unsigned int row = 0; row < height; row++) {
         if (null_counter < height - row) {
             toggle = false;
-            while (!toggle) {
-                if (data_2[row][col] < eps) {
+            while (toggle == false) {
+                if (std::abs(data_2[row][col]) < eps) {
                     null_counter = 0;
                     for (unsigned int i = row; i < height; i++) {
-                        if (data_2[i][col] < eps) {
+                        if (std::abs(data_2[i][col]) < eps) {
                             null_counter++;
                         }
                     }
@@ -232,8 +238,23 @@ void Matrix::memory_allocation(unsigned int height, unsigned int width) {
     if (height == 0 || width == 0) {
         return;
     }
-    data_1 = new double[height * width];
-    data_2 = new double *[height];
+    try {
+        data_1 = new double[height * width];
+        data_2 = new double *[height];
+    }
+    catch (std::bad_alloc const &) {
+        if (data_1 != nullptr) {
+            delete[] data_1;
+            data_1 = nullptr;
+        }
+        if (data_2 != nullptr) {
+            delete[] data_2;
+            data_2 = nullptr;
+        }
+        data_1 = nullptr;
+        data_2 = nullptr;
+        return;
+    }
     for (int row = 0; row < height; row++) {
         data_2[row] = &data_1[row * width];
     }
@@ -241,11 +262,14 @@ void Matrix::memory_allocation(unsigned int height, unsigned int width) {
 
 /* Освобождение памяти */
 void Matrix::memory_clearing() {
-    if (data_1 != nullptr && data_2 != nullptr) {
+    if (data_1 != nullptr) {
         delete[] data_1;
+        data_1 = nullptr;
+    }
+    if (data_2 != nullptr) {
         delete[] data_2;
+        data_2 = nullptr;
     }
     height = 0;
     width = 0;
 }
-

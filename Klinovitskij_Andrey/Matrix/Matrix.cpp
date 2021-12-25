@@ -6,16 +6,45 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 #define ANSI_COLOR_RED   "\x1b[0;91;40m"
-#define ANSI_COLOR_ORANGE "\x1b[0;93;40m"
+//#define ANSI_COLOR_ORANGE "\x1b[0;93;40m"
 #define ANSI_COLOR_GREEN "\x1b[0;92;40m"
 
 #pragma once
 
+void Errors(int code) {
+    switch (code) {
+        case 1:
+            std::cout <<"\n\n"<<ANSI_COLOR_RED << "ERROR"
+                      << ANSI_COLOR_RESET << "\n\n Can't allocate memory\n";
+            break;
+        case 2:
+            std::cout << ANSI_COLOR_RED << "ERROR"
+                      << ANSI_COLOR_RESET << "\nin " << ANSI_COLOR_GREEN << "'+'"
+                      << ANSI_COLOR_RESET << ". Matrix A and B must be the same size\n\n\n";
+            break;
+        case 3:
+            std::cout << ANSI_COLOR_RED << "ERROR"
+                      << ANSI_COLOR_RESET << "\nin " << ANSI_COLOR_GREEN << "'-'"
+                      << ANSI_COLOR_RESET << ". Matrix A and B must be the same size\n\n\n";
+            break;
+        case 4:
+            std::cout << "\n" << ANSI_COLOR_RED << "ERROR"
+                      << ANSI_COLOR_RESET << "\nin " << ANSI_COLOR_GREEN << "'*'" << ANSI_COLOR_RESET
+                      << ". Must be A col = B row\n\n\n";
+            break;
+    }
+
+}
 
 Matrix::Matrix(int height, int width) {
     this->height = height;
     this->width = width;
-    data = (int *) malloc(height * width * sizeof(int));
+    if (!(data = (int *) malloc(height * width * sizeof(int)))) {
+        Errors(1);
+        this->data = 0;
+        this->height = 0;
+        this->width = 0;
+    }
 }
 
 Matrix::Matrix(const Matrix &other) {
@@ -102,36 +131,26 @@ int Matrix::multiplication(Matrix A, Matrix B) {
 
 Matrix Matrix::operator+(const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        std::cout << "\n"<<ANSI_COLOR_ORANGE<<"WARNING!"<<ANSI_COLOR_RESET<<"\n\n"<<ANSI_COLOR_RED<<"Error"
-        <<ANSI_COLOR_RESET<<" in "<<ANSI_COLOR_GREEN<<"'-'"
-        <<ANSI_COLOR_RESET<<". Matrix A and B must be the same size\n\n\n";
+        Errors (2);
         Matrix Error(0, 0);
         return Error;
     }
     Matrix Sum(this->height, this->width);
-    for (int col = 0; col < width; col++) {
-        for (int row = 0; row < height; row++) {
-            Sum.data[height * col + row] = this->data[height * col + row] + other.data[height * col + row];
-        }
-    }
+    for (int counter = 0; counter < this->width * other.height; counter++)
+        Sum.data[counter] = this->data[counter] + other.data[counter];
     Sum.out();
     return Sum;
 }
 
 Matrix Matrix::operator-(const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        std::cout << "\n"<<ANSI_COLOR_ORANGE<<"WARNING!"<<ANSI_COLOR_RESET<<"\n\n"<<ANSI_COLOR_RED<<"Error"
-        <<ANSI_COLOR_RESET<<" in "<<ANSI_COLOR_GREEN<<"'-'"
-        <<ANSI_COLOR_RESET<<". Matrix A and B must be the same size\n\n\n";
+        Errors (3);
         Matrix Error(0, 0);
         return Error;
     }
     Matrix Sub(this->height, this->width);
-    for (int i = 0; i < this->width; i++) {
-        for (int j = 0; j < other.height; j++) {
-            Sub.data[other.height * i + j] = this->data[other.height * i + j] - other.data[other.height * i + j];
-        }
-    }
+    for (int counter = 0; counter < this->width * other.height; counter++)
+        Sub.data[counter] = this->data[counter] - other.data[counter];
     Sub.out();
     return Sub;
 }
@@ -139,27 +158,41 @@ Matrix Matrix::operator-(const Matrix &other) {
 Matrix Matrix::operator*(const Matrix &other) {
     int sum = 0;
     if (this->width != other.height) {
-        std::cout << "\n"<<ANSI_COLOR_ORANGE<<"WARNING!"<<ANSI_COLOR_RESET<<"\n\n"<<ANSI_COLOR_RED<<"Error"
-        <<ANSI_COLOR_RESET<<" in "<<ANSI_COLOR_GREEN<<"'*'"<<ANSI_COLOR_RESET<<". Must be A col = B row\n\n\n";
+        Errors(4);
         Matrix Error(0, 0);
         return Error;
     }
-    Matrix Mul(this->height, other.width);
+    Matrix Result(this->height, other.width);
     for (int i = 0, j = 0; i < this->height * other.width; i++) {
         for (int k = 0; k < this->width; k++)
             sum += this->data[k + j * this->width] * other.data[i - j * other.width + k * other.width];
-        Mul.data[i] = sum;
+        Result.data[i] = sum;
         sum = 0;
         if ((i + 1) % (this->width + 1) == 0) j++;
     }
-    Mul.out();
-    return Mul;
+    Result.out();
+    return Result;
 }
+
+Matrix::Matrix(Matrix &&other) noexcept {
+    this->height = other.height;
+    this->width = other.width;
+    this->data = other.data;
+    other.data = nullptr;
+    other.height = 0;
+    other.width = 0;
+}
+
 
 Matrix &Matrix::operator=(const Matrix &other) {
     this->width = other.width;
     this->height = other.height;
-    this->data = other.data;
+    if (!(data = (int *) malloc(height * width * sizeof(int)))) {
+        Errors(1);
+        this->data = 0;
+        this->height = 0;
+        this->width = 0;
+    }
     std::memcpy(this->data, other.data, width * height * sizeof(int));
 }
 
@@ -171,23 +204,22 @@ Matrix &Matrix::operator=(Matrix &&other) noexcept {
     width = other.width;
     height = other.height;
 
-    data = other.data;
+    if (!(data = (int *) malloc(height * width * sizeof(int)))) {
+        Errors(1);
+        this->data = 0;
+        this->height = 0;
+        this->width = 0;
+    }
+
+    other.width = 0;
+    other.height = 0;
     other.data = nullptr;
     return *this;
 }
 
-int Matrix :: trace()
-{
+int Matrix::trace() {
     int trace = 0;
     for (int row = 0; row < width; row++)
-    {
-        for (int col = 0; col < height; col++)
-        {
-            if (row == col)
-            {
-                trace += data[row*width+col];
-            }
-        }
-    }
+        trace += data[row * width + row];
     std::cout << trace << std::endl;
 }

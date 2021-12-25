@@ -3,16 +3,12 @@
 #include <iomanip>
 #include <math.h>
 
-// ЗАМЕЧАНИЯ: (к предыдущей версии кода)
-// - Убрать комментарии в Заголовочном файле
-// - Осуществить копирование через memcpy
-// - Убрать лишний цикл при сложении
-// - Убрать Exit(1), вместо этого возвращать значение
-// - Убрать ограничения на квадратные матрицы
-// - Создание единичной и нулевой матрицы вынести как отдельные функции
-// - Значение double задавать с точкой
-// - Сравнение double с нулем осуществлять как (num < eps)
 
+Matrix::Matrix(){
+    this -> rows = 0;
+    this -> cols = 0;
+    data = nullptr;
+}
 
 Matrix::Matrix(int rows, int cols) { //Простой конструктор
     this -> rows = rows;
@@ -26,23 +22,16 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
     data = new double [rows * cols];
     switch(type){
         case 0: //создание нулевой матрицы
-            for(int i = 0; i < rows; i++){
-                for(int j = 0; j < cols; j++){
-                    data[cols * i + j] = 0.;
-                }
-            }
+            this->set_nulls();
             break;
         case 1: //создание единичной матрицы
-            for(int i = 0; i < rows; i++){
-                for(int j = 0; j < cols; j++){
-                    if(i == j) {
-                        data[cols * i + j]= 1.;
-                    } else {
-                        data[cols * i + j]= 0.;
-                    }
-                }
-            }
+            this->set_ones();
             break;
+        default:
+            this->set_nulls();
+            for(int i = 0; i < cols*rows; i++){
+                data[i] = i;
+            }
     }
 }
 
@@ -59,6 +48,9 @@ void Matrix::print() { //Вывод на экран
 }
 
 void Matrix::set(int row, int col,double element){ //Присвоение значения элементу
+    if(((row >= rows)||(row < 0)) || ((col >= cols)||(col < 0))){
+        return;
+    }
     data[cols*row + col] = element;
 }
 
@@ -67,9 +59,7 @@ Matrix & Matrix::operator = (const Matrix &other){ //Перегрузка опе
     this -> cols = other.cols;
     delete[] this -> data;
     this -> data = new double [rows * cols];
-    for(int i = 0; i < (rows * cols); i++) {
-        this -> data[i] = other.data[i];
-    }
+    memcpy(this -> data, other.data,sizeof(double)* rows * cols);
     return *this;
 }
 
@@ -106,7 +96,7 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept { //Перезагрузк
 
 Matrix Matrix::operator + (const Matrix &other) { //Перезагрузка оператора сложения
     Matrix temp(this->rows, this->cols, 0);
-    if((this->rows != other.rows)&&(this->cols != other.cols)){ //В случае несовпадения размера вернем нулевую матрицу
+    if((this->rows != other.rows) || (this->cols != other.cols)){ //В случае несовпадения размера вернем нулевую матрицу
         return temp;
     }
     for(int i = 0; i < rows*cols; i++){
@@ -131,28 +121,25 @@ Matrix Matrix::operator * (const Matrix &other) { //Перезагрузка о�
     return temp;
 }
 
-void Matrix::setnulls() {//Сделать матрицу нулевой
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < cols; j++){
-            data[cols * i + j] = 0.;
-        }
+void Matrix::set_nulls() {//Сделать матрицу нулевой
+    for(int i = 0; i < rows*cols; i++){
+        data[i] = 0.;
     }
 }
 
-void Matrix::setones() {//Сделать матрицу единичной
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < cols; j++){
-            if(i == j) {
-                data[cols * i + j]= 1.;
-            } else {
-                data[cols * i + j]= 0.;
-            }
-        }
+void Matrix::set_ones() {//Сделать матрицу единичной
+    int len = rows;
+    if (cols < rows) {
+        len = cols;
+    }
+    this->set_nulls();
+    for(int i = 0; i < len; i++){
+        data[cols * i + i]= 1.;
     }
 }
 
-int Matrix::tr() { //След матрицы
-    int trace = 0;
+double Matrix::tr() { //След матрицы
+    double trace = 0;
     for (int i = 0; i < this -> rows; i++) {
         trace += this->data[cols * i + i];
     }

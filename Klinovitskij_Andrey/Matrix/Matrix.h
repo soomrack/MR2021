@@ -1,5 +1,5 @@
 //
-// Created by User on 22.11.2021.
+// Created by KAD1605 on 22.11.2021.
 //
 #pragma once
 
@@ -11,14 +11,13 @@ private:
     int height;
     int width;
     int *data;
-    int **data2;
 public:
     Matrix();
     Matrix(int height, int width);
     Matrix(const Matrix&); //for copy
+    Matrix (Matrix &&other) noexcept;
     ~Matrix();
 
-    int** allocate(int width, int height);
     void set_random(int height, int width);
     void out();
     int size_height();

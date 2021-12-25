@@ -1,77 +1,54 @@
 #include <iostream>
 #include <ctime>
 #include "library.h"
+#include <cstring>
+#include <random>
 
-Matrix::Matrix(int rows, int cols) {            //Конструктор для случайных матриц
-    srand(time(NULL));
+using namespace std;
+
+Matrix::Matrix(int rows, int cols, Matrix_type type) {
     this->rows = rows;
     this->cols = cols;
-    matrix = new int *[rows];
-    for (int i = 0; i < rows; ++i) {
-        matrix[i] = new int[cols];
-    }
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            matrix[i][j] = rand() % 20;
-        }
-    }
-}
-
-Matrix::Matrix(int rows, int cols, int type){   //Конструктор для стандартных матриц (нулевая и единичная)
-    this->rows = rows;
-    this->cols = cols;
-    matrix = new int *[rows];
-    for (int i = 0; i < rows; ++i) {
-        matrix[i] = new int[cols];
-    }
-    if (type == 0) {
-        for (int i = 0; i < rows; ++i) {
-            for (int j = 0; j < cols; ++j) {
-                matrix[i][j] = 0;
-            }
+    memory_allocation();
+    if (matrix != nullptr) {            //Проверка успешного выделения памяти
+        switch (type) {
+            case RANDOM: set_random();break;
+            case IDENTITY: set_identity(); break;
+            case ONES: set_ones(); break;
+            case ZERO: set_zero(); break;
+            default: set_zero(); break;
         }
     }
     else {
-        for (int i = 0; i < rows; ++i) {
-            for (int j = 0; j < cols; ++j) {
-                if (i == j) {
-                    matrix[i][j] = 1;
-                }
-                else {
-                    matrix[i][j] = 0;
-                }
-            }
-        }
+        this->cols = 0;
+        this->rows = 0;
     }
 }
 
-Matrix::Matrix(int rows, int cols, bool isTemp){  //Конструктор для временно создаваемого объекта при арифметических операциях
-    this->rows = rows;
-    this->cols = cols;
+Matrix::Matrix(){
+    this->rows = 0;
+    this->cols = 0;
+    matrix = nullptr;
 }
 
 Matrix::~Matrix() {
-    for (int i = 0; i < rows; ++i) {
-        delete [] matrix[i];
-    }
-    delete [] matrix;
+    free_memory();
 }
 
-Matrix::Matrix(const Matrix &other) {       //Конструктор копирования
+Matrix::Matrix(const Matrix &other) {
     this->rows = other.rows;
     this->cols = other.cols;
-    this->matrix = new int* [rows];
-    for (int i = 0; i < rows; ++i) {
-        this->matrix[i] = new int[cols];
+    memory_allocation();
+    if (matrix != nullptr) {
+        memcpy(matrix, other.matrix, other.rows * other.cols * sizeof(double));
     }
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            this->matrix[i][j] = other.matrix[i][j];
-        }
+    else {
+        this->rows = 0;
+        this->cols = 0;
     }
 }
 
-Matrix::Matrix(Matrix &&other) noexcept {       //Конструктор перемещения
+Matrix::Matrix(Matrix &&other) noexcept {
     this->rows = other.rows;
     this->cols = other.cols;
     this->matrix = other.matrix;
@@ -80,148 +57,174 @@ Matrix::Matrix(Matrix &&other) noexcept {       //Конструктор пер�
     other.cols = 0;
 }
 
-Matrix Matrix::operator - (const Matrix &other){        //Перегрузка оператора вычитания
-    if ((this->rows != other.rows) || (this->cols != other.cols)) {
-        std::cout << "Matrices are not equal" << std::endl;
-        exit(1);
+Matrix Matrix::operator- (const Matrix &other){     //Перегрузка оператора вычитания
+    if ((rows != other.rows) || (cols != other.cols)) {
+        return Matrix();
     }
-    Matrix temp(this->rows, this->cols, true);
-    temp.matrix = new int* [rows];
-    for (int i = 0; i < rows; ++i) {
-        temp.matrix[i] = new int[cols];
-    }
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            temp.matrix[i][j] = this->matrix[i][j] - other.matrix[i][j];
-        }
+    Matrix temp(rows, cols, ZERO);
+    for (int i = 0; i < rows * cols; ++i) {
+            temp.matrix[i] = this->matrix[i] - other.matrix[i];
     }
     return temp;
 }
 
 Matrix Matrix::operator + (const Matrix &other){        //Перегрузка оператора сложения
-    if ((this->rows != other.rows) || (this->cols != other.cols)) {
-        std::cout << "Matrices are not equal" << std::endl;
-        exit(1);
+    if ((rows != other.rows) || (cols != other.cols)) {
+        return Matrix();
     }
-    Matrix temp(this->rows, this->cols, true);
-    temp.matrix = new int* [rows];
-    for (int i = 0; i < rows; ++i) {
-        temp.matrix[i] = new int[cols];
+    Matrix temp(rows, cols, ZERO);
+    for (int i = 0; i < rows * cols; ++i) {
+        temp.matrix[i] = matrix[i] + other.matrix[i];
     }
+    return temp;
+}
+
+Matrix Matrix::operator * (const Matrix &other){        //Перегрузка оператора умножения
+    if (this->cols != other.rows){
+        return Matrix();
+    }
+    Matrix temp(rows, cols, ZERO);
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            temp.matrix[i][j] = this->matrix[i][j] + other.matrix[i][j];
+            for (int k = 0; k < rows; ++k) {
+                temp.matrix[j + i * cols] += matrix[k + i * cols] * other.matrix[j + k * (rows)];
+            }
         }
     }
     return temp;
 }
 
-Matrix & Matrix::operator = (const Matrix &other){      //Перегрузка оператора присваивания
+Matrix& Matrix::operator= (const Matrix &other){      //Перегрузка оператора присваивания
+    if (&other == this) {
+        return *this;
+    }
+    rows = other.rows;
+    cols = other.cols;
+    free_memory();
+    memory_allocation();
+    if (matrix != nullptr) {
+        memcpy(matrix, other.matrix, other.rows * other.cols * sizeof(double));
+    }
+    else {
+        this->cols = 0;
+        this->rows = 0;
+    }
+    return *this;
+}
+
+Matrix& Matrix::operator= (Matrix &&other) noexcept {       //Перегрузка оператора присваивания для перемещения
     if (&other == this) {
         return *this;
     }
     this->rows = other.rows;
     this->cols = other.cols;
-    delete [] this->matrix;
-    this->matrix = new int* [rows];
-    for (int i = 0; i < rows; ++i) {
-        this->matrix[i] = new int[cols];
-    }
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            this->matrix[i][j] = other.matrix[i][j];
-        }
-    }
-    return *this;
-}
-
-Matrix & Matrix::operator = (Matrix &&other) noexcept {     //Перегрузка оператора присваивания для оператора перемещения
-    this->rows = other.rows;
-    this->cols = other.cols;
-    delete [] this->matrix;
+    free_memory();
     this->matrix = other.matrix;
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            this->matrix[i][j] = other.matrix[i][j];
-        }
-    }
     other.matrix = nullptr;
     other.rows = 0;
     other.cols = 0;
     return *this;
 }
 
-Matrix Matrix::operator * (const Matrix &other){        //Перегрузка оператора умножения
-    if (this->cols != other.rows){
-        std::cout << "Matrices are not equal" << std::endl;
-        exit(1);
+void Matrix::set_random() {
+    srand(time(nullptr));
+    for (int i = 0; i < rows * cols; ++i) {
+            matrix[i] = rand() % 3;
     }
-    Matrix temp(this->rows, other.cols, false);
-    temp.matrix = new int* [rows];
-    for (int i = 0; i < rows; ++i) {
-        temp.matrix[i] = new int[cols];
-    }
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < other.cols; ++j) {
-            temp.matrix[i][j] = 0;
-            for (int k = 0; k < other.rows; ++k) {
-                temp.matrix[i][j] += this->matrix[i][k] * other.matrix[k][j];
-            }
-        }
-    }
-    return temp;
 }
 
-int Matrix::trace() {
-    int matrix_trace = 0;
-    if (this->rows != this->cols) {
-        std::cout << "Matrix is not square" << std::endl;
-        exit(1);
+void Matrix::set_zero(){
+    for (int i = 0; i < rows * cols; ++i) {
+        matrix[i] = 0.0;
     }
-    for (int i = 0; i < this->rows; ++i) {
-        matrix_trace += matrix[i][i];
+}
+
+void Matrix::set_ones(){
+    for (int i = 0; i < rows * cols; ++i) {
+        matrix[i] = 1.0;
+    }
+}
+
+void Matrix::set_identity(){
+    set_zero();
+    for (int i = 0; i < rows; ++i) {
+        matrix[i + i * rows] = 1.0;
+    }
+}
+
+double Matrix::trace() {
+    double matrix_trace = 0.0;
+    for (int i = 0; i < rows; ++i) {
+        matrix_trace += matrix[i + i * rows];
     }
     return matrix_trace;
 }
 
 double Matrix::det(){
-    if (this->rows != this->cols) {
-        std::cout << "Matrix is not square" << std::endl;
-        exit(1);
+    if (rows != cols) {
+        return 0.0;
     }
+    Matrix temp(*this);
     double det = 1.0;
-    double add = 0.0;
-    auto **det_matrix = new double *[rows];
-    for (int i = 0; i < rows; ++i) {
-        det_matrix[i] = new double[cols];
-    }
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            det_matrix[i][j] = (double)matrix[i][j];
-        }
-    }
+    double div = 0.0;           //Хранит результат деления элементов строк для последующей триангуляция матрицы
+    int swap_count = 0;
     for (int i = 0; i < rows-1; ++i) {
-        for (int j = i+1; j < cols; ++j) {
-            add = -(det_matrix[j][i] / det_matrix[i][i]);
-            for (int k = 0; k < rows; ++k) {
-                det_matrix[j][k] += det_matrix[i][k] * add;
+        int max_pos = temp.max_position(i + cols * i);      //Определение положения максимального элемента для перестановки строк
+        if (temp.matrix[max_pos] == 0.0){
+            return 0.0;
+        }
+        if (temp.matrix[i + cols * i] == 0.0){
+            temp.swap_rows(i + cols * i, i, max_pos);       //Перестановка строк
+            swap_count++;
+        }
+        for (int j = i + 1; j < cols; ++j) {
+            div = -(temp.matrix[i + cols * j] / temp.matrix[i + cols * i]);
+            for (int k = i; k < rows; ++k) {
+                temp.matrix[k + j * cols] += temp.matrix[k + i * cols] * div;
             }
         }
     }
-    for (int i = 0; i < rows; ++i) {
-        det *= det_matrix[i][i];
+    if (swap_count % 2 == 1) {
+        det = -1.0;
     }
     for (int i = 0; i < rows; ++i) {
-        delete [] det_matrix[i];
+        det *= temp.matrix[i + i*cols];
     }
-    delete [] det_matrix;
     return det;
 }
-void Matrix::print() {
-    for (int i = 0; i < this->rows; ++i) {
-        for (int j = 0; j < this->cols; ++j) {
-            std::cout << this->matrix[i][j] << "\t";
+
+int Matrix::max_position(int pos){
+    int max_pos = pos;
+    double max = abs(matrix[max_pos]);
+    for (int j = pos + cols; j < rows * cols; j += cols) {
+        if (abs(matrix[j]) > max) {
+            max_pos = j;
+            max = abs(matrix[j]);
         }
-        std::cout << std::endl;
     }
+    return max_pos;
+}
+
+void Matrix::swap_rows(int pos, int row, int max_pos){
+    double storage[cols];
+    memcpy(storage, matrix + (row * cols), cols * sizeof(double));
+    memcpy(matrix + (row * cols), matrix + ((max_pos/cols) * cols), cols * sizeof(double));
+    memcpy(matrix + ((max_pos/cols) * cols), storage, cols * sizeof(double));
+}
+
+void Matrix::print() {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            cout << matrix[j + i * cols] << "\t";
+        }
+        cout << endl;
+    }
+}
+
+void Matrix::memory_allocation() {
+    matrix = new double[rows*cols];
+}
+
+void Matrix::free_memory() {
+    delete [] matrix;
 }
