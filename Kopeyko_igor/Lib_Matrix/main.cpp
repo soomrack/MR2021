@@ -68,5 +68,14 @@ int main() {
     T4.print();
     double g = T4.det();
     std::cout << g << std::endl;
+    T4.set_ones();
+    T4.print();
+    Matrix JJ (3,5, 1);
+    JJ.print();
+    Matrix DD;
+    DD.print();
+    JJ.set(-1,-34,234);
+    DD = JJ;
+    DD.print();
     return 0;
 }
