@@ -33,24 +33,17 @@ void Matrix::clear_mem() {
     columns = 0;
 }
 
-Matrix::Matrix(unsigned int rows, unsigned int columns, char type) {
+Matrix::Matrix(unsigned int rows, unsigned int columns, Matrix_type type) {
     this->rows = rows;
     this->columns = columns;
     allocate_mem(rows, columns);
     if (data_line != nullptr) {
         switch (type) {
-            case '0':
-                zeros();
-                break;
-            case '1':
-                ones();
-                break;
-            case 'E':
-                identity();
-                break;
-            case 'R':
-                random();
-                break;
+            case ZEROS: set_zeros(); break;
+            case ONES: set_ones(); break;
+            case IDENTITY: set_identity(); break;
+            case RANDOM: set_random(); break;
+            default: set_zeros(); break;
         }
     }
 }
@@ -110,31 +103,25 @@ Matrix &Matrix::operator= (Matrix &&other) noexcept {
 }
 
 Matrix Matrix::operator+ (const Matrix &other) {
-    Matrix var;
     if ((this->rows != other.rows) || (this->columns != other.columns)) {
-        return var;
+        return Matrix();
     }
-    var.rows = other.rows;
-    var.columns = other.columns;
-    var.allocate_mem(var.rows, var.columns);
+    Matrix result(other.rows, other.columns);
     for (unsigned int cell = 0; cell < other.rows * other.columns; cell++) {
-        var.data_line[cell] = this->data_line[cell] + other.data_line[cell];
+        result.data_line[cell] = this->data_line[cell] + other.data_line[cell];
     }
-    return var;
+    return result;
 }
 
 Matrix Matrix::operator- (const Matrix &other) {
-    Matrix var;
     if ((this->rows != other.rows) || (this->columns != other.columns)) {
-        return var;
+        return Matrix();
     }
-    var.rows = other.rows;
-    var.columns = other.columns;
-    var.allocate_mem(var.rows, var.columns);
+    Matrix result(other.rows, other.columns);
     for (unsigned int cell = 0; cell < other.rows * other.columns; cell++) {
-        var.data_line[cell] = this->data_line[cell] - other.data_line[cell];
+        result.data_line[cell] = this->data_line[cell] - other.data_line[cell];
     }
-    return var;
+    return result;
 }
 
 Matrix Matrix::operator* (const Matrix &other) {
@@ -148,7 +135,7 @@ Matrix Matrix::operator* (const Matrix &other) {
 
     for (unsigned int row = 0; row < this->rows; row++) {
         for (unsigned int col = 0; col < other.columns; col++) {
-            double cell = 0;
+            double cell = 0.0;
             for (unsigned int k = 0; k < this->columns; k++) {
                 cell = cell + ((this->data[row][k]) * other.data[k][col]);
             }
@@ -158,12 +145,8 @@ Matrix Matrix::operator* (const Matrix &other) {
     return var;
 }
 
-unsigned int Matrix::get_rows() { return rows; }
-
-unsigned int Matrix::get_columns() { return columns; }
-
 double Matrix::get_value(unsigned int row, unsigned int column) {
-    if (row > rows || column > columns) {
+    if (row >= rows || column >= columns) {
         return nan("");
     }
     return data[row][column];
@@ -179,7 +162,7 @@ double Matrix::get_det() {
     for (unsigned int col = 0; col < var.columns - 1; col++) {
         var.sort_rows(col);
         for (unsigned int row = col + 1; row < var.rows; row++) {
-            if (var.data[col][col] && var.data[row][col]) {
+            if ((abs(var.data[col][col]) > 0.001) && (abs(var.data[row][col]) > 0.001)) {
                 double k = var.data[row][col] / var.data[col][col];
                 for (unsigned int m = col; m < var.columns; m++) {
                     var.data[row][m] = var.data[row][m] - (k * var.data[col][m]);
@@ -285,31 +268,28 @@ void Matrix::sort_rows(unsigned int col) {
     }
 }
 
-void Matrix::zeros() {
+void Matrix::set_zeros() {
     for (unsigned int cell = 0; cell < rows * columns; cell++) {
         data_line[cell] = 0;
     }
 }
 
-void Matrix::ones() {
+void Matrix::set_ones() {
     for (unsigned int cell = 0; cell < rows * columns; cell++) {
         data_line[cell] = 1;
     }
 }
 
-void Matrix::identity() {
-    for (unsigned int row = 0; row < rows; row++) {
-        for (unsigned int col = 0; col < columns; col++) {
-            if (row == col) {
-                data[row][col] = 1;
-            } else {
-                data[row][col] = 0;
-            }
+void Matrix::set_identity() {
+    set_zeros();
+    if (rows == columns) {
+        for (unsigned int row = 0; row < rows; row++) {
+            data[row][row] = 1;
         }
     }
 }
 
-void Matrix::random() {
+void Matrix::set_random() {
     srand(time(NULL));
     for (unsigned int cell = 0; cell < rows * columns; cell++) {
         data_line[cell] = rand() % 1000;
