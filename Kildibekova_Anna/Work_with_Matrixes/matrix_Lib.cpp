@@ -41,6 +41,9 @@ Matrix & Matrix::operator = (const Matrix &matrix) {
         std::cout<<"=> Присваевоемой матрицы не существует."<<std::endl;
         return *this;
     }
+    if (&matrix == this) {
+        return *this;
+    }
     free_memory();
     wight = matrix.wight;
     height = matrix.height;
