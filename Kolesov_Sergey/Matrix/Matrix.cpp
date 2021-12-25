@@ -6,53 +6,62 @@
 #include <iostream>
 #include <cstring>
 
-void Matrix::rid_memory(){
-    delete[] this->ptr_d;
-    this->rows = 0;
-    this->cols = 0;
+void Matrix::free_memory(){
+    delete[] ptr_d;
+    rows = 0;
+    cols = 0;
 }
 
 Matrix::Matrix(unsigned int rows, unsigned int cols, double val){
-    this->ptr_d = new double[rows*cols];
+    ptr_d = new double[rows*cols];
     this->rows = rows;
     this->cols = cols;
 
     for (int i=0; i<(rows*cols); i++)
-        this->ptr_d[i] = val;
+        ptr_d[i] = val;
 }
 
 Matrix::Matrix(unsigned int rows, unsigned int cols, double* data){
-    this->ptr_d = new double[rows*cols];
-    memcpy(this->ptr_d, data, rows*cols*8);
+    ptr_d = new double[rows*cols];
+    memcpy(ptr_d, data, rows*cols*sizeof(double));
     this->rows = rows;
     this->cols = cols;
 }
 
 Matrix::Matrix(Matrix& clone){
-    this->ptr_d = new double[clone.rows*clone.cols];
-    memcpy(this->ptr_d, clone.ptr_d, clone.rows*clone.cols*8);
-    this->rows = clone.rows;
-    this->cols = clone.cols;
+    ptr_d = new double[clone.rows*clone.cols];
+    memcpy(ptr_d, clone.ptr_d, clone.rows*clone.cols*sizeof(double));
+    rows = clone.rows;
+    cols = clone.cols;
+}
+
+Matrix::Matrix(Matrix&& clone) noexcept{
+    ptr_d = clone.ptr_d;
+    rows = clone.rows;
+    cols = clone.cols;
+    clone.ptr_d = nullptr;
+    clone.rows = 0;
+    clone.cols = 0;
 }
 
 Matrix::Matrix(char Type, unsigned int n){
     switch (Type) {
         case 'E':
-            this->ptr_d = new double[n*n];
-            this->rows = n;
-            this->cols = n;
-            memset(this->ptr_d, 0, n*n*8);
+            ptr_d = new double[n*n];
+            rows = n;
+            cols = n;
+            memset(ptr_d, 0, n*n*sizeof(double));
             for (int i=0; i<n; i++)
-                this->ptr_d[i*this->cols+i] = 1;
+                ptr_d[i*cols + i] = 1;
         case 'O':
-            this->ptr_d = new double[n*n];
-            this->rows = n;
-            this->cols = n;
-            memset(this->ptr_d, 0, n*n*8);
+            ptr_d = new double[n*n];
+            rows = n;
+            cols = n;
+            memset(this->ptr_d, 0, n*n*sizeof(double));
         default:
-            this->ptr_d = nullptr;
-            this->rows = 0;
-            this->cols = 0;
+            ptr_d = nullptr;
+            rows = 0;
+            cols = 0;
 
     }
 }
@@ -61,30 +70,30 @@ Matrix& Matrix::operator= (const Matrix& clone){
     if (this == &clone)
         return *this;
 
-    rid_memory();
-    this->ptr_d = new double[clone.rows*clone.cols];
-    memcpy(this->ptr_d, clone.ptr_d, clone.rows*clone.cols*8);
-    this->rows = clone.rows;
-    this->cols = clone.cols;
+    free_memory();
+    ptr_d = new double[clone.rows*clone.cols];
+    memcpy(ptr_d, clone.ptr_d, clone.rows*clone.cols*sizeof(double));
+    rows = clone.rows;
+    cols = clone.cols;
 
     return *this;
 }
 
 double Matrix::operator() (unsigned int row, unsigned int col)
 {
-    if (row > this->rows || col > this->cols)
-        return 0;
-    return this->ptr_d[this->cols*row + col];
+    if (row > rows || col > cols)
+        return 0.0;
+    return ptr_d[cols*row + col];
 }
 
 Matrix::~Matrix(){
-    rid_memory();
+    free_memory();
 }
 
 void Matrix::print(){
-    for (int i = 0; i < this->rows; i++){
-        for (int j = 0; j < this->cols; j++){
-            std::cout << this->ptr_d[i * this->cols + j] << "  ";
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < cols; j++){
+            std::cout << ptr_d[i * cols + j] << "  ";
         }
         std::cout << '\n';
     }
@@ -92,32 +101,32 @@ void Matrix::print(){
 }
 
 void Matrix::transposition() {
-    if (this->ptr_d != nullptr) {
-        this->ptr_b = new double[this->rows * this->cols];
-        memcpy(this->ptr_b, this->ptr_d, this->rows * this->cols * 8);
+    if (ptr_d != nullptr) {
+        ptr_b = new double[rows * cols];
+        memcpy(ptr_b, ptr_d, rows * cols * sizeof(double));
 
-        for (int i = 0; i < this->rows; i++) {
-            for (int j = 0; j < (this->cols); j++)
-                this->ptr_d[j * this->cols + i] = this->ptr_b[i * this->cols + j];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < (cols); j++)
+                ptr_d[j * cols + i] = ptr_b[i * cols + j];
         }
 
-        int temp = this->cols;
-        this->cols = this->rows;
-        this->rows = temp;
-        delete[] this->ptr_b;
+        int temp = cols;
+        cols = rows;
+        rows = temp;
+        delete[] ptr_b;
     }
 }
 
 void Matrix::reverse() {
-    if ((this->rows == this->cols)&&(this->det() != 0)){
-        Matrix M(3,3,this->ptr_d);
+    if ((rows == cols)&&(det() != 0)){
+        Matrix M(3,3,ptr_d);
         double det = this->det();
         M.transposition();
         M.print();
 
-        for (int i = 0; i < this->rows; i++){
-            for (int j = 0; j < this->cols; j++) {
-                this->ptr_d[i * this->cols + j] = M.minorij(i + 1, j + 1) / det;
+        for (int i = 0; i < rows; i++){
+            for (int j = 0; j < cols; j++) {
+                ptr_d[i * cols + j] = M.minorij(i + 1, j + 1) / det;
             }
         }
     }
@@ -125,55 +134,55 @@ void Matrix::reverse() {
 
 void Matrix::normalization() {
     double sum = 0;
-    for (int i = 0; i < this->rows * this->cols; i++)
-        sum += this->ptr_d[i];
-    for (int i = 0; i < this->rows * this->cols; i++)
-        this->ptr_d[i] /= sum;
+    for (int i = 0; i < rows * cols; i++)
+        sum += ptr_d[i];
+    for (int i = 0; i < rows * cols; i++)
+        ptr_d[i] /= sum;
 }
 
-void Matrix::swap_rows(unsigned int row1, unsigned int row2){
+void Matrix::swap_rows(unsigned int row_first, unsigned int row_second){
     double temp = 0;
-    for (int i = 0; i < this->cols; i++) {
-        temp = this->ptr_d[(row1 - 1) * this->cols + i];
-        this->ptr_d[(row1 - 1) * this->cols + i] = this->ptr_d[(row2 - 1) * this->cols + i];
-        this->ptr_d[(row2 - 1) * this->cols + i] = temp;
+    for (int i = 0; i < cols; i++) {
+        temp = ptr_d[(row_first - 1) * cols + i];
+        ptr_d[(row_first - 1) * cols + i] = ptr_d[(row_second - 1) * cols + i];
+        ptr_d[(row_second - 1) * cols + i] = temp;
     }
 }
 
-void Matrix::swap_cols(unsigned int col1, unsigned int col2){
+void Matrix::swap_cols(unsigned int col_first, unsigned int col_second){
     double temp = 0;
-    for (int i = 0; i < this->rows; i++) {
-        temp = this->ptr_d[i*this->cols + col1-1];
-        this->ptr_d[i*this->cols + col1-1] = this->ptr_d[i*this->cols + col2-1];
-        this->ptr_d[i*this->cols + col2-1] = temp;
+    for (int i = 0; i < rows; i++) {
+        temp = ptr_d[i*cols + col_first-1];
+        ptr_d[i*cols + col_first-1] = ptr_d[i*cols + col_second-1];
+        ptr_d[i*cols + col_second-1] = temp;
     }
 }
 
 double Matrix::trace(){
-    if (this->rows != this->cols)
-        return 0;
+    if (rows != cols)
+        return 0.0;
 
     double tr = 0;
-    for (int i = 0; i < this->rows; i++)
-        tr += this->ptr_d[i * this->cols + i];
+    for (int i = 0; i < rows; i++)
+        tr += ptr_d[i * cols + i];
 
     return tr;
 }
 
 double Matrix::det(){
-    if ((this->rows != this->cols)||(this->rows == 0))
-        return 0;
+    if ((rows != cols)||(rows == 0))
+        return 0.0;
 
     double det = 0;
     double temp_main = 1;
     double temp_side = 1;
 
-    for (int i = 0; i < this->rows; i++) {
+    for (int i = 0; i < rows; i++) {
         temp_main = 1;
         temp_side = 1;
-        for (int j = 0; j < this->rows; j++) {
-            temp_main *= this->ptr_d[j * this->cols + (i+j)%this->cols];
-            temp_side *= this->ptr_d[j * this->cols + (this->cols+i-j)%this->cols];
+        for (int j = 0; j < rows; j++) {
+            temp_main *= ptr_d[j * cols + (i+j)%cols];
+            temp_side *= ptr_d[j * cols + (cols+i-j)%cols];
         }
         det += temp_main;
         det -= temp_side;
@@ -183,11 +192,11 @@ double Matrix::det(){
 }
 
 double Matrix::minorij(unsigned int row, unsigned int col){
-    if ((this->rows != this->cols)||(this->rows < 2))
-        return 0;
+    if ((rows != cols)||(rows < 2))
+        return 0.0;
 
-    if ((this->rows < row-1 )||(this->cols < col-1))
-        return 0;
+    if ((rows < row-1 )||(cols < col-1))
+        return 0.0;
 
     double min = 0;
     double temp_main = 1;
@@ -195,26 +204,26 @@ double Matrix::minorij(unsigned int row, unsigned int col){
     int count_main = 0;
     int count_side = 0;
 
-    for (int i = 0; i < this->cols; i++) {
+    for (int i = 0; i < cols; i++) {
         temp_main = 1;
         temp_side = 1;
         count_main = 0;
         count_side = 0;
 
-        for (int j = 0; j < this->rows; j++) {
-            if ((j != row - 1)&&((i + j) % this->cols != col - 1)) {
-                temp_main *= this->ptr_d[j * this->cols + (i + j) % this->cols];
+        for (int j = 0; j < rows; j++) {
+            if ((j != row - 1)&&((i + j) % cols != col - 1)) {
+                temp_main *= ptr_d[j * cols + (i + j) % cols];
                 count_main++;
             }
-            if ((j != row - 1)&&((this->cols + i - j) % this->cols != col - 1)) {
-                temp_side *= this->ptr_d[j * this->cols + (this->cols + i - j) % this->cols];
+            if ((j != row - 1)&&((cols + i - j) % cols != col - 1)) {
+                temp_side *= ptr_d[j * cols + (cols + i - j) % cols];
                 count_side++;
             }
         }
 
-        if (count_main == this->rows-1)
+        if (count_main == rows-1)
             min += temp_main;
-        if (count_side == this->rows-1)
+        if (count_side == rows-1)
             min -= temp_side;
     }
 
@@ -231,59 +240,59 @@ double Matrix::complement(unsigned int row, unsigned int col){
 }
 
 Matrix Matrix::operator+ (const Matrix& val){
-    if ((this->rows != val.rows) || (this->cols != val.cols)){
+    if ((rows != val.rows) || (cols != val.cols)){
         Matrix M;
         return M;
     }
 
-    Matrix M(this->rows, this->cols);
+    Matrix M(rows, cols, 0.0);
 
-    for (int i = 0; i < this->rows * this->cols; i++)
-        M.ptr_d[i] = this->ptr_d[i] + val.ptr_d[i];
+    for (int i = 0; i < rows * cols; i++)
+        M.ptr_d[i] = ptr_d[i] + val.ptr_d[i];
 
     return M;
 }
 
 Matrix Matrix::operator- (const Matrix& val){
-    if ((this->rows != val.rows) || (this->cols != val.cols)){
+    if ((rows != val.rows) || (cols != val.cols)){
         Matrix M;
         return M;
     }
 
-    Matrix M(this->rows, this->cols);
+    Matrix M(rows, cols);
 
-    for (int i = 0; i < this->rows * this->cols; i++)
-        M.ptr_d[i] = this->ptr_d[i] - val.ptr_d[i];
+    for (int i = 0; i < rows * cols; i++)
+        M.ptr_d[i] = ptr_d[i] - val.ptr_d[i];
 
     return M;
 }
 
 Matrix Matrix::operator* (double val){
-    if (this->ptr_d == nullptr){
+    if (ptr_d == nullptr){
         Matrix M;
         return M;
     }
 
-    Matrix M(this->rows, this->cols);
+    Matrix M(rows, cols);
 
-    for (int i = 0; i < this->rows * this->cols; i++)
-        M.ptr_d[i] = this->ptr_d[i] * val;
+    for (int i = 0; i < rows * cols; i++)
+        M.ptr_d[i] = ptr_d[i] * val;
 
     return M;
 }
 
 Matrix Matrix::operator* (const Matrix& val){
-    if (this->cols != val.rows){
+    if (cols != val.rows){
         Matrix M;
         return M;
     }
 
-    Matrix M(this->rows, val.cols);
+    Matrix M(rows, val.cols);
 
-    for (int i = 0; i < this->rows; i++) {
+    for (int i = 0; i < rows; i++) {
         for (int j = 0; j < val.cols; j++) {
-            for (int k = 0; k < this->cols; k++) {
-                M.ptr_d[i * val.cols + j] += (this->ptr_d[this->cols * i + k] * val.ptr_d[k * val.cols + j]);
+            for (int k = 0; k < cols; k++) {
+                M.ptr_d[i * val.cols + j] += (ptr_d[cols * i + k] * val.ptr_d[k * val.cols + j]);
             }
         }
     }
@@ -292,13 +301,13 @@ Matrix Matrix::operator* (const Matrix& val){
 }
 
 double Matrix::get(unsigned int row, unsigned int col) {
-    if ((row > this->rows)||(col > this->cols))
-        return 0;
+    if ((row > rows)||(col > cols))
+        return 0.0;
 
-    return this->ptr_d[(row-1)* this->cols + col-1];
+    return ptr_d[(row-1)* cols + col-1];
 }
 
 void Matrix::set(unsigned int row, unsigned int col, double val) {
-    if ((row <= this->rows) && (col <= this->cols))
-        this->ptr_d[(row - 1) * this->cols + col - 1] = val;
+    if ((row <= rows) && (col <= cols))
+        ptr_d[(row - 1) * cols + col - 1] = val;
 }
