@@ -4,9 +4,14 @@
 #include <cstring>
 
 
+enum{
+ERRSQUIRE = -1, // Size error! Not squire matrix!
+ERRNUMBER = -2, // Assignment error! There is no such element in the matrix!
+};
+
 Matrix::Matrix(){  // default matrix
-    this -> rows = rows = 0;
-    this -> cols = cols = 0;
+    this -> rows = 0;
+    this -> cols = 0;
     data = new double [rows * cols];
 }
 
@@ -20,12 +25,14 @@ Matrix::Matrix(int rows, int cols) { // create Matrix
     }
 }
 
-void Matrix::assigning(int num_row, int num_col, double value) {  // put a value for element
+int Matrix::value(int num_row, int num_col, double value) {  // put a value for element
+    if ((num_col>cols)||(num_row>rows)){
+        return ERRNUMBER;
+    }
     data[cols*num_row + num_col] = value;
 }
 
 void Matrix::print() {  // put matrix on the screen
-    std::cout << "matrix \n";
     for (int i = 0; i < (cols * rows); i++)
     {
         printf ("%.2f\t", data[i]);
@@ -63,40 +70,35 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept { // reloading the assignm
     return *this;
 }
 
-void Matrix::zero(){  // zero matrix
+void Matrix::set_zero(){  // zero matrix
     for (int i = 0; i < cols*rows; i++)
     {
         data[i] = 0;
     }
 }
 
-void Matrix::single(){  // unit matrix
-    for (int i = 0; i < rows; i++)
+int Matrix::set_identity_matrix(){  // unit matrix
+    if (rows != cols){
+        return ERRSQUIRE;
+    }
+    set_zero();
+    int j = 0;
+    for (int i = 0; i < rows && j<cols; i++ && j++)
     {
-        for (int j = 0; j < cols; j++)
+        if (i == j)
         {
-            if (rows == cols)
-            {
-                if (i == j)
-                {
-                    data[i * cols + j] = 1;
-                }
-                else
-                {
-                    data[i * cols + j] = 0;
-                }
-            }
-            else
-            {
-                std::cout << "Not squire matrix\n";
-            }
+            data[i * cols + j] = 1;
         }
     }
 }
 
-double Matrix::trace()  // trace of matrix
-{
-    double trace_matrix = 0;
+double Matrix::trace(){  // trace of matrix
+    double trace_matrix = 0.0;
+    if (cols != rows)
+    {
+        trace_matrix = NAN;
+        return trace_matrix;
+    }
     for (int i = 0; i < rows; i++)
     {
         trace_matrix += data[i*cols+i];
@@ -104,34 +106,27 @@ double Matrix::trace()  // trace of matrix
     return trace_matrix;
 }
 
-
-
-Matrix Matrix::Mult_scalar(const double scalar, const Matrix)  // matrix multiplication on scalar
+Matrix Matrix::mult_scalar(const double scalar, const Matrix)  // matrix multiplication on scalar
 {
     Matrix Result(rows, cols);
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
-        {
-            data[i * cols + j] = scalar * data[i * cols + j];
-        }
+    for (int i = 0; i < rows*cols; i++) {
+        data[i] = scalar * data[i];
     }
 }
 
 Matrix Matrix :: operator+(const Matrix &other){ // operator sum of matrix
     if ((this -> cols != other.cols) || (this -> rows != other.rows))
     {
-        Matrix Result;
-        std::cout << "Different sizes of matrix\n" << std::endl;
-        return Result;
+        Matrix result;
+        return result;
     }
     else
     {
-        Matrix Result(rows, cols);
+        Matrix result(rows, cols);
         for (unsigned int i = 0; i < rows * cols; i++) {
-            Result.data[i] = data[i] + other.data[i];
+            result.data[i] = data[i] + other.data[i];
         }
-        return Result;
+        return result;
     }
 }
 
@@ -139,40 +134,37 @@ Matrix Matrix :: operator-(const Matrix &other) // operator matrix difference
 {
     if ((this -> cols != other.cols) || (this -> rows != other.rows))
     {
-        Matrix Result;
-        std::cout << "Different sizes of matrix\n" << std::endl;
-        return Result;
+        Matrix result;
+        return result;
     }
     else
     {
-        Matrix Result(rows, cols);
+        Matrix result(rows, cols);
         for (unsigned int i = 0; i < rows * cols; i++) {
-            Result.data[i] = data[i] - other.data[i];
+            result.data[i] = data[i] - other.data[i];
         }
-        return Result;
+        return result;
     }
 }
 
 Matrix Matrix::operator * (const Matrix &other) { // operator matrix multiplication
     if (this -> cols != other.rows) {
-        Matrix Result;
-        std::cout << "Incorrect sizes of matrix\n" << std::endl;
-        return Result;
+        Matrix result;
+        return result;
     }
-    else {
-        Matrix Result(rows, other.cols);
+    Matrix result(rows, other.cols);
         for (int i = 0; i < this->rows; i++) {
             for (int j = 0; j < other.cols; j++) {
                 for (int k = 0; k < other.cols; k++) {
-                    Result.data[cols * i + j] += (this->data[cols * i + k] * other.data[cols * k + j]);
+                    result.data[cols * i + j] += (this->data[cols * i + k] * other.data[cols * k + j]);
                 }
             }
         }
-        return Result;
-    }
+    return result;
 }
 
-Matrix Matrix::Minor(int rows, int cols, const Matrix A) { // matrix minors
+
+Matrix Matrix::minor(int rows, int cols, const Matrix A) { // matrix minors
     Matrix result(A.rows-1, A.cols-1);
     int k = 0;
     for (int i = 0; i < A.rows; i++)
@@ -188,7 +180,7 @@ Matrix Matrix::Minor(int rows, int cols, const Matrix A) { // matrix minors
         }
     }
     return result;
-};
+}
 
 Matrix Matrix::addition(const Matrix A) { // additions of matrix
     Matrix result (A.rows, A.cols);
@@ -196,42 +188,41 @@ Matrix Matrix::addition(const Matrix A) { // additions of matrix
     {
         for (int j = 0; j <  A.cols; j++)
         {
-            result.data[i*A.cols + j] = pow((-1), i + j) * determinant(Minor(i, j, A));
+            result.data[i*A.cols + j] = pow((-1), i + j) * determinant(minor(i, j, A));
         }
     }
     return result;
 }
 
 double Matrix::determinant(const Matrix A) { // matrix determinant
+    double det = 0.0;
     if(A.rows != A.cols) {
-        std::cout << "Not squire matrix\n" << std::endl;
+        det = NAN;
+        return det;
     }
-    else {
-        double D = 0;
-        switch (A.rows) {
-            case 1:
-                return A.data[0];
-            case 2:
-                return (A.data[0] * A.data[3] - A.data[1] * A.data[2]);
-            default: {
-                Matrix Dop = addition(A);
-                for (int j = 0; j < A.cols; j++) {
-                    D += A.data[j] * Dop.data[j];
-                }
-                return D;
+    switch (A.rows) {
+        case 1:
+            return A.data[0];
+        case 2:
+            return (A.data[0] * A.data[3] - A.data[1] * A.data[2]);
+        default: {
+            Matrix dop = addition(A);
+            for (int j = 0; j < A.cols; j++) {
+                det += A.data[j] * dop.data[j];
             }
+            return det;
         }
     }
 }
 
 extern Matrix Matrix::transposition(const Matrix A) { // matrix transposition
-    Matrix Result (A.cols, A.rows);
+    Matrix result (A.cols, A.rows);
     for (int i = 0; i < A.rows; i++) {
         for (int j = 0; j < A.cols; j++) {
-            Result.data[j * A.rows + i] = A.data[i * A.cols + j];
+            result.data[j * A.rows + i] = A.data[i * A.cols + j];
         }
     }
-    return Result;
+    return result;
 }
 
 Matrix::~Matrix() { // Destructor

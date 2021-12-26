@@ -20,17 +20,17 @@ public:
     Matrix operator + (const Matrix &other); // operator sum of matrix
     Matrix operator - (const Matrix &other); // operator matrix difference
     Matrix operator * (const Matrix &other); // operator matrix multiplication
-    Matrix Mult_scalar(const double scalar,const Matrix); // matrix multiplication on scalar
+    Matrix mult_scalar(const double scalar,const Matrix); // matrix multiplication on scalar
     Matrix addition(const Matrix A);  // additions of matrix
-    Matrix Minor(int rows, int cols, const Matrix A); // matrix minors
+    Matrix minor(int rows, int cols, const Matrix A); // matrix minors
     Matrix transposition(const Matrix A); // matrix transposition
 
     double determinant(const Matrix A); // matrix determinant
-    void assigning(int num_row, int num_col, double value); // put a value for element
-    void print(); // put matrix on the screen
-    void zero(); // zero matrix
-    void single(); // unit matrix
     double trace(); // trace of matrix
+    int value(int num_row, int num_col, double value); // put a value for element
+    int set_identity_matrix(); // unit matrix
+    void print(); // put matrix on the screen
+    void set_zero(); // zero matrix
 };
 
 #endif
