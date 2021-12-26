@@ -91,7 +91,7 @@ Matrix Matrix::operator * (const Matrix &matrix) {
 }
 
 double Matrix::trace() const {
-    if (!is_null()) {
+    if (is_null()) {
         return 0.0;
     }
     double trace = 0.0;
@@ -102,11 +102,36 @@ double Matrix::trace() const {
     }
     return trace;
 }
-double Matrix::determinant() const { }
+double Matrix::determinant() const {
+    double det = 0.0;
+    if (width != height) {
+        std::cout<<"=> Матрица не квадратная."<<std::endl<<std::endl;
+        return det;
+    }
+    if (is_null()) {
+        return det;
+    }
+    for (uint col = 0; col < width; col++) {
+        double det_pos = 1.0;
+        double det_neg = 1.0;
+        for (uint row = 0; row < height; row++) {
+            uint cell_pos = row * (width + 1) + col
+                          - (row + col) / width * width;
+            uint cell_neg = row * (width - 1) + col
+                          + ((col * 2) / (col + 1))
+                          * (width - (row + col) / width * width);
+            det_pos *= data[cell_pos];
+            det_neg *= data[cell_neg];
+        }
+        det += det_pos - det_neg;
+    }
+
+    return det;
+}
 
 void Matrix::print(const std::string &text) const {
     std::cout<<text<<std::endl;
-    if (!is_null()) {
+    if (is_null()) {
         return;
     }
     for (uint cell = 0; cell < height * width; cell++) {
@@ -136,9 +161,9 @@ void Matrix::free_memory() {
 bool Matrix::is_null() const {
     if (width == 0 || height == 0) {
         std::cout<<"=> Матрица пуста."<<std::endl<<std::endl;
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 // TODO: Может быть, лучше использовать memset(data, 0, height * width)?

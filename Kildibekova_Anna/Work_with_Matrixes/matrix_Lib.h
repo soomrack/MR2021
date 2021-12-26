@@ -24,7 +24,7 @@ public:
     Matrix operator * (const Matrix &matrix);
 public:
     double trace() const;
-    double determinant() const;  //TODO
+    double determinant() const;
     void print(const std::string &text = "Матрица:") const;
 private:
     void memory_allocation();
