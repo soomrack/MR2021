@@ -16,10 +16,8 @@ Matrix::Matrix(int rows, int cols, int* other_matrix) //стандартный �
 {
 	this->rows = rows;
 	this->cols = cols;
-
 	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
 	memcpy(data, other_matrix, rows * cols * sizeof(int));
-
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
@@ -30,14 +28,12 @@ Matrix::Matrix(int rows, int cols, int* other_matrix) //стандартный �
 Matrix::Matrix(int rows, int cols, int type) { //Конструктор единичной и нулевой матриц заданного размера
 	this->rows = rows;
 	this->cols = cols;
-
 	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
 		arr[i] = &data[i * cols];
 	}
-	
 	switch (type) //заполнение единичной и нулевоц матриц
 	{
 	case 0: //создание нулевой матрицы
@@ -49,7 +45,6 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
 			}
 		}
 		break;
-
 	case 1: //создание единичной матрицы
 		for (int i = 0; i < rows; i++)
 		{
@@ -60,7 +55,6 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
 			}
 		}
 		break;
-
 	default:
 		rows = 0;
 		cols = 0;
@@ -71,16 +65,14 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
 
 Matrix::Matrix(const Matrix& other_matrix) //конструктор копирования
 {
-	this->rows = other_matrix.rows;
-	this->cols = other_matrix.cols;
-
-	this->data = new int[rows * cols]; //создание последовательного динамического двумерного массива
-	memcpy(this->data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
-
-	this->arr = new int* [rows];
+	rows = other_matrix.rows;
+	cols = other_matrix.cols;
+	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
+	memcpy(data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
+	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
-		this->arr[i] = &data[i * cols];
+		arr[i] = &data[i * cols];
 	}
 }
 
@@ -90,7 +82,6 @@ Matrix::Matrix(Matrix&& other_matrix) noexcept //Конструктор пере
 	cols = other_matrix.cols;
 	data = other_matrix.data;
 	arr = other_matrix.arr;
-
 	other_matrix.rows = 0;
 	other_matrix.cols = 0;
 	other_matrix.data = nullptr;
@@ -103,7 +94,6 @@ Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка о�
 	{
 		return Matrix();
 	}
-
 	Matrix result(this->rows, this->cols,0);
 	for (int i = 0; i < rows; i++) //инициализация динамического двумерного массива
 	{
@@ -121,9 +111,7 @@ Matrix Matrix::operator *(const Matrix& other_matrix) //перегрузка о�
 	{
 		return Matrix();
 	}
-
 	Matrix result(this->rows, other_matrix.cols,0);
-
 	for (int row = 0; row < this->rows; row++) //инициализация динамического двумерного массива
 	{
 		for (int col = 0; col < other_matrix.cols; col++)
@@ -144,22 +132,17 @@ Matrix& Matrix::operator =(const Matrix& other_matrix) //перегрузка о
 	{
 		return *this;
 	}
-
-	this->rows = other_matrix.rows;
-	this->cols = other_matrix.cols;
-
-	delete[] this->data;
-	delete[] this->arr;
-
-	this->data = new int[rows * cols]; //создание последовательного динамического двумерного массива
-	memcpy(this->data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
-
-	this->arr = new int* [rows];
+	rows = other_matrix.rows;
+	cols = other_matrix.cols;
+	delete[] data;
+	delete[] arr;
+	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
+	memcpy(data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
+	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
-		this->arr[i] = &data[i * cols];
+		arr[i] = &data[i * cols];
 	}
-
 	return *this;
 }
 
@@ -189,10 +172,8 @@ int Matrix::trace()
 Matrix Matrix::minor(int row, int col, const Matrix a)
 {
 	Matrix result(a.rows - 1, a.cols - 1,0);
-
 	int offsetRow = 0; //Смещение индекса строки в матрице
 	int offsetCol = 0; //Смещение индекса столбца в матрице
-
 	for (int i = 0; i < result.rows; i++)
 	{
 		//Пропустить row-ую строку
@@ -200,7 +181,6 @@ Matrix Matrix::minor(int row, int col, const Matrix a)
 		{
 			offsetRow = 1; //Как только встретили строку, которую надо пропустить, делаем смещение для исходной матрицы
 		}
-
 		offsetCol = 0; //Обнулить смещение столбца
 		for (int j = 0; j < result.cols; j++)
 		{
@@ -209,7 +189,6 @@ Matrix Matrix::minor(int row, int col, const Matrix a)
 			{
 				offsetCol = 1; //Встретили нужный столбец, проускаем его смещением
 			}
-
 			result.arr[i][j] = a.arr[i + offsetRow][j + offsetCol];
 		}
 	}
@@ -223,7 +202,6 @@ double Matrix::det(const Matrix a)
 	{
 		return -1.;
 	}
-
 	switch (a.rows)
 	{
 	case 1:
