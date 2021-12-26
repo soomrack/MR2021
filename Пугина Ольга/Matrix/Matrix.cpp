@@ -5,29 +5,21 @@
 
 
 Matrix::Matrix(){
-    this->rows = 0;
-    this->cols = 0;
+    rows = 0;
+    cols = 0;
     data = nullptr;
 }
 
 
 Matrix::Matrix(int rows, int cols, int *arr, unsigned int length) {
-    if (length == rows * cols){
+    if (length == rows * cols)
+    {
         this->rows = rows;
         this->cols = cols;
         data = new int[rows * cols];
-        if (data != nullptr){
-            memcpy(data, arr, sizeof(int) * length);
-        }else{
-            this->rows = 0;
-            this->cols = 0;
-        }
-    } else {
-        Matrix();
+        memcpy(data, arr, sizeof(int) * length);
     }
-
 }
-
 
 Matrix::Matrix(int rows, int cols, Matrix_Type type, int value){
     this->rows = rows;
@@ -86,17 +78,12 @@ Matrix::~Matrix() {
 }
 
 //Конструктор копирования
-Matrix::Matrix(const Matrix &source) {
-    this->rows = source.rows;
-    this->cols = source.cols;
-    this->data = new int[rows * cols];
-    if (data != nullptr){
-        memcpy(data,source.data,sizeof(int)*rows * cols);
-    }else{
-        this->rows = 0;
-        this->cols = 0;
-    }
-
+Matrix::Matrix(const Matrix &source)
+{
+    rows = source.rows;
+    cols = source.cols;
+    data = new int[rows * cols];
+    memcpy(data,source.data,sizeof(int)*rows * cols);
 }
 
 //Конструктор перемещения
@@ -114,15 +101,11 @@ Matrix & Matrix::operator = (const Matrix &source){
     if (&source == this) {
         return *this;
     }
-    this->rows = source.rows;
-    this->cols = source.cols;
-    this->data = new int[rows * cols];
-    if (data != nullptr){
-        memcpy(data,source.data,sizeof(int)*rows * cols);
-    }else{
-        this->rows = 0;
-        this->cols = 0;
-    }
+    rows = source.rows;
+    cols = source.cols;
+    delete [] data;
+    data = new int[rows * cols];
+    memcpy(data,source.data,sizeof(int)*rows * cols);
     return *this;
 }
 
@@ -182,16 +165,16 @@ Matrix Matrix::operator* (const Matrix &other){
 //След матрицы
 int Matrix::trace() {
     int matrix_trace = 0;
-    for (int k = 0; k < this->rows || k < this->cols ; ++k) {
+    for (int k = 0; k < rows || k < cols ; ++k) {
         matrix_trace += data[k + rows * k];
     }
     return matrix_trace;
 }
 //Вывод на экран
 void Matrix::print() {
-    for (int i = 0; i < this->rows; ++i) {
-        for (int j = 0; j < this->cols; ++j) {
-            std::cout << this->data[j + rows * i] << "\t";
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            std::cout << data[j + rows * i] << "\t";
         }
         std::cout << std::endl;
     }
@@ -200,8 +183,8 @@ void Matrix::print() {
 // Определитель меодом Гаусса
 int Matrix::det(){
     int det = 1;
-    Matrix tmp(this->rows, this->cols, TEMPORARY,0 );
-    memcpy(tmp.data,this->data,sizeof(int)*rows*cols );
+    Matrix tmp(rows, cols, TEMPORARY,0 );
+    memcpy(tmp.data,data,sizeof(int)*rows*cols );
     for (int diagonal = 0; diagonal < cols; ++diagonal) {
         if (tmp.data[diagonal + rows*diagonal] == 0){
             return 0;
