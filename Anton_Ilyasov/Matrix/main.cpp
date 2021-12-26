@@ -29,7 +29,7 @@ int main() //пример работы с библиотекой матриц
 	Bb.print();
 	
 	Aa.minor(2, 2, Aa).print();
-	cout << Aa.minor(2, 2, Aa).det(Aa) << endl;;
+	cout << Aa.minor(2, 2, Aa).det(Aa) << endl;
 
 	return 0;
 }

@@ -69,7 +69,7 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
 	}
 }
 
-Matrix::Matrix(const Matrix& other_matrix)	//конструктор копирования
+Matrix::Matrix(const Matrix& other_matrix) //конструктор копирования
 {
 	this->rows = other_matrix.rows;
 	this->cols = other_matrix.cols;
@@ -105,7 +105,7 @@ Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка о�
 	}
 
 	Matrix result(this->rows, this->cols,0);
-	for (int i = 0; i < rows; i++)				 //инициализация динамического двумерного массива
+	for (int i = 0; i < rows; i++) //инициализация динамического двумерного массива
 	{
 		for (int j = 0; j < cols; j++)
 		{
@@ -124,8 +124,7 @@ Matrix Matrix::operator *(const Matrix& other_matrix) //перегрузка о�
 
 	Matrix result(this->rows, other_matrix.cols,0);
 
-	//инициализация динамического двумерного массива
-	for (int row = 0; row < this->rows; row++)
+	for (int row = 0; row < this->rows; row++) //инициализация динамического двумерного массива
 	{
 		for (int col = 0; col < other_matrix.cols; col++)
 		{
