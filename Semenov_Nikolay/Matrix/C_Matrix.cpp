@@ -1,16 +1,26 @@
 #include "C_Matrix.h"
 #include <iostream>
+#include <cstring>
+
 using namespace std;
 
+/* Конструктор по умолчанию */
+Matrix::Matrix(){
+    this -> height = 0;
+    this -> width = 0;
+    data = nullptr;
+}
+
 /* Создание матрицы и выделение памяти */
-Matrix::Matrix(int height, int width) {
-    if (height <= 0 || width <= 0) {
-        std::cout << "\n\nERROR\nHeight|Width must be >= 1." << std::endl;
-        //exit(1);
-    }
+Matrix::Matrix(unsigned int height, unsigned int width) {
     this->height = height;
     this->width = width;
     data = (int *) malloc(height * width * sizeof(int));
+    if (!(data = (int *) malloc(height * width * sizeof(int)))) { //Проверка на выделение памяти
+        this->data = 0;
+        this->height = 0;
+        this->width = 0;
+    }
 }
 
 /* Конструктор копирования */
@@ -18,10 +28,11 @@ Matrix::Matrix(const Matrix &other) {
     this->height = other.height;
     this->width = other.width;
     this->data = (int *) malloc(height * width * sizeof(int));
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            this->data[width * i + j] = other.data[width * i + j];
-        }
+    std::memcpy(this->data, other.data, width * height * sizeof(int));
+    if (!(data = (int *) malloc(height * width * sizeof(int)))) { //Проверка на выделение памяти
+        this->data = 0;
+        this->height = 0;
+        this->width = 0;
     }
 }
 
@@ -31,18 +42,13 @@ Matrix::Matrix(Matrix &&Matrix) noexcept {
     width = Matrix.width;
     data = Matrix.data;
     Matrix.data = nullptr;
+    height = 0;
+    width = 0;
 }
 
 /* Деструктор */
-Matrix::~Matrix() {
-    erase(data);
-}
-
-/* Освобождение памяти */
-void Matrix::erase(int *data) const {
-    if (height != 0 && width != 0 && data != nullptr) {
-        delete[] data;
-    }
+Matrix::~Matrix(){
+    delete[] data;
 }
 
 //-----
@@ -50,141 +56,124 @@ void Matrix::erase(int *data) const {
 /* Перегрузка оператора сложения */
 Matrix Matrix::operator + (const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        std::cout << "\n\nERROR\nMatrix A and B must be the same size.";
         Matrix Error(0, 0);
         return Error;
     }
-    Matrix Summarize(this->height, this->width);
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            Summarize.data[height * i + j] = this->data[height * i + j] + other.data[height * i + j];
-        }
+    Matrix summarize(this->height, this->width);
+    for (int i = 0; i < this->width * other.height; i++){
+        summarize.data[i] = this->data[i] + other.data[i];
     }
-    Summarize.Output();
-    return Summarize;
+    return summarize;
 }
 
 /* Перегрузка оператора вычитания */
 Matrix Matrix::operator - (const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        std::cout << "\n\nERROR\nMatrix A and B must be the same size.";
         Matrix Error(0, 0);
         return Error;
     }
-    Matrix Subtraction(this->height, this->width);
-    for (int i = 0; i < this->width; i++) {
-        for (int j = 0; j < other.height; j++) {
-            Subtraction.data[other.height * i + j] = this->data[other.height * i + j] - other.data[other.height * i + j];
-        }
+    Matrix subtraction(this->height, this->width);
+    for (int i = 0; i < this->width * other.height; i++){
+        subtraction.data[i] = this->data[i] - other.data[i];
     }
-    Subtraction.Output();
-    return Subtraction;
+    return subtraction;
 }
 
 /* Перегрузка оператора умножения */
 Matrix Matrix::operator * (const Matrix &other) {
     int sum = 0;
     if (this->width != other.height) {
-        std::cout << "\n\nERROR\nMatrix A and B must be commutative (columns A = height B).\n\n\n";
         Matrix Error(0, 0);
         return Error;
     }
-    Matrix Multiplication(this->height, other.width);
-    for (int i = 0, j = 0; i < this->height * other.width; i++) {
-        for (int k = 0; k < this->width; k++)
-            sum += this->data[k + j * this->width] * other.data[i - j * other.width + k * other.width];
-        Multiplication.data[i] = sum;
-        sum = 0;
-        if ((i + 1) % (this->width + 1) == 0) j++;
+    Matrix multiplication(this->height, other.width);
+    for(int row = 0; row < this->height; row++) {
+        for(int col_B = 0; col_B < other.width; col_B++) {
+            for(int col_A = 0; col_A < other.width; col_A++) {
+                multiplication.data[width * row + col_B] += (this->data[width * row + col_A] * other.data[width * col_A + col_B]);
+            }
+        }
     }
-    Multiplication.Output();
-    return Multiplication;
+    return multiplication;
 }
 
 /* След матрицы */
-int Matrix::Trace() {
-    int trace = 0;
-    if (this->height != this->width) {
-        std::cout << "\n\nERROR\nMatrix is not square." << std::endl;
-        exit(2);
-    }
+int Matrix::trace() {
+    int tr = 0;
     for (int i = 0; i < height; i++) {
-        trace += data[width * i + 1 * i];
+        tr += data[width * i + i];
         }
-    return trace;
+    return tr;
 }
 
 /* Расчёт определителя матрицы методом Гаусса */
-double Matrix::Determinant(){
+double Matrix::determinant(){
     if (this->height != this->width) {
-        std::cout << "\n\nERROR\nMatrix is not square." << std::endl;
-        exit(2);
+        return 0;
     }
     double det = 1.0;
-    double add = 0.0;
-    auto **Matrix_Det = new double *[height];
+    double add;
+    auto **matrix_Det = new double *[height];
     for (int i = 0; i < height; ++i) {
-        Matrix_Det[i] = new double[width];
+        matrix_Det[i] = new double[width];
     }
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
-            Matrix_Det[i][j] = (double)data[width * i + j];
+            matrix_Det[i][j] = (double)data[width * i + j];
         }
     }
-    for (int i = 0; i < height-1; ++i) {
+    for (int i = 0; i < height - 1; ++i) {
         for (int j = i+1; j < width; ++j) {
-            add = -(Matrix_Det[j][i] / Matrix_Det[i][i]);
+            add = -(matrix_Det[j][i] / matrix_Det[i][i]);
             for (int k = 0; k < height; ++k) {
-                Matrix_Det[j][k] += Matrix_Det[i][k] * add;
+                matrix_Det[j][k] += matrix_Det[i][k] * add;
             }
         }
     }
     for (int i = 0; i < height; ++i) {
-        det *= Matrix_Det[i][i];
+        det *= matrix_Det[i][i];
     }
     for (int i = 0; i < height; ++i) {
-        delete [] Matrix_Det[i];
+        delete [] matrix_Det[i];
     }
-    delete [] Matrix_Det;
+    delete [] matrix_Det;
     return det;
 }
 
 //-----
 
 /* Создание случайной матрицы */
-void Matrix::Rand(int height, int width){
+void Matrix::set_Random(int height, int width){
     for (int i = 0; i < height * width; i++) {
         data[i] = rand() % 10;
     }
 }
 
 /* Создание нулевой матрицы */
-void Matrix::Zero() {
+void Matrix::set_Zero() {
     for (int i = 0; i < height * width; i++) {
         data[i] = 0;
     }
 }
 
 /* Создание единичной матрицы */
-void Matrix::Identity() {
-    if (this->height != this->width) {
-        std::cout << "Matrix is not square." << std::endl;
-        exit(1);
+void Matrix::set_Identity() {
+    set_Zero();
+    unsigned int length;
+    if (width < height) {
+        length = width;
+    } else {
+        length = height;
     }
-    Zero();
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if (i == j) {
-                data[i] = 1;
-            }
-        }
+    for(int i = 0; i < length; i++){
+        data[width * i + i]= 1;
     }
 }
 
 //-----
 
 /* Вывод матрицы на экран */
-void Matrix::Output() {
+void Matrix::output() {
     for (int i = 0; i < this->width * this->height; i++) {
         std::cout << data[i] << " ";
         if ((i + 1) % this->width == 0)
