@@ -2,25 +2,34 @@
 #include <string.h>
 #include"Matrix.Libryary.h"
 
-int main()
+int main() //пример работы с библиотекой матриц
 {
-	Matrix A(3, 3, 1);
-	A.print();
-	Matrix B(2, 2, 1);
-	Matrix C(2, 2, 1);
+	int A[3][3] = { 1,2,3,
+				    4,5,6,
+			   	    7,8,9 };
 
-	A = C;
-	Matrix D= A + B;
+	int B[3][3] = { -1,-2,-3,
+					-4,-5,-6,
+					-7,-8,-9 };
 
+	Matrix Aa(3, 3, *A);
+	Matrix Bb(3, 3, *B);
+	Matrix Cc(2, 2, 1);
+
+	Matrix D = Aa * Bb;
 	D.print();
 
-	A.print();
+	D = Aa + Bb;
+	D.print();
 
-	A = B * C;
-	A = B + C;
+	cout << Aa.trace() << endl;
+	cout << Aa.det(Aa) << endl;
 
-	cout << A.trace()<< endl;
-	cout << A.det(A) << endl;
+	Bb = Cc;
+	Bb.print();
+	
+	Aa.minor(2, 2, Aa).print();
+	cout << Aa.minor(2, 2, Aa).det(Aa) << endl;;
 
 	return 0;
 }

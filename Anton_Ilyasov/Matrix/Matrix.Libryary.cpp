@@ -4,7 +4,7 @@
 #include "Matrix.Libryary.h"
 using namespace std;
 
-Matrix::Matrix() //матрица нулевого размера
+Matrix::Matrix() //простой конструктор
 { 
 	rows = 0;
 	cols = 0;
@@ -12,12 +12,14 @@ Matrix::Matrix() //матрица нулевого размера
 	arr = nullptr;
 }
 
-Matrix::Matrix(int rows, int cols) //обычный конструктор с параметрами
+Matrix::Matrix(int rows, int cols, int* other_matrix) //стандартный конструктор с параметрами
 {
 	this->rows = rows;
 	this->cols = cols;
 
 	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
+	memcpy(data, other_matrix, rows * cols * sizeof(int));
+
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
@@ -102,7 +104,7 @@ Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка о�
 		return Matrix();
 	}
 
-	Matrix result(this->rows, this->cols);
+	Matrix result(this->rows, this->cols,0);
 	for (int i = 0; i < rows; i++)				 //инициализация динамического двумерного массива
 	{
 		for (int j = 0; j < cols; j++)
@@ -120,7 +122,7 @@ Matrix Matrix::operator *(const Matrix& other_matrix) //перегрузка о�
 		return Matrix();
 	}
 
-	Matrix result(this->rows, other_matrix.cols);
+	Matrix result(this->rows, other_matrix.cols,0);
 
 	//инициализация динамического двумерного массива
 	for (int row = 0; row < this->rows; row++)
@@ -185,10 +187,9 @@ int Matrix::trace()
 	return trace;
 }
 
-
 Matrix Matrix::minor(int row, int col, const Matrix a)
 {
-	Matrix result(a.rows - 1, a.cols - 1);
+	Matrix result(a.rows - 1, a.cols - 1,0);
 
 	int offsetRow = 0; //Смещение индекса строки в матрице
 	int offsetCol = 0; //Смещение индекса столбца в матрице
