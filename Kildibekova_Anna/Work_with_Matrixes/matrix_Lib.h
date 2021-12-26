@@ -15,6 +15,7 @@ private:
     double *data;
 public:
     Matrix(uint height = 0, uint width = 0, type_of_matrix type = ZERO);
+    Matrix(uint height, uint width, double *matrix);
     Matrix(const Matrix &matrix);
     Matrix(Matrix && matrix);
     ~Matrix();
@@ -24,7 +25,7 @@ public:
     Matrix operator * (const Matrix &matrix);
 public:
     double trace() const;
-    double determinant() const;
+    double determinant() const; //TODO: Только для матриц < 4 порядка
     void print(const std::string &text = "Матрица:") const;
 private:
     void memory_allocation();

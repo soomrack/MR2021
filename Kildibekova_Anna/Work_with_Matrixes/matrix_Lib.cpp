@@ -24,7 +24,20 @@ Matrix::Matrix(uint height, uint width, type_of_matrix type){
     }
 }
 
-Matrix::Matrix(const Matrix &matrix){
+Matrix::Matrix(uint height, uint width, double *matrix) {
+    if (matrix == NULL){     // TODO: Нужна ли проверка?
+        return;
+    }
+    this->height = height;
+    this->width = width;
+    memory_allocation();
+    if (data == NULL){     // TODO: Нужна ли проверка?
+        return;
+    }
+    memcpy(data, matrix, height * width * sizeof(double));
+}
+
+Matrix::Matrix(const Matrix &matrix) {
     height = matrix.height;
     width = matrix.width;
     memory_allocation();
@@ -72,6 +85,8 @@ Matrix Matrix::operator + (const Matrix &matrix) {
     }
     return result_matrix;
 }
+
+
 Matrix Matrix::operator * (const Matrix &matrix) {
     if (width != matrix.height) {
         std::cout<<"=> Несоответствие размеров матриц."<<std::endl;
@@ -82,8 +97,11 @@ Matrix Matrix::operator * (const Matrix &matrix) {
     for (uint row = 0; row < result_matrix.height; row++) {
         for (uint col = 0; col < result_matrix.width; col++) {
             for (uint i = 0; i < width; i++) {
-                result_matrix.data[row * result_matrix.width+col] +=
-                data[i + row * width] * matrix.data [col + i * matrix.width];
+                uint res_cell = row * result_matrix.width + col;
+                uint left_cell = i + row * width;
+                uint right_cell = col + i * matrix.width;
+                result_matrix.data[res_cell] +=
+                data[left_cell] * matrix.data [right_cell];
             }
         }
     }
@@ -102,6 +120,8 @@ double Matrix::trace() const {
     }
     return trace;
 }
+
+// Считает через произведения по диагоналям
 double Matrix::determinant() const {
     double det = 0.0;
     if (width != height) {
@@ -112,20 +132,19 @@ double Matrix::determinant() const {
         return det;
     }
     for (uint col = 0; col < width; col++) {
-        double det_pos = 1.0;
-        double det_neg = 1.0;
+        double pos = 1.0;
+        double neg = 1.0;
         for (uint row = 0; row < height; row++) {
             uint cell_pos = row * (width + 1) + col
                           - (row + col) / width * width;
+            uint re_col = width - 1 - col;
             uint cell_neg = row * (width - 1) + col
-                          + ((col * 2) / (col + 1))
-                          * (width - (row + col) / width * width);
-            det_pos *= data[cell_pos];
-            det_neg *= data[cell_neg];
+                          + ((row + re_col) / width * width);
+            pos *= data[cell_pos];
+            neg *= data[cell_neg];
         }
-        det += det_pos - det_neg;
+        det += pos - neg;
     }
-
     return det;
 }
 
@@ -154,7 +173,7 @@ void Matrix::memory_allocation() {
 
 void Matrix::free_memory() {
     free(data);
-    height = 0;
+    this->height = 0;
     width = 0;
 }
 
