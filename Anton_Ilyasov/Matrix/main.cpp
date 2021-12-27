@@ -15,24 +15,35 @@ int main() //пример работы с библиотекой матриц
 
 	Matrix Aa(4, 3, *A);
 	Matrix Bb(3, 3, *B);
-	Matrix Cc(2, 2, 1);
+	Matrix Cc(3, 3, 1);
+
+	Aa.set_identity();
+	Aa.print();
+	Aa.set_zeros();
+	Aa.print();
+	Aa.set_ones();
+	Aa.print();
 
 	cout << Aa.trace() << endl;
 
-	Matrix D = Aa * Bb;
+	Aa = Cc - Bb;
+	Aa.print();
+
+	Matrix D = Aa+Bb;
+	D = Bb;
 	D.print();
 
-	D = Aa + Bb;
+
+	Aa.print();
+	Bb.print();
+	D = Aa * Bb;
 	D.print();
 
-	cout << Aa.trace() << endl;
 	cout << Aa.det(Aa) << endl;
 
-	Bb = Cc;
-	Bb.print();
-	
 	Aa.minor(2, 2, Aa).print();
 	cout << Aa.minor(2, 2, Aa).det(Aa) << endl;
+
 
 	return 0;
 }

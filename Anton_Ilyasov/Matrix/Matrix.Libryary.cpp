@@ -61,8 +61,6 @@ Matrix::Matrix(unsigned int rows, unsigned int cols, int type) { //Констр�
 
 Matrix::Matrix(const Matrix& other_matrix) //конструктор копирования
 {
-	delete[] data;
-	delete[] arr;
 	rows = other_matrix.rows;
 	cols = other_matrix.cols;
 	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
@@ -96,6 +94,20 @@ Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка о�
 	for (int i = 0; i < cols * rows; i++)
 	{
 		result.data[i] = data[i] + other_matrix.data[i];
+	}
+	return result;
+}
+
+Matrix Matrix::operator -(const Matrix& other_matrix) //перегрузка оператора -
+{
+	if ((rows != other_matrix.rows) || (cols != other_matrix.cols))
+	{
+		return Matrix();
+	}
+	Matrix result(rows, cols, 0);
+	for (int i = 0; i < cols * rows; i++)
+	{
+		result.data[i] = data[i] - other_matrix.data[i];
 	}
 	return result;
 }
@@ -145,7 +157,7 @@ void Matrix::print()
 {
 	for (int i = 0; i < rows * cols; i++)
 	{
-		cout << data[i]<<' ';
+		cout << data[i] << ' ';
 		if ((i + 1) % cols == 0)
 		{
 			cout << endl;
@@ -153,18 +165,35 @@ void Matrix::print()
 	}
 }
 
+void Matrix::set_zeros()
+{
+	for (int i = 0; i < cols * rows; i++) 
+	{
+		data[i] = 0;
+	}
+}
+
+void Matrix::set_ones()
+{
+	for (int i = 0; i < cols * rows; i++)
+	{
+		data[i] = 1;
+	}
+}
+
+void Matrix::set_identity()
+{
+	set_zeros();
+	for (int i = 0; i < std::min(cols, rows); i++)
+	{
+		arr[i][i] = 1;
+	}
+}
+
 int Matrix::trace()
 {
 	int trace = 0;
-	if (rows > cols)
-	{
-		for (int i = 0; i < cols; i++)
-		{
-			trace += arr[i][i];
-		}
-	}
-	else
-	for (int i = 0; i < rows; i++)
+	for (int i = 0; i < std::min(cols, rows); i++) 
 	{
 		trace += arr[i][i];
 	}

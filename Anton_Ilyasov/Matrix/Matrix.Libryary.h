@@ -17,12 +17,16 @@ public:
 	Matrix(Matrix&& other_matrix) noexcept;
 public:
 	Matrix operator +(const Matrix& other_matrix);
+	Matrix operator -(const Matrix& other_matrix);
 	Matrix operator *(const Matrix& other_matrix);
 	Matrix& operator =(const Matrix& other_matrix);
 	Matrix minor(unsigned int row, unsigned int col, const Matrix a);
 public:
 	void print();
 	int trace();
+	void set_zeros();
+	void set_ones();
+	void set_identity();
 	double det(const Matrix a);
 	~Matrix();
 };
