@@ -6,9 +6,6 @@ Matrix::Matrix(uint height, uint width, type_of_matrix type){
     this->height = height;
     this->width = width;
     memory_allocation();
-    if (data == NULL){     // TODO: Нужна ли проверка?
-        return;
-    }
     switch (type) {
         case ZERO: zero_matrix();
             break;
@@ -25,15 +22,9 @@ Matrix::Matrix(uint height, uint width, type_of_matrix type){
 }
 
 Matrix::Matrix(uint height, uint width, double *matrix) {
-    if (matrix == NULL){     // TODO: Нужна ли проверка?
-        return;
-    }
     this->height = height;
     this->width = width;
     memory_allocation();
-    if (data == NULL){     // TODO: Нужна ли проверка?
-        return;
-    }
     memcpy(data, matrix, height * width * sizeof(double));
 }
 
@@ -41,13 +32,9 @@ Matrix::Matrix(const Matrix &matrix) {
     height = matrix.height;
     width = matrix.width;
     memory_allocation();
-    if (data == NULL){     // TODO: Нужна ли проверка?
-        return;
-    }
     memcpy(data, matrix.data, height * width * sizeof(double));
 }
 Matrix::Matrix(Matrix && matrix){
-    free_memory();
     height = matrix.height;
     width = matrix.width;
     data = matrix.data;
@@ -59,9 +46,6 @@ Matrix::~Matrix() {
 }
 
 Matrix & Matrix::operator = (const Matrix &matrix) {
-    if (matrix.data == NULL){     // TODO: Нужна ли проверка?
-        return *this;
-    }
     if (&matrix == this) {
         return *this;
     }
@@ -101,7 +85,7 @@ Matrix Matrix::operator * (const Matrix &matrix) {
                 uint left_cell = i + row * width;
                 uint right_cell = col + i * matrix.width;
                 result_matrix.data[res_cell] +=
-                data[left_cell] * matrix.data [right_cell];
+                    data[left_cell] * matrix.data [right_cell];
             }
         }
     }
@@ -113,10 +97,8 @@ double Matrix::trace() const {
         return 0.0;
     }
     double trace = 0.0;
-    uint min;
-    min = height < width ? height : width;
-    for (uint i = 0; i < min; i++) {
-        trace += data[i * (1 + width)];
+    for (uint i = 0; i < height * width; i += 1 + width) {
+        trace += data[i];
     }
     return trace;
 }
@@ -164,16 +146,11 @@ void Matrix::print(const std::string &text) const {
 
 void Matrix::memory_allocation() {
     data = new double [height * width];
-    if (data == NULL){
-        std::cout<<"=> Ошибка выделения памяти!(Возможно,затребованный"
-                   "размер памяти слишком большой)"<<std::endl;
-        return;
-    }
 }
 
 void Matrix::free_memory() {
     free(data);
-    this->height = 0;
+    height = 0;
     width = 0;
 }
 
