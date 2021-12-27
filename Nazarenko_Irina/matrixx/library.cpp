@@ -80,7 +80,7 @@ void Matrix::print() {
 }
 
 void Matrix::Matrix_1() {
-    if (width = height) {
+    if (width == height) {
         data = (double *) malloc(height * height * sizeof(double));
         for (int i = 1; i <= height; i++) {
             for (int j = 1; j <= height; j++) {
