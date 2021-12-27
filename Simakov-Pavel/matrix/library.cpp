@@ -1,39 +1,53 @@
 #include "library.h"
 #include <iomanip>
 #include <iostream>
+#include <cmath>
 
-Matrix::Matrix(int rows, int columns) // constructor with parameters
+Matrix::Matrix()
+{
+    this->rows = 0;
+    this->columns = 0;
+    elements = nullptr;
+}
+
+Matrix::Matrix(unsigned int rows, unsigned int columns) // constructor with parameters
 {
     this -> rows = rows;
     this -> columns = columns;
     this -> elements = new double[rows*columns];
-
 }
 
-Matrix::Matrix(int range, char type, int nothing) // constructor for 0-1 order
+Matrix::Matrix(unsigned int range,Type type) // constructor for 0-1 order
 {
     this -> rows = range;
     this -> columns = range;
     elements = new double[rows * columns];
-    if (type == '0')
+    if (type == TYPE_NULL)
     {
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < columns; j++)
-            {
-                elements[i * columns + j] = 0.;
-            }
-        }
+        this->fill_null();
     }
-    if (type == '1')
+    if (type == TYPE_ONE)
     {
-        for (int i = 0; i < rows; i++)
+        this->fill_ones();
+    }
+}
+
+void Matrix::fill_null()
+{
+    for (int i = 0; i < rows*columns; i++)
+    {
+        elements[i] = 0.;
+    }
+}
+
+void Matrix::fill_ones()
+{
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < columns; j++)
         {
-            for (int j = 0; j < columns; j++)
-            {
-                if (i == j) elements[i * columns + j] = 1.;
-                else elements[i * columns + j] = 0.;
-            }
+            if (i == j) elements[i * columns + j] = 1.;
+            else elements[i * columns + j] = 0.;
         }
     }
 }
@@ -50,7 +64,7 @@ void Matrix::user_input()
     }
 }
 
-void Matrix::output()
+void Matrix::print()
 {
     for (int i = 0; i < rows; i++)
     {
@@ -70,10 +84,11 @@ Matrix::~Matrix() //destructor
 
 Matrix::Matrix(const Matrix &m) //copy
 {
-    this -> rows = m.rows;
-    this -> columns = m.columns;
-    this -> elements = new double [rows*columns];
-    memcpy(this -> elements, m.elements, rows*columns*sizeof(double));
+    rows = m.rows;
+    columns = m.columns;
+    delete[] this -> elements;
+    elements = new double [rows*columns];
+    memcpy(elements, m.elements, rows*columns*sizeof(double));
 }
 
 Matrix::Matrix(Matrix &&m) noexcept // move
@@ -89,14 +104,10 @@ Matrix::Matrix(Matrix &&m) noexcept // move
 Matrix & Matrix::operator = (const Matrix & m) // overload assignment
 {
     if (this == &m) return *this;
-    this -> rows = m.rows;
-    this -> columns = m.columns;
+    rows = m.rows;
+    columns = m.columns;
     delete[] this -> elements;
-    this -> elements = new double[rows*columns];
-    for (int i = 0; i < (rows*columns); i++)
-    {
-        this -> elements[i] = m.elements[i];
-    }
+    elements = new double[rows*columns];
     memcpy(elements, m.elements, rows*columns*sizeof(double));
     return *this;
 }
@@ -106,7 +117,7 @@ Matrix Matrix::operator + (const Matrix& m) // overload +
     if ((rows != m.rows) || (columns != m.columns))
     {
         std::cout << "the size of the matrices does not match" << std::endl;
-        return Matrix (0,0);
+        return Matrix(0,0);
     }
 
     Matrix sum(rows, columns);
@@ -155,14 +166,14 @@ int Matrix::trace()
     int sum = 0;
     for (int i = 0; i < rows; i++)
     {
-        sum += elements[columns*i + i];
+        sum += (int)elements[columns*i + i];
     }
     return sum;
 }
 
 double Matrix::minor(int number_row, int number_column)
 {
-    Matrix cut(rows-1, columns-1);
+    Matrix cut((this->rows)-1, (this->columns)-1);
     memset(cut.elements, 0, (rows-1)*(columns-1)*8);
     int skipped_row = 0;
     int skipped_column = 0;
@@ -174,7 +185,7 @@ double Matrix::minor(int number_row, int number_column)
         for (int j = 0; j < cut.columns; j++)
         {
             if (j == number_column) skipped_column++;
-            cut.elements[cut.columns*i + j] = elements[columns*(skipped_row + 1) + (j+skipped_column)];
+            cut.elements[cut.columns*i + j] = elements[columns*(skipped_row + i) + (j+skipped_column)];
         }
         skipped_column = 0;
     }
@@ -188,27 +199,22 @@ double Matrix::det()
         return -1;
     }
     double determ = 0;
-    switch (rows)
+    if (rows == 0)
     {
-        case 0:
-        {
-            std::cout << "null matrix error" << std::endl;
-            return -1;
-        }
-        case 1:
-        {
-            return elements[0];
-        }
-        case 2:
-        {
-            return elements[0]*elements[3] - elements[1]*elements[2];
-        }
-        default:
-            for (int i = 0; i < rows; i++)
-            {
-                determ += pow(-1,i+2) * elements[i] * minor(0,i);
-            }
-            return determ;
+        std::cout << "null matrix error" << std::endl;
+        return -1;
     }
-
+    if (rows == 1)
+    {
+        return elements[0];
+    }
+    if (rows == 2)
+    {
+        return elements[0]*elements[3] - elements[1]*elements[2];
+    }
+    for (int i = 0; i < columns; i++)
+    {
+        determ += pow(-1,i+2) * elements[i] * minor(0,i);
+    }
+    return determ;
 }

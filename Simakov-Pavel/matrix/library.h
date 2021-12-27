@@ -1,5 +1,10 @@
 #ifndef MATRIX_LIBRARY_H
 #define MATRIX_LIBRARY_H
+enum Type
+{
+    TYPE_NULL,
+    TYPE_ONE,
+};
 
 class Matrix
 {
@@ -8,10 +13,13 @@ private:
     unsigned int columns;
     double * elements;
 public:
-    Matrix(int rows, int columns);
-    Matrix::Matrix(int range, char type, int nothing);
+    Matrix();
+    Matrix(unsigned int rows, unsigned int columns);
+    Matrix(unsigned int range,Type type);
+    void fill_null();
+    void fill_ones();
     void user_input();
-    void output();
+    void print();
     ~Matrix();
     Matrix(const Matrix &m);
     Matrix(Matrix &&m) noexcept;
