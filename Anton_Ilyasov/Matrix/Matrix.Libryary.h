@@ -2,6 +2,10 @@
 #include <string.h>
 using namespace std;
 
+typedef enum {
+	IDENTITY
+} MatrixType;
+
 class Matrix
 {
 private:
@@ -11,8 +15,9 @@ private:
 	int* data;
 public:
 	Matrix();
+	Matrix(unsigned int rows, unsigned int cols, int value);
 	Matrix(unsigned int rows, unsigned int cols, int* other_matrix);
-	Matrix(unsigned int rows, unsigned int cols, int type);
+	Matrix(unsigned int rows, unsigned int cols, MatrixType type);
 	Matrix(const Matrix& other_matrix);
 	Matrix(Matrix&& other_matrix) noexcept;
 public:

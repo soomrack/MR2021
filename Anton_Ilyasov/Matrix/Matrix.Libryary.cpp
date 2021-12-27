@@ -12,11 +12,11 @@ Matrix::Matrix() //простой конструктор
 	arr = nullptr;
 }
 
-Matrix::Matrix(unsigned int rows, unsigned int cols, int* other_matrix) //стандартный конструктор с параметрами
+Matrix::Matrix(unsigned int rows, unsigned int cols, int* other_matrix) //матрица создается на основе исходного массива
 {
 	this->rows = rows;
 	this->cols = cols;
-	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
+	data = new int[rows * cols];
 	memcpy(data, other_matrix, rows * cols * sizeof(int));
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
@@ -25,37 +25,38 @@ Matrix::Matrix(unsigned int rows, unsigned int cols, int* other_matrix) //ста
 	}
 }
 
-Matrix::Matrix(unsigned int rows, unsigned int cols, int type) { //Конструктор единичной и нулевой матриц заданного размера
+Matrix::Matrix(unsigned int rows, unsigned int cols, int value) //все элементы матрицы принимают значение value
+{
 	this->rows = rows;
 	this->cols = cols;
-	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
+	data = new int[rows * cols];
+	for (int i = 0; i < cols * rows; i++) 
+	{
+		data[i] = value;
+	}
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
 		arr[i] = &data[i * cols];
 	}
-	switch (type) //заполнение единичной и нулевоц матриц
+}
+
+Matrix::Matrix(unsigned int rows, unsigned int cols, MatrixType type) { //Конструктор единичной матрицы
+	this->rows = rows;
+	this->cols = cols;
+	data = new int[rows * cols];
+	arr = new int* [rows];
+	for (int i = 0; i < rows; i++)
 	{
-	case 0: //создание нулевой матрицы
-		for (int i = 0; i < rows * cols; i++)
-		{
-			data[i] = 0;
-		}
-		break;
-	case 1: //создание единичной матрицы
-		for (int i = 0; i < rows * cols; i++)
-		{
-			data[i] = 0;
-			for (int i = 0; i < rows; i++) {
-				data[cols * i + i] = 1;
-			}
-		}
+		arr[i] = &data[i * cols];
+	}
+	switch (type)
+	{
+	case IDENTITY:
+		set_identity();
 		break;
 	default:
-		rows = 0;
-		cols = 0;
-		data = nullptr;
-		arr = nullptr;
+		set_zeros();
 	}
 }
 
@@ -63,8 +64,8 @@ Matrix::Matrix(const Matrix& other_matrix) //конструктор копиро
 {
 	rows = other_matrix.rows;
 	cols = other_matrix.cols;
-	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
-	memcpy(data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
+	data = new int[rows * cols];
+	memcpy(data, other_matrix.data, sizeof(int) * rows * cols);
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
@@ -119,7 +120,7 @@ Matrix Matrix::operator *(const Matrix& other_matrix) //перегрузка о�
 		return Matrix();
 	}
 	Matrix result(rows, other_matrix.cols, 0);
-	for (int row = 0; row < rows; row++) //инициализация динамического двумерного массива
+	for (int row = 0; row < rows; row++)
 	{
 		for (int col = 0; col < other_matrix.cols; col++)
 		{
@@ -143,8 +144,8 @@ Matrix& Matrix::operator =(const Matrix& other_matrix) //перегрузка о
 	cols = other_matrix.cols;
 	delete[] data;
 	delete[] arr;
-	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
-	memcpy(data, other_matrix.data, sizeof(int) * rows * cols); //инициализация массива матрицы
+	data = new int[rows * cols];
+	memcpy(data, other_matrix.data, sizeof(int) * rows * cols);
 	arr = new int* [rows];
 	for (int i = 0; i < rows; i++)
 	{
