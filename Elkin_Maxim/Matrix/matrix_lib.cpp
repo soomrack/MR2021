@@ -125,24 +125,20 @@ Matrix Matrix::operator- (const Matrix &other) {
 }
 
 Matrix Matrix::operator* (const Matrix &other) {
-    Matrix var;
     if (this->columns != other.rows) {
-        return var;
+        return Matrix();
     }
-    var.rows = this->rows;
-    var.columns = other.columns;
-    var.allocate_mem(var.rows, var.columns);
-
+    Matrix result(this->rows, other.columns);
     for (unsigned int row = 0; row < this->rows; row++) {
         for (unsigned int col = 0; col < other.columns; col++) {
             double cell = 0.0;
             for (unsigned int k = 0; k < this->columns; k++) {
                 cell = cell + ((this->data[row][k]) * other.data[k][col]);
             }
-            var.data[row][col] = cell;
+            result.data[row][col] = cell;
         }
     }
-    return var;
+    return result;
 }
 
 double Matrix::get_value(unsigned int row, unsigned int column) {

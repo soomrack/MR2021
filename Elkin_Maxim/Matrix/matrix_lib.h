@@ -43,13 +43,13 @@ public:
     void set_matrix_from_2d(double (&arr)[height][width]); //
     void set_values_cmd();
     void set_value(unsigned int,unsigned int,double);
-private:
-    void allocate_mem(unsigned int, unsigned int);
-    void clear_mem();
-    void sort_rows(unsigned int);
-private: //functions for filling matrix
+public: //functions for filling matrix
     void set_zeros();
     void set_ones();
     void set_identity(); // if matrix isn't square fills with zeros
     void set_random();
+private:
+    void allocate_mem(unsigned int, unsigned int);
+    void clear_mem();
+    void sort_rows(unsigned int);
 };
