@@ -5,14 +5,14 @@
 using namespace std;
 
 Matrix::Matrix() //простой конструктор
-{ 
+{
 	rows = 0;
 	cols = 0;
 	data = nullptr;
 	arr = nullptr;
 }
 
-Matrix::Matrix(int rows, int cols, int* other_matrix) //стандартный конструктор с параметрами
+Matrix::Matrix(unsigned int rows, unsigned int cols, int* other_matrix) //стандартный конструктор с параметрами
 {
 	this->rows = rows;
 	this->cols = cols;
@@ -25,7 +25,7 @@ Matrix::Matrix(int rows, int cols, int* other_matrix) //стандартный �
 	}
 }
 
-Matrix::Matrix(int rows, int cols, int type) { //Конструктор единичной и нулевой матриц заданного размера
+Matrix::Matrix(unsigned int rows, unsigned int cols, int type) { //Конструктор единичной и нулевой матриц заданного размера
 	this->rows = rows;
 	this->cols = cols;
 	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
@@ -37,21 +37,17 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
 	switch (type) //заполнение единичной и нулевоц матриц
 	{
 	case 0: //создание нулевой матрицы
-		for (int i = 0; i < rows; i++)
+		for (int i = 0; i < rows * cols; i++)
 		{
-			for (int j = 0; j < cols; j++)
-			{
-				arr[i][j] = 0;
-			}
+			data[i] = 0;
 		}
 		break;
 	case 1: //создание единичной матрицы
-		for (int i = 0; i < rows; i++)
+		for (int i = 0; i < rows * cols; i++)
 		{
-			for (int j = 0; j < cols; j++)
-			{
-				arr[i][j] = 0;
-				arr[i][i] = 1;
+			data[i] = 0;
+			for (int i = 0; i < rows; i++) {
+				data[cols * i + i] = 1;
 			}
 		}
 		break;
@@ -65,6 +61,8 @@ Matrix::Matrix(int rows, int cols, int type) { //Конструктор един
 
 Matrix::Matrix(const Matrix& other_matrix) //конструктор копирования
 {
+	delete[] data;
+	delete[] arr;
 	rows = other_matrix.rows;
 	cols = other_matrix.cols;
 	data = new int[rows * cols]; //создание последовательного динамического двумерного массива
@@ -86,40 +84,37 @@ Matrix::Matrix(Matrix&& other_matrix) noexcept //Конструктор пере
 	other_matrix.cols = 0;
 	other_matrix.data = nullptr;
 	other_matrix.arr = nullptr;
-} 
+}
 
 Matrix Matrix::operator +(const Matrix& other_matrix) //перегрузка оператора +
 {
-	if ((this->rows != other_matrix.rows) || (this->cols != other_matrix.cols))
+	if ((rows != other_matrix.rows) || (cols != other_matrix.cols))
 	{
 		return Matrix();
 	}
-	Matrix result(this->rows, this->cols,0);
-	for (int i = 0; i < rows; i++) //инициализация динамического двумерного массива
+	Matrix result(rows, cols, 0);
+	for (int i = 0; i < cols * rows; i++)
 	{
-		for (int j = 0; j < cols; j++)
-		{
-			result.arr[i][j] = this->arr[i][j] + other_matrix.arr[i][j];
-		}
+		result.data[i] = data[i] + other_matrix.data[i];
 	}
 	return result;
 }
 
 Matrix Matrix::operator *(const Matrix& other_matrix) //перегрузка оператора *
 {
-	if (this->cols != other_matrix.rows)
+	if (cols != other_matrix.rows)
 	{
 		return Matrix();
 	}
-	Matrix result(this->rows, other_matrix.cols,0);
-	for (int row = 0; row < this->rows; row++) //инициализация динамического двумерного массива
+	Matrix result(rows, other_matrix.cols, 0);
+	for (int row = 0; row < rows; row++) //инициализация динамического двумерного массива
 	{
 		for (int col = 0; col < other_matrix.cols; col++)
 		{
 			result.arr[row][col] = 0;
 			for (int i = 0; i < other_matrix.rows; i++)
 			{
-				result.arr[row][col] += this->arr[row][i] * other_matrix.arr[i][col];
+				result.arr[row][col] += arr[row][i] * other_matrix.arr[i][col];
 			}
 		}
 	}
@@ -148,20 +143,27 @@ Matrix& Matrix::operator =(const Matrix& other_matrix) //перегрузка о
 
 void Matrix::print()
 {
-	cout << endl;
-	for (int i = 0; i < rows; i++)
+	for (int i = 0; i < rows * cols; i++)
 	{
-		for (int j = 0; j < cols; j++)
+		cout << data[i]<<' ';
+		if ((i + 1) % cols == 0)
 		{
-			cout << arr[i][j] << ' ';
+			cout << endl;
 		}
-		cout << endl;
 	}
 }
 
 int Matrix::trace()
 {
 	int trace = 0;
+	if (rows > cols)
+	{
+		for (int i = 0; i < cols; i++)
+		{
+			trace += arr[i][i];
+		}
+	}
+	else
 	for (int i = 0; i < rows; i++)
 	{
 		trace += arr[i][i];
@@ -169,9 +171,9 @@ int Matrix::trace()
 	return trace;
 }
 
-Matrix Matrix::minor(int row, int col, const Matrix a)
+Matrix Matrix::minor(unsigned int row, unsigned int col, const Matrix a)
 {
-	Matrix result(a.rows - 1, a.cols - 1,0);
+	Matrix result(a.rows - 1, a.cols - 1, 0);
 	int offsetRow = 0; //Смещение индекса строки в матрице
 	int offsetCol = 0; //Смещение индекса столбца в матрице
 	for (int i = 0; i < result.rows; i++)
