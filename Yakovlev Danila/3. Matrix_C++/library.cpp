@@ -39,7 +39,7 @@ Matrix &Matrix::operator=(Matrix &&m) noexcept{//перегрузка опера
 
 Matrix Matrix:: operator + (Matrix &m) { //операция сложения
     if ((rows!=m.rows)||(columns!=m.columns)){
-        printf("Error");
+        printf("Error. Матрицы не равны по размерам");
     }
     else{
         Matrix res(rows, columns);
@@ -51,7 +51,7 @@ Matrix Matrix:: operator + (Matrix &m) { //операция сложения
 
 Matrix Matrix:: operator - (Matrix &m) { //операция разности
     if ((rows!=m.rows)||(columns!=m.columns)){
-        printf("Error");
+        printf("Error. Матрицы не равны по размерам");
     }
     else{
         Matrix res(rows, columns);
@@ -64,7 +64,7 @@ Matrix Matrix:: operator - (Matrix &m) { //операция разности
 
 Matrix Matrix:: operator * (Matrix &m) { //операция умножения
     if (rows!=m.columns){
-        printf("Error");
+        printf("Error. Число строк в первой матрице не равно столбцам второй матрицы");
     }
     else{
         Matrix res2(rows, m.columns);
