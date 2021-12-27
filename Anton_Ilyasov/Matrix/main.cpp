@@ -4,17 +4,20 @@
 
 int main() //пример работы с библиотекой матриц
 {
-	int A[3][3] = { 1,2,3,
+	int A[4][3] = { 1,2,3,
                         4,5,6,
-                        7,8,9 };
+		                7,8,9,
+                        10,11,12 };
 
 	int B[3][3] = { -1,-2,-3,
                         -4,-5,-6,
                         -7,-8,-9 };
 
-	Matrix Aa(3, 3, *A);
+	Matrix Aa(4, 3, *A);
 	Matrix Bb(3, 3, *B);
 	Matrix Cc(2, 2, 1);
+
+	cout << Aa.trace() << endl;
 
 	Matrix D = Aa * Bb;
 	D.print();
