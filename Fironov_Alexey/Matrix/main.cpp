@@ -15,9 +15,9 @@ int main() {
     matrix.set_cell(3,3,-3);
 
     Matrix reverse (matrix);
-    reverse.get_reverse();
+    reverse.set_reverse();
     double temp = matrix.get_cell(2,3);
-    reverse.visual();
+    reverse.print();
     std::cout<<"\n\n";
     std::cout<<temp;
 
