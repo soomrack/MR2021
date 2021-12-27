@@ -16,7 +16,7 @@ Matrix:: Matrix(const Matrix &m) { //конструктор копировани
         data = new double [rows * columns];
         memcpy(data, m.data,sizeof(double)* rows * columns);
 }
-void Matrix:: create(int place_in_line, int place_in_the_column, double numeric_value) {
+void Matrix:: create(int place_in_line, int place_in_the_column, double numeric_value) {//создание матрицы - присваивание значения
     data[place_in_line*columns + place_in_the_column] = numeric_value;
 }
 Matrix &Matrix::operator=(Matrix &&m) noexcept{//перегрузка операции присваивания
@@ -41,19 +41,24 @@ Matrix Matrix:: operator - (Matrix &m) { //операция разности
         return res;
 }
 Matrix Matrix:: operator * (Matrix &m) { //операция умножения
-        Matrix res(rows, m.columns);
-        for (int i = 0; i < rows*m.columns; i++) { //это для результата
-            res.data[i]=0;
-            for (int ii = 0; ii < rows; ii++) {//строки исходных матриц
-                for (int jj = 0; jj < m.columns; jj++) {//столбцы исходных матриц
-                    if (((i+1)%(m.columns+1)==jj)&&((i+1)/(m.columns+1)==ii)) {
-                        res.data[i] = res.data[i] + data[ii] * m.data[jj]; // столбцы (i+1)%(m.columns+1)==jj строки (i+1)/(m.columns+1)==ii
-                    }
+        Matrix res2(rows, m.columns);
+                for (int i = 0; i < rows*m.columns; i++) {
+                    res2.data[i]=0;
+                    for (int j = 0; j < m.columns; j++) {//(i+1)%(m.columns)==jj && ((i+1)%(rows)==(ii)
+                    res2.data[i] = res2.data[i] + data[(i/rows)*m.columns+j] * m.data[(i%m.columns)+j*m.columns];
+                    /*
+                     * data[(i/rows)*m.columns+j] - идем по строке. целочисленное деление на длинну строки(=колво столбцов), чтобы, прибавив строку, получить
+                     * на какой мы строке и передвижение по строке уже с помощью +j
+                     *
+                     * m.data[(i%m.columns)+j*m.columns] - идем по столбцу. остаток от деления на столбец покажет на каком мы столбце и дальше
+                     * передвигаемся вдоль него прибавляя при каждом переходе длину строки(=колво столбцов)
+                     */
+                    printf("%.0f*%.0f + ",data[(i%rows)*m.columns+j],m.data[(i%m.columns)+j*m.columns]);
                 }
+                    printf("*\n");
             }
-        }
-        return res;
-}//----------------------------
+        return res2;
+}
 Matrix:: Matrix (Matrix &&m) noexcept{ //конструктор перемещений
     rows = m.rows;
     columns = m.columns;
@@ -62,11 +67,6 @@ Matrix:: Matrix (Matrix &&m) noexcept{ //конструктор перемеще
 void Matrix:: zero_matrix() { //нулевая матрица
         for (int i = 0; i < rows * columns; i++)
             data[i] = 0;
-}
-void Matrix:: gq_matrix(){ //временная матрица для поиска ошибки в моей программе
-    data[0] = 0;
-    for (int i = 1; i < rows * columns; i++)
-        data[i] = data[i-1]+1;
 }
 void Matrix:: unit_matrix() { //единичная матрица
         for (int i = 0; i < rows; i++) {
