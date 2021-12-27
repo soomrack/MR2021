@@ -57,6 +57,7 @@ Matrix::Matrix(unsigned int rows, unsigned int cols, MatrixType type) { //Кон
 		break;
 	default:
 		set_zeros();
+		break;
 	}
 }
 
