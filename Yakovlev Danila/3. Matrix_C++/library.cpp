@@ -53,9 +53,7 @@ Matrix Matrix:: operator * (Matrix &m) { //операция умножения
                      * m.data[(i%m.columns)+j*m.columns] - идем по столбцу. остаток от деления на столбец покажет на каком мы столбце и дальше
                      * передвигаемся вдоль него прибавляя при каждом переходе длину строки(=колво столбцов)
                      */
-                    printf("%.0f*%.0f + ",data[(i%rows)*m.columns+j],m.data[(i%m.columns)+j*m.columns]);
                 }
-                    printf("*\n");
             }
         return res2;
 }
