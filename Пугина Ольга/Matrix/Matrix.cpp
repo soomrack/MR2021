@@ -136,7 +136,7 @@ Matrix Matrix::operator+ (const Matrix &other){
 //Перегрузка оператора умножения
 Matrix Matrix::operator* (const Matrix &other){
     if (this->cols != other.rows){
-        return Matrix()и   ;
+        return Matrix();
     }
     Matrix result(other.rows, other.cols, TEMPORARY,0 );
     for (int row = 0; row < rows; ++row) {
