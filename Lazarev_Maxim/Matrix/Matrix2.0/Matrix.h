@@ -4,16 +4,16 @@
 
 class Matrix{
 public:
-    class exception{
+    class Exception: public std::exception{
     public:
-        exception(int id):exId(id){}
-        exception(exception& other){this->exId=other.exId;}
-        exception(exception&& other){this->exId=other.exId;}
-        std::string what();
+        Exception(int id):exId(id){}
+        Exception(Exception& other){this->exId=other.exId;}
+        Exception(Exception&& other){this->exId=other.exId;}
+        const char* what () const noexcept override;
     private:
         int exId = 0;
     };
-    Matrix (const int lineCount, const int columnCount, double value = 0.0);
+    Matrix (const int lineCount = 0, const int columnCount = 0, double value = 0.0);
     Matrix (const Matrix& other);
     Matrix (Matrix&& other);
     ~Matrix();
