@@ -11,9 +11,7 @@ Matrix::Matrix(){
 }
 
 
-Matrix::Matrix(int rows, int cols, int *arr, unsigned int length) {
-    if (length == rows * cols)
-    {
+Matrix::Matrix(int rows, int cols, int *arr) {
         this->rows = rows;
         this->cols = cols;
         data = new int[rows * cols];
@@ -26,18 +24,7 @@ Matrix::Matrix(int rows, int cols, Matrix_Type type, int value){
     this->cols = cols;
     data = new int[rows * cols];
     if (data == nullptr){
-        this->rows = 0;
-        this->cols = 0;
-    }else{
-        switch (type){
-            case ZERO: zeros(); break;
-            case IDENTITY: identity(); break;
-            case RANDOM: random(value); break;
-            case DIAGONAL: diagonal(value); break;
-            case NUMBER: number(value); break;
-            case TEMPORARY: break;
-            default: zeros(); break;
-        }
+        return Matrix();
     }
 }
 
@@ -82,6 +69,7 @@ Matrix::Matrix(const Matrix &source)
 {
     rows = source.rows;
     cols = source.cols;
+    delete [] data;
     data = new int[rows * cols];
     memcpy(data,source.data,sizeof(int)*rows * cols);
 }
@@ -123,7 +111,7 @@ Matrix & Matrix::operator= (Matrix &&source) noexcept {
 //Перегрузка оператора вычитания
 Matrix Matrix::operator- (const Matrix &other){
     if (this->rows != other.rows || this->cols != other.cols){
-        return Matrix{};
+        return Matrix();
     }
     Matrix result(other.rows, other.cols, TEMPORARY,0 );
     for (int i = 0; i < cols*rows; ++i) {
@@ -136,7 +124,7 @@ Matrix Matrix::operator- (const Matrix &other){
 //Перегрузка оператора сложения
 Matrix Matrix::operator+ (const Matrix &other){
     if (this->rows != other.rows || this->cols != other.cols){
-        return Matrix{};
+        return Matrix();
     }
     Matrix result(other.rows, other.cols, TEMPORARY,0 );
     for (int i = 0; i < cols*rows; ++i) {
@@ -148,7 +136,7 @@ Matrix Matrix::operator+ (const Matrix &other){
 //Перегрузка оператора умножения
 Matrix Matrix::operator* (const Matrix &other){
     if (this->cols != other.rows){
-        return Matrix{};
+        return Matrix()и   ;
     }
     Matrix result(other.rows, other.cols, TEMPORARY,0 );
     for (int row = 0; row < rows; ++row) {

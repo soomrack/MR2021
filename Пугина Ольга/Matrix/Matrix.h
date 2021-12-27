@@ -18,7 +18,7 @@ private:
     int *data;
 public:
     Matrix();
-    Matrix(int rows, int cols, int *arr, unsigned int length);
+    Matrix(int rows, int cols, int *arr);
     //will copy the length elements from the arr to the matrix[row*cols].
     Matrix(int rows, int cols, Matrix_Type type, int value = 0);
     ~Matrix();
