@@ -56,18 +56,19 @@ Matrix & Matrix::operator= (const Matrix &m) {
 }
 
 Matrix Matrix::operator + (const Matrix &m) {
-    int a;
+    Matrix result(height,width);
     if ((height !=m.height)||(width!=m.width)) {
         std::cout << "Matrix can not be summered" << std::endl;
-
+        height=0;
+        width=0;
     }
-    Matrix result(height,width);
     result.print();
     for (int i = 0; i <height*width; i++) {
         result.data[i] = m.data[i]+data[i];
     };
     return result;
 }
+
 
 
 void Matrix::print() {
