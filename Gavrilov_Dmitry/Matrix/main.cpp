@@ -3,9 +3,10 @@
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
+    srand(time(NULL));
 
-    Matrix A(3,3,4);
-    Matrix B(3,3,0);
+    Matrix A(3,3);
+    Matrix B(3,3,3);
     Matrix C(A+B);
     std::cout << "Matrix A " << std::endl;
     A.print();

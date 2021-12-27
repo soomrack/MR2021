@@ -2,23 +2,21 @@
 #include <ctime>
 #include "Matrix_lib.h."
 
-Matrix::Matrix(unsigned int rows = 0,unsigned int columns = 0,unsigned int type = 0){
+Matrix::Matrix(unsigned int rows ,unsigned int columns, int type){
     this->rows = rows;
     this->columns = columns;
-    srand(time(NULL));
 
     data = new int[rows * columns];
 
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < columns; ++j) {
             switch (type){
-                case 0:
+                case ZERO_MATRIX:
                     data[j + rows * i] = 0;
                     break;
-                case 1:
-                    if ( rows != columns){
+                case IDENITY_MATRIX:
+                    if ( rows != columns)
                         std::cout << "Matrix must be square" << std::endl;
-                    }
                     if (i == j)  data[j + rows * i] = 1;
                     else data[j + rows * i] = 0;
                     break;
@@ -36,9 +34,9 @@ Matrix::~Matrix() {
 }
 
 Matrix::Matrix(const Matrix &other) {
-    this->rows = other.rows;
-    this->columns = other.columns;
-    this->data = new int [rows*columns];
+    rows = other.rows;
+    columns = other.columns;
+    data = new int [rows*columns];
     memcpy(data,other.data,sizeof(int)*rows * columns);
 }
 
@@ -55,11 +53,8 @@ Matrix & Matrix::operator = (const Matrix &other){
     this->rows = other.rows;
     this->columns = other.columns;
     this->data = new int [rows*columns];
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            this->data[j + rows * i] = other.data[j + rows * i];
-        }
-    }
+    memcpy(data,other.data,sizeof(int)*rows * columns);
+
     return *this;
 }
 
@@ -68,9 +63,6 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept {
     this->columns = other.columns;
     delete [] this->data;
     this->data = new int [rows*columns];
-
-    memcpy(data,other.data,sizeof(int)*rows * columns);
-
     other.data = nullptr;
     other.rows = 0;
     other.columns = 0;
@@ -78,31 +70,25 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept {
 }
 
 Matrix Matrix::operator- (const Matrix &other){
-    if (this->rows != other.rows || this->columns != other.columns){
+    if (this->rows != other.rows || this->columns != other.columns)
         std::cout << "Matrix aren't equal" << std::endl;
-        exit(1);
-    }
-    Matrix temp(this->rows, this->columns, 9);
+
+    Matrix temp(this->rows, this->columns);
     temp.data = new int [rows*columns];
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            temp.data[j + rows * i] = this->data[j + rows * i] - other.data[j + rows * i];
-        }
+    for (int i = 0; i < rows*columns; ++i){
+        temp.data[i] = data[i] - other.data[i];
     }
     return temp;
 }
 
 Matrix Matrix::operator+ (const Matrix &other){
-    if (this->rows != other.rows || this->columns != other.columns){
+    if (this->rows != other.rows || this->columns != other.columns)
         std::cout << "Matrix aren't same" << std::endl;
-        exit(1);
-    }
+
     Matrix temp(this->rows, this->columns, 0);
     temp.data = new int [this->rows*this->columns];
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            temp.data[j + rows * i] = this->data[j + rows * i] + other.data[j + rows * i];
-        }
+    for (int i = 0; i < rows*columns; ++i){
+        temp.data[i] = data[i] + other.data[i];
     }
     return temp;
 }
@@ -127,10 +113,9 @@ Matrix Matrix::operator * (const Matrix &other){
 
 int Matrix::trace() {
     int matrix_trace = 0;
-    if (this->rows != this->columns) {
+    if (this->rows != this->columns)
         std::cout << "Matrix isn't square" << std::endl;
-        exit(1);
-    }
+
     for (int i = 0; i < this->rows; ++i) {
         matrix_trace += data[i + rows * i];
     }
