@@ -29,8 +29,7 @@ public:
 public:
 	void print();
 	int trace();
-	void set_zeros();
-	void set_ones();
+	void set(int value);
 	void set_identity();
 	double det(const Matrix a);
 	~Matrix();

@@ -29,10 +29,10 @@ int main() //пример работы с библиотекой матриц
 	Aa.set_identity();
 	Aa.print();
 	cout << endl;
-	Aa.set_zeros();
+	Aa.set(0);
 	Aa.print();
 	cout << endl;
-	Aa.set_ones();
+	Aa.set(1);
 	Aa.print();
 	cout << endl;
 

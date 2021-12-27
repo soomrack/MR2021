@@ -56,7 +56,7 @@ Matrix::Matrix(unsigned int rows, unsigned int cols, MatrixType type) { //Кон
 		set_identity();
 		break;
 	default:
-		set_zeros();
+		set(0);
 		break;
 	}
 }
@@ -167,25 +167,18 @@ void Matrix::print()
 	}
 }
 
-void Matrix::set_zeros()
+void Matrix::set(int value) //все элементы матрицы принимают значение value
 {
 	for (int i = 0; i < cols * rows; i++) 
 	{
-		data[i] = 0;
+		data[i] = value;
 	}
 }
 
-void Matrix::set_ones()
-{
-	for (int i = 0; i < cols * rows; i++)
-	{
-		data[i] = 1;
-	}
-}
 
-void Matrix::set_identity()
+void Matrix::set_identity() //единичная матрица из исходной
 {
-	set_zeros();
+	set(0);
 	for (int i = 0; i < std::min(cols, rows); i++)
 	{
 		arr[i][i] = 1;
