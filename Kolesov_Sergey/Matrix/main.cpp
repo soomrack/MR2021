@@ -16,19 +16,19 @@ int main ()
 
     M1.print();
     M2.print();
-    M1.swap_cols(1, 3);
-    M1.swap_rows(1, 3);
+    M1.swap_cols(0, 2);
+    M1.swap_rows(0, 2);
     M1.print();
     Matrix M3;
     M3 = M1 + M2;
     M3.print();
     M3.normalization();
     M3.print();
-    std::cout << M3(2,2) << "\n";
+    std::cout << M3(1,1) << "\n";
     std::cout << M2.det()   << "\n"
               << M2.trace() << "\n"
-              << M2.minorij(2,2) << "\n"
-              << M2.complement(2,2) << "\n";
+              << M2.minorij(1,1) << "\n"
+              << M2.complement(1,1) << "\n";
     Matrix M4(3,3,*B);
     M3 = M4;
     M4.print();

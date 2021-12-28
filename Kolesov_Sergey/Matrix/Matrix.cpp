@@ -44,16 +44,16 @@ Matrix::Matrix(Matrix&& clone) noexcept{
     clone.cols = 0;
 }
 
-Matrix::Matrix(char Type, unsigned int n){
+Matrix::Matrix(MatrixType Type, unsigned int n){
     switch (Type) {
-        case 'E':
+        case SINGLE:
             data = new double[n*n];
             rows = n;
             cols = n;
             memset(data, 0, n*n*sizeof(double));
             for (int i=0; i<n; i++)
                 data[i*cols + i] = 1;
-        case '0':
+        case ZEROS:
             data = new double[n*n];
             rows = n;
             cols = n;
@@ -132,14 +132,15 @@ void Matrix::reverse() {
 
         for (int i = 0; i < rows; i++){
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = M.minorij(i + 1, j + 1) / det;
+                data[i * cols + j] = M.minorij(i, j) / det;
             }
         }
     }
 }
 
 void Matrix::normalization() {
-    double sum = 0;
+
+    double sum = 0.0;
     for (int i = 0; i < rows * cols; i++)
         sum += data[i];
     for (int i = 0; i < rows * cols; i++)
@@ -147,20 +148,20 @@ void Matrix::normalization() {
 }
 
 void Matrix::swap_rows(unsigned int row_first, unsigned int row_second){
-    double temp = 0;
+    double temp = 0.0;
     for (int i = 0; i < cols; i++) {
-        temp = data[(row_first - 1) * cols + i];
-        data[(row_first - 1) * cols + i] = data[(row_second - 1) * cols + i];
-        data[(row_second - 1) * cols + i] = temp;
+        temp = data[row_first * cols + i];
+        data[row_first * cols + i] = data[row_second * cols + i];
+        data[row_second * cols + i] = temp;
     }
 }
 
 void Matrix::swap_cols(unsigned int col_first, unsigned int col_second){
-    double temp = 0;
+    double temp = 0.0;
     for (int i = 0; i < rows; i++) {
-        temp = data[i*cols + col_first-1];
-        data[i*cols + col_first-1] = data[i*cols + col_second-1];
-        data[i*cols + col_second-1] = temp;
+        temp = data[i*cols + col_first];
+        data[i*cols + col_first] = data[i*cols + col_second];
+        data[i*cols + col_second] = temp;
     }
 }
 
@@ -168,7 +169,7 @@ double Matrix::trace(){
     if (rows != cols)
         return 0.0;
 
-    double tr = 0;
+    double tr = 0.0;
     for (int i = 0; i < rows; i++)
         tr += data[i * cols + i];
 
@@ -179,9 +180,9 @@ double Matrix::det(){
     if ((rows != cols)||(rows == 0))
         return 0.0;
 
-    double det = 0;
-    double temp_main = 1;
-    double temp_side = 1;
+    double det = 0.0;
+    double temp_main = 1.0;
+    double temp_side = 1.0;
 
     for (int i = 0; i < rows; i++) {
         temp_main = 1;
@@ -201,27 +202,27 @@ double Matrix::minorij(unsigned int row, unsigned int col){
     if ((rows != cols)||(rows < 2))
         return 0.0;
 
-    if ((rows < row-1 )||(cols < col-1))
+    if ((rows <= row )||(cols <= col))
         return 0.0;
 
-    double min = 0;
-    double temp_main = 1;
-    double temp_side = 1;
+    double min = 0.0;
+    double temp_main = 1.0;
+    double temp_side = 1.0;
     int count_main = 0;
     int count_side = 0;
 
     for (int i = 0; i < cols; i++) {
-        temp_main = 1;
-        temp_side = 1;
+        temp_main = 1.0;
+        temp_side = 1.0;
         count_main = 0;
         count_side = 0;
 
         for (int j = 0; j < rows; j++) {
-            if ((j != row - 1)&&((i + j) % cols != col - 1)) {
+            if ((j != row)&&((i + j) % cols != col)) {
                 temp_main *= data[j * cols + (i + j) % cols];
                 count_main++;
             }
-            if ((j != row - 1)&&((cols + i - j) % cols != col - 1)) {
+            if ((j != row)&&((cols + i - j) % cols != col)) {
                 temp_side *= data[j * cols + (cols + i - j) % cols];
                 count_side++;
             }
@@ -307,13 +308,13 @@ Matrix Matrix::operator* (const Matrix& val){
 }
 
 double Matrix::get(unsigned int row, unsigned int col) {
-    if ((row > rows)||(col > cols))
+    if ((row >= rows)||(col >= cols))
         return 0.0;
 
-    return data[(row-1)* cols + col-1];
+    return data[row * cols + col];
 }
 
 void Matrix::set(unsigned int row, unsigned int col, double val) {
     if ((row <= rows) && (col <= cols))
-        data[(row - 1) * cols + col - 1] = val;
+        data[row * cols + col] = val;
 }

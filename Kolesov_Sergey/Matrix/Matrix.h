@@ -5,6 +5,11 @@
 #ifndef MATRIX_MATRIX_H
 #define MATRIX_MATRIX_H
 
+typedef enum{
+    SINGLE,
+    ZEROS
+} MatrixType;
+
 class Matrix {
 private:
     double * data;//data
@@ -17,7 +22,7 @@ public:
     Matrix(unsigned int rows, unsigned int cols, double* data);
     Matrix(Matrix& clone);
     Matrix(Matrix&& clone) noexcept;
-    Matrix(char Type, unsigned int n); // square matrix nxn: E - single, O - all elements = 0.
+    Matrix(MatrixType Type, unsigned int n); // square matrix nxn: E - single, O - all elements = 0.
     Matrix& operator= (const Matrix&  clone);
     Matrix& operator= (const Matrix&& clone) noexcept;
     ~Matrix();
