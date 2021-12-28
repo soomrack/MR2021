@@ -1,8 +1,8 @@
 #include "library.h"
 
 Matrix:: Matrix() { //матрица по умолчанию
-    this -> rows = 0;
-    this -> columns = 0;
+    rows = 0;
+    columns = 0;
     data = nullptr;
 }
 
@@ -28,17 +28,10 @@ Matrix:: Matrix (Matrix &&m) noexcept{ //конструктор перемеще
     m.data=nullptr;
 }
 
-Matrix &Matrix::operator = (Matrix &&m) noexcept{//приравнивание через перенос //****************************************
-    rows = m.rows;
-    columns = m.columns;
-    data = m.data;
-    m.rows=0;
-    m.columns=0;
-    m.data=nullptr;
-    return *this;
-}
-
 Matrix &Matrix::operator = (const Matrix &m){//перегрузка операции присваивания
+    if (&m == this) {
+        return *this;
+    }
     rows = m.rows;
     columns = m.columns;
     delete[] data;
@@ -47,13 +40,17 @@ Matrix &Matrix::operator = (const Matrix &m){//перегрузка операц
     return *this;
 }
 
-void Matrix:: set_value(unsigned int number_row,unsigned int number_column, double numeric_value) {//присваивание значения
-    if((number_row>rows)||(number_column>columns)){
-        printf("Error. Going beyond the boundaries of the matrix");
+Matrix &Matrix::operator = (Matrix &&m) noexcept{//приравнивание через перенос
+    if (&m == this) {
+        return *this;
     }
-    else{
-        data[number_row*columns + number_column] = numeric_value;
-    }
+    rows = m.rows;
+    columns = m.columns;
+    data = m.data;
+    m.rows=0;
+    m.columns=0;
+    m.data=nullptr;
+    return *this;
 }
 
 Matrix Matrix:: operator + (Matrix &m) { //операция сложения
@@ -84,6 +81,19 @@ Matrix Matrix:: operator * (Matrix &m) { //операция умножения
         printf("Error. The number of columns in the first matrix is not equal to the number of rows in the second matrix");
         return Matrix();
     }
+    Matrix res(rows, m.columns);
+    for (int i = 0; i < res.rows; i++) {
+        for (int j = 0; j < res.columns; j++) {
+            for (int n = 0; n < m.rows; n++) {
+                int i_res = i*res.columns + j;
+                int i_M1 = i*columns + n;
+                int i_M2 = j + n*columns;
+                res.data[i_res] = res.data[i_res] + data[i_M1] * m.data[i_M2];
+            }
+        }
+    }
+    return res;
+    /* альтернативный способ:
     Matrix res2(rows, m.columns);
     for (int i = 0; i < columns*m.rows; i++) {
         res2.data[i]=0;
@@ -93,9 +103,17 @@ Matrix Matrix:: operator * (Matrix &m) { //операция умножения
             res2.data[i] = res2.data[i] + data[d1+j] * m.data[d2+j*columns];
         }
     }
-    return res2;
+    return res2;*/
 }
 
+void Matrix:: set_value(unsigned int number_row,unsigned int number_column, double numeric_value) {//присваивание значения
+    if((number_row>rows)||(number_column>columns)){
+        printf("Error. Going beyond the boundaries of the matrix");
+    }
+    else{
+        data[number_row*columns + number_column] = numeric_value;
+    }
+}
 
 void Matrix:: zero_matrix() { //нулевая матрица
     for (int i = 0; i < rows * columns; i++)

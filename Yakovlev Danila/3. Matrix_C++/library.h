@@ -11,11 +11,11 @@ private:
     double *data;
 public:
     Matrix(); //обычная матрица
-    Matrix(unsigned int rows,unsigned int columns); //матрица с заданными размерами
-    Matrix(Matrix &m); //конструктор копирования
+    Matrix(unsigned int rows,unsigned int columns);//матрица с заданными размерами
+    Matrix(const Matrix &m); //конструктор копирования
     Matrix(Matrix &&m) noexcept;//конструктор перемещений
     Matrix & operator = (Matrix &&m) noexcept; //приравнивание через перенос
-    Matrix & operator = (Matrix &m); //перегрузка операции присваивания
+    Matrix & operator = (const Matrix &m); //перегрузка операции присваивания
     Matrix operator + (Matrix &m); //операция сложения
     Matrix operator - (Matrix &m); //операция разности
     Matrix operator * (Matrix &m); //операция умножения
