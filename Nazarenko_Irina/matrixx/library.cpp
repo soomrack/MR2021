@@ -1,6 +1,12 @@
 #include "library.h"
 #include <iostream>
 
+Matrix::Matrix(){
+    height = 0;
+    width = 0;
+    data = nullptr;
+}
+
 
 Matrix::Matrix (unsigned int height, unsigned int width, double value) {
     this->height = height;
@@ -9,9 +15,11 @@ Matrix::Matrix (unsigned int height, unsigned int width, double value) {
     if (data == nullptr){
         this->height = 0;
         this->width = 0;
-    } else for (int i = 0; i < height*width; i++) {
-            data[i] = value;
-        }
+        return;
+    }
+    for (int i = 0; i < height*width; i++) {
+        data[i] = value;
+    }
 
 }
 
@@ -23,7 +31,9 @@ Matrix::Matrix (unsigned int height, unsigned int width, double *data) {
     if (data == nullptr){
         this->height = 0;
         this->width = 0;
-    } else for (int i = 0; i < height*width; i++) {
+        return;
+    }
+        for (int i = 0; i < height*width; i++) {
             memcpy(this->data,data, height*width*sizeof(double));
         };
 }
@@ -33,10 +43,15 @@ Matrix::Matrix(const Matrix &m){
     height=m.height;
     width=m.width;
     data=(double *)malloc(height*width*sizeof(double));
+    if (data == nullptr){
+        height = 0;
+        width = 0;
+        return;
+    }
     memcpy(data, m.data, height*width*sizeof(double));
 }
 
-Matrix::Matrix(Matrix &&m)   {
+Matrix::Matrix(Matrix &&m)    noexcept {
     height = m.height;
     width = m.width;
     free(data);
@@ -51,8 +66,13 @@ Matrix & Matrix::operator= (const Matrix &m) {
     height = m.height;
     free(data);
     data = (double *) malloc(height * width * sizeof(double));
+    if (data == nullptr){
+        height = 0;
+        width = 0;
+        return * this;
+    }
     memcpy(data, m.data, height * width * (sizeof(double)));
-    return *this;
+    return * this;
 }
 
 Matrix Matrix::operator + (const Matrix &m) {
@@ -68,6 +88,24 @@ Matrix Matrix::operator + (const Matrix &m) {
     return result;
 }
 
+Matrix Matrix::operator * (const Matrix &m) {
+    Matrix result(height,width);
+    if (width !=m.height) {
+        std::cout << "Matrix can not be multiplied" << std::endl;
+        result.height=0;
+        result.width=0;
+    }
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < m.width; ++j) {
+            double Temp = 0.0;
+            for (int k = 0; k < m.height; ++k) {
+                Temp += data[ i * width + k] * m.data[m.width * k + j];
+            }
+            result.data[i * width + j] = Temp;
+        }
+    }
+    return result;
+}
 
 
 void Matrix::print() {
@@ -78,30 +116,31 @@ void Matrix::print() {
     };
 }
 
-void Matrix::Matrix_1() {
+void Matrix::identity_matrix() {
     if (width == height) {
-        data = (double *) malloc(height * height * sizeof(double));
-        for (int i = 1; i <= height; i++) {
-            for (int j = 1; j <= height; j++) {
-                if (i == j)
-                    data[j + (i - 1) * height - 1] = 1;
-                else data[j + (i - 1) * height - 1] = 0;
-            };
+        zero_matrix();
+        for (int i = 0; i < height*width; i=i+height+1) {
+            data[i] = 1.0;
         };
     }
     else std::cout << "Matrix can't be made"<<std::endl;
 }
 
-void Matrix::trace() {
-    int trace;
-    trace=0;
-    for (int i = 1; i <= height; i++) {
-        for (int j = 1; j <= height; j++) {
-            if (i == j)
-                trace=trace+data[j + (i - 1) * width-1];
-        };
+void Matrix::zero_matrix(){
+    for (int i = 0; i < height*width; i++) {
+        data[i] = 0.0;
     };
-    std::cout <<trace<<std::endl;
+}
+
+void Matrix::trace() {
+    if (width == height) {
+        int trace;
+        trace = 0;
+        for (int i = 0; i < height * width; i = i + height + 1) {
+            trace = trace + data[i];
+        };
+        std::cout << trace << std::endl;
+    } else std::cout << "Trace can't be found" << std::endl;
 }
 
 void Matrix::determinant(){

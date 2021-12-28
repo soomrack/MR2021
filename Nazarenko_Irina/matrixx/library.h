@@ -12,14 +12,15 @@ public:
     Matrix(unsigned int height, unsigned int width, double value=0.0);
     Matrix(unsigned int height, unsigned int width, double *data);
     Matrix(const Matrix &m);
-    Matrix(Matrix &&m);
+    Matrix(Matrix &&m) noexcept ;
     Matrix & operator= (const Matrix &m);
     Matrix operator+ (const Matrix &m);
-    Matrix & operator* (const Matrix &m);
+    Matrix operator* (const Matrix &m);
     void print();
     void determinant();
     void trace();
-    void Matrix_1(); // генерирует единичную матрицу
+    void identity_matrix ();// генерирует единичную матрицу
+    void zero_matrix(); //генерирует нулевую матрицу
 };
 
 
