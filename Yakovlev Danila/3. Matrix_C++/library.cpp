@@ -32,7 +32,6 @@ Matrix &Matrix::operator = (Matrix &&m) noexcept{//приравнивание ч
     rows = m.rows;
     columns = m.columns;
     data = m.data;
-    memcpy(data, m.data,sizeof(double)* rows * columns);
     return *this;
 }
 
@@ -45,12 +44,12 @@ Matrix &Matrix::operator = (Matrix &m){//перегрузка операции �
     return *this;
 }
 
-void Matrix:: set_value(unsigned int row,unsigned int column, double numeric_value) {//присваивание значения
-    if((row>rows)||(column>columns)){
+void Matrix:: set_value(unsigned int p_row,unsigned int p_column, double numeric_value) {//присваивание значения
+    if((p_row>rows)||(p_column>columns)){
         printf("Error. Going beyond the boundaries of the matrix");
     }
     else{
-        data[row*columns + column] = numeric_value;
+        data[p_row*columns + p_column] = numeric_value;
     }
 }
 
