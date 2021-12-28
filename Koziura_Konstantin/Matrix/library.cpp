@@ -89,7 +89,6 @@ Matrix Matrix::operator+ (const Matrix &m){
     for (int i = 0; i < result.height * result.width; ++i) {
         result.data[i] = data[i] + m.data[i];
     }
-    std::cout<<m.width<<" "<< m.height;
     return result;
 }
 
