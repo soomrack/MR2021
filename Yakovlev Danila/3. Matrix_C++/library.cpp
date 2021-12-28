@@ -113,7 +113,7 @@ double Matrix:: trace(){ //след матрицы
 }
 
 int Matrix:: print() {//вывод матрицы в консоль
-    printf("Matrix:\n");
+    printf("\n");
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             printf("%.3lf\t",data[i*columns+j]);
