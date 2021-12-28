@@ -33,9 +33,9 @@ Matrix::Matrix (unsigned int height, unsigned int width, double *data) {
         this->width = 0;
         return;
     }
-        for (int i = 0; i < height*width; i++) {
-            memcpy(this->data,data, height*width*sizeof(double));
-        };
+    for (int i = 0; i < height*width; i++) {
+        memcpy(this->data,data, height*width*sizeof(double));
+    };
 }
 
 
@@ -97,11 +97,11 @@ Matrix Matrix::operator * (const Matrix &m) {
     }
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < m.width; ++j) {
-            double Temp = 0.0;
+            double temp = 0.0;
             for (int k = 0; k < m.height; ++k) {
-                Temp += data[ i * width + k] * m.data[m.width * k + j];
+                temp += data[ i * width + k] * m.data[m.width * k + j];
             }
-            result.data[i * width + j] = Temp;
+            result.data[i * width + j] = temp;
         }
     }
     return result;
@@ -117,13 +117,14 @@ void Matrix::print() {
 }
 
 void Matrix::identity_matrix() {
-    if (width == height) {
-        zero_matrix();
-        for (int i = 0; i < height*width; i=i+height+1) {
-            data[i] = 1.0;
-        };
-    }
-    else std::cout << "Matrix can't be made"<<std::endl;
+    if (width != height) {
+        std::cout << "Matrix can't be made" << std::endl;
+        return;
+    };
+    zero_matrix();
+    for (int i = 0; i < height*width; i=i+height+1) {
+        data[i] = 1.0;
+    };
 }
 
 void Matrix::zero_matrix(){
@@ -133,32 +134,36 @@ void Matrix::zero_matrix(){
 }
 
 void Matrix::trace() {
-    if (width == height) {
-        int trace;
-        trace = 0;
-        for (int i = 0; i < height * width; i = i + height + 1) {
-            trace = trace + data[i];
-        };
-        std::cout << trace << std::endl;
-    } else std::cout << "Trace can't be found" << std::endl;
+    if (width != height) {
+        std::cout << "Trace can't be found" << std::endl;
+        return;
+    };
+    double trace;
+    trace = 0.0;
+    for (int i = 0; i < height * width; i = i + height + 1) {
+        trace = trace + data[i];
+    }
+    std::cout << trace << std::endl;
+
 }
 
 void Matrix::determinant(){
-    if(height==width) {
-        switch (height){
-            case 1: std::cout << data[0]<<std::endl;
-                break;
-            case 2:   std::cout << data[3]*data[2]- data[1]*data[2] <<std::endl;
-                break;
-            case 3:   std::cout << data[0]*data[4]*data[8]+ data[1]*data[5]*data[6]+data[2]*data[3]*data[7]-(data[2]*data[4]*data[6]+ data[0]*data[7]*data[5]+data[1]*data[3]*data[8]) <<std::endl;
-                break;
-            default:   std::cout << "This program can't calculate determinant for matrix with height>3" <<std::endl;
-                break;
+    if(height!=width) {
+        std::cout << "Matrix is not square" <<std::endl ;
+        return;
+    }
+    switch (height){
+        case 1: std::cout << data[0]<<std::endl;
+            break;
+        case 2:   std::cout << data[3]*data[2]- data[1]*data[2] <<std::endl;
+            break;
+        case 3:   std::cout << data[0]*data[4]*data[8]+ data[1]*data[5]*data[6]+data[2]*data[3]*data[7]-(data[2]*data[4]*data[6]+ data[0]*data[7]*data[5]+data[1]*data[3]*data[8]) <<std::endl;
+            break;
+        default:   std::cout << "This program can't calculate determinant for matrix with height>3" <<std::endl;
+            break;
         };
 
-    }
-    else
-        std::cout << "Matrix is not square" <<std::endl ;
+
 }
 
 Matrix::~Matrix() {
