@@ -7,8 +7,8 @@
 
 class Matrix {
 private:
-    double * ptr_d;//data
-    double * ptr_b;//bufer
+    double * data;//data
+    double * buf;//bufer
     unsigned int rows;
     unsigned int cols;
 
@@ -18,7 +18,8 @@ public:
     Matrix(Matrix& clone);
     Matrix(Matrix&& clone) noexcept;
     Matrix(char Type, unsigned int n); // square matrix nxn: E - single, O - all elements = 0.
-    Matrix& operator= (const Matrix& val);
+    Matrix& operator= (const Matrix&  clone);
+    Matrix& operator= (const Matrix&& clone) noexcept;
     ~Matrix();
 
 public:

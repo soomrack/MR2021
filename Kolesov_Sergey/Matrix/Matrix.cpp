@@ -7,39 +7,39 @@
 #include <cstring>
 
 void Matrix::free_memory(){
-    delete[] ptr_d;
+    delete[] data;
     rows = 0;
     cols = 0;
 }
 
 Matrix::Matrix(unsigned int rows, unsigned int cols, double val){
-    ptr_d = new double[rows*cols];
+    data = new double[rows*cols];
     this->rows = rows;
     this->cols = cols;
 
     for (int i=0; i<(rows*cols); i++)
-        ptr_d[i] = val;
+        data[i] = val;
 }
 
 Matrix::Matrix(unsigned int rows, unsigned int cols, double* data){
-    ptr_d = new double[rows*cols];
-    memcpy(ptr_d, data, rows*cols*sizeof(double));
+    this->data = new double[rows*cols];
+    memcpy(this->data, data, rows*cols*sizeof(double));
     this->rows = rows;
     this->cols = cols;
 }
 
 Matrix::Matrix(Matrix& clone){
-    ptr_d = new double[clone.rows*clone.cols];
-    memcpy(ptr_d, clone.ptr_d, clone.rows*clone.cols*sizeof(double));
+    data = new double[clone.rows*clone.cols];
+    memcpy(data, clone.data, clone.rows*clone.cols*sizeof(double));
     rows = clone.rows;
     cols = clone.cols;
 }
 
 Matrix::Matrix(Matrix&& clone) noexcept{
-    ptr_d = clone.ptr_d;
+    data = clone.data;
     rows = clone.rows;
     cols = clone.cols;
-    clone.ptr_d = nullptr;
+    clone.data = nullptr;
     clone.rows = 0;
     clone.cols = 0;
 }
@@ -47,22 +47,21 @@ Matrix::Matrix(Matrix&& clone) noexcept{
 Matrix::Matrix(char Type, unsigned int n){
     switch (Type) {
         case 'E':
-            ptr_d = new double[n*n];
+            data = new double[n*n];
             rows = n;
             cols = n;
-            memset(ptr_d, 0, n*n*sizeof(double));
+            memset(data, 0, n*n*sizeof(double));
             for (int i=0; i<n; i++)
-                ptr_d[i*cols + i] = 1;
-        case 'O':
-            ptr_d = new double[n*n];
+                data[i*cols + i] = 1;
+        case '0':
+            data = new double[n*n];
             rows = n;
             cols = n;
-            memset(this->ptr_d, 0, n*n*sizeof(double));
+            memset(data, 0, n*n*sizeof(double));
         default:
-            ptr_d = nullptr;
+            data = nullptr;
             rows = 0;
             cols = 0;
-
     }
 }
 
@@ -71,11 +70,18 @@ Matrix& Matrix::operator= (const Matrix& clone){
         return *this;
 
     free_memory();
-    ptr_d = new double[clone.rows*clone.cols];
-    memcpy(ptr_d, clone.ptr_d, clone.rows*clone.cols*sizeof(double));
+    data = new double[clone.rows*clone.cols];
+    memcpy(data, clone.data, clone.rows*clone.cols*sizeof(double));
     rows = clone.rows;
     cols = clone.cols;
 
+    return *this;
+}
+
+Matrix& Matrix::operator= (const Matrix&& clone) noexcept{
+    data = clone.data;
+    rows = clone.rows;
+    cols = clone.cols;
     return *this;
 }
 
@@ -83,7 +89,7 @@ double Matrix::operator() (unsigned int row, unsigned int col)
 {
     if (row > rows || col > cols)
         return 0.0;
-    return ptr_d[cols*row + col];
+    return data[cols*row + col];
 }
 
 Matrix::~Matrix(){
@@ -93,7 +99,7 @@ Matrix::~Matrix(){
 void Matrix::print(){
     for (int i = 0; i < rows; i++){
         for (int j = 0; j < cols; j++){
-            std::cout << ptr_d[i * cols + j] << "  ";
+            std::cout << data[i * cols + j] << "  ";
         }
         std::cout << '\n';
     }
@@ -101,32 +107,32 @@ void Matrix::print(){
 }
 
 void Matrix::transposition() {
-    if (ptr_d != nullptr) {
-        ptr_b = new double[rows * cols];
-        memcpy(ptr_b, ptr_d, rows * cols * sizeof(double));
+    if (data != nullptr) {
+        buf = new double[rows * cols];
+        memcpy(buf, data, rows * cols * sizeof(double));
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < (cols); j++)
-                ptr_d[j * cols + i] = ptr_b[i * cols + j];
+                data[j * cols + i] = buf[i * cols + j];
         }
 
         int temp = cols;
         cols = rows;
         rows = temp;
-        delete[] ptr_b;
+        delete[] buf;
     }
 }
 
 void Matrix::reverse() {
     if ((rows == cols)&&(det() != 0)){
-        Matrix M(3,3,ptr_d);
+        Matrix M(3,3,data);
         double det = this->det();
         M.transposition();
         M.print();
 
         for (int i = 0; i < rows; i++){
             for (int j = 0; j < cols; j++) {
-                ptr_d[i * cols + j] = M.minorij(i + 1, j + 1) / det;
+                data[i * cols + j] = M.minorij(i + 1, j + 1) / det;
             }
         }
     }
@@ -135,26 +141,26 @@ void Matrix::reverse() {
 void Matrix::normalization() {
     double sum = 0;
     for (int i = 0; i < rows * cols; i++)
-        sum += ptr_d[i];
+        sum += data[i];
     for (int i = 0; i < rows * cols; i++)
-        ptr_d[i] /= sum;
+        data[i] /= sum;
 }
 
 void Matrix::swap_rows(unsigned int row_first, unsigned int row_second){
     double temp = 0;
     for (int i = 0; i < cols; i++) {
-        temp = ptr_d[(row_first - 1) * cols + i];
-        ptr_d[(row_first - 1) * cols + i] = ptr_d[(row_second - 1) * cols + i];
-        ptr_d[(row_second - 1) * cols + i] = temp;
+        temp = data[(row_first - 1) * cols + i];
+        data[(row_first - 1) * cols + i] = data[(row_second - 1) * cols + i];
+        data[(row_second - 1) * cols + i] = temp;
     }
 }
 
 void Matrix::swap_cols(unsigned int col_first, unsigned int col_second){
     double temp = 0;
     for (int i = 0; i < rows; i++) {
-        temp = ptr_d[i*cols + col_first-1];
-        ptr_d[i*cols + col_first-1] = ptr_d[i*cols + col_second-1];
-        ptr_d[i*cols + col_second-1] = temp;
+        temp = data[i*cols + col_first-1];
+        data[i*cols + col_first-1] = data[i*cols + col_second-1];
+        data[i*cols + col_second-1] = temp;
     }
 }
 
@@ -164,7 +170,7 @@ double Matrix::trace(){
 
     double tr = 0;
     for (int i = 0; i < rows; i++)
-        tr += ptr_d[i * cols + i];
+        tr += data[i * cols + i];
 
     return tr;
 }
@@ -181,8 +187,8 @@ double Matrix::det(){
         temp_main = 1;
         temp_side = 1;
         for (int j = 0; j < rows; j++) {
-            temp_main *= ptr_d[j * cols + (i+j)%cols];
-            temp_side *= ptr_d[j * cols + (cols+i-j)%cols];
+            temp_main *= data[j * cols + (i+j)%cols];
+            temp_side *= data[j * cols + (cols+i-j)%cols];
         }
         det += temp_main;
         det -= temp_side;
@@ -212,11 +218,11 @@ double Matrix::minorij(unsigned int row, unsigned int col){
 
         for (int j = 0; j < rows; j++) {
             if ((j != row - 1)&&((i + j) % cols != col - 1)) {
-                temp_main *= ptr_d[j * cols + (i + j) % cols];
+                temp_main *= data[j * cols + (i + j) % cols];
                 count_main++;
             }
             if ((j != row - 1)&&((cols + i - j) % cols != col - 1)) {
-                temp_side *= ptr_d[j * cols + (cols + i - j) % cols];
+                temp_side *= data[j * cols + (cols + i - j) % cols];
                 count_side++;
             }
         }
@@ -248,7 +254,7 @@ Matrix Matrix::operator+ (const Matrix& val){
     Matrix M(rows, cols, 0.0);
 
     for (int i = 0; i < rows * cols; i++)
-        M.ptr_d[i] = ptr_d[i] + val.ptr_d[i];
+        M.data[i] = data[i] + val.data[i];
 
     return M;
 }
@@ -262,13 +268,13 @@ Matrix Matrix::operator- (const Matrix& val){
     Matrix M(rows, cols);
 
     for (int i = 0; i < rows * cols; i++)
-        M.ptr_d[i] = ptr_d[i] - val.ptr_d[i];
+        M.data[i] =data[i] - val.data[i];
 
     return M;
 }
 
 Matrix Matrix::operator* (double val){
-    if (ptr_d == nullptr){
+    if (data == nullptr){
         Matrix M;
         return M;
     }
@@ -276,7 +282,7 @@ Matrix Matrix::operator* (double val){
     Matrix M(rows, cols);
 
     for (int i = 0; i < rows * cols; i++)
-        M.ptr_d[i] = ptr_d[i] * val;
+        M.data[i] = data[i] * val;
 
     return M;
 }
@@ -287,12 +293,12 @@ Matrix Matrix::operator* (const Matrix& val){
         return M;
     }
 
-    Matrix M(rows, val.cols);
+    Matrix M(rows, val.cols, 0.0);
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < val.cols; j++) {
             for (int k = 0; k < cols; k++) {
-                M.ptr_d[i * val.cols + j] += (ptr_d[cols * i + k] * val.ptr_d[k * val.cols + j]);
+                M.data[i * val.cols + j] += (data[cols * i + k] * val.data[k * val.cols + j]);
             }
         }
     }
@@ -304,10 +310,10 @@ double Matrix::get(unsigned int row, unsigned int col) {
     if ((row > rows)||(col > cols))
         return 0.0;
 
-    return ptr_d[(row-1)* cols + col-1];
+    return data[(row-1)* cols + col-1];
 }
 
 void Matrix::set(unsigned int row, unsigned int col, double val) {
     if ((row <= rows) && (col <= cols))
-        ptr_d[(row - 1) * cols + col - 1] = val;
+        data[(row - 1) * cols + col - 1] = val;
 }
