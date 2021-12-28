@@ -105,7 +105,7 @@ void Matrix:: unit_matrix() { //единичная матрица
 double Matrix:: trace(){ //след матрицы
     double trace=0.0;
     for (int i = 0; i < rows * columns; i++){
-        if ((i/rows)==(i%columns)){
+        if ((i/columns)==(i%columns)){
             trace = trace+data[i];
         }
     }
@@ -126,7 +126,3 @@ int Matrix:: print() {//вывод матрицы в консоль
 Matrix:: ~Matrix() { //деструктор
         free (data);
 }
-
-
-
-
