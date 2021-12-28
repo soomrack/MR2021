@@ -12,11 +12,11 @@ typedef enum {
 
 class Matrix {
 private:
-    int rows = 0;
-    int cols = 0;
+    unsigned int rows = 0;
+    unsigned int cols = 0;
     double *matrix;
 public:
-    Matrix(int rows, int cols, Matrix_type type);
+    Matrix(unsigned int rows, unsigned int cols, Matrix_type type);
     Matrix();
     Matrix(const Matrix &other);
     Matrix(Matrix &&other) noexcept;
