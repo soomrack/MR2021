@@ -168,6 +168,9 @@ double Matrix::det(){
     double det = 1.0;
     double div = 0.0;           //Хранит результат деления элементов строк для последующей триангуляция матрицы
     for (int i = 0; i < rows-1; ++i) {
+        if ( abs( temp.data[i+cols*i])<0.001){
+            return 0;
+        }
         for (int j = i + 1; j < cols; ++j) {
             div = -(temp.matrix[i + cols * j] / temp.matrix[i + cols * i]);
             for (int k = i; k < rows; ++k) {
@@ -179,18 +182,6 @@ double Matrix::det(){
         det *= temp.matrix[i + i*cols];
     }
     return det;
-}
-
-int Matrix::max_position(int pos){
-    int max_pos = pos;
-    double max = abs(matrix[max_pos]);
-    for (int j = pos + cols; j < rows * cols; j += cols) {
-        if (abs(matrix[j]) > max) {
-            max_pos = j;
-            max = abs(matrix[j]);
-        }
-    }
-    return max_pos;
 }
 
 void Matrix::print() {
