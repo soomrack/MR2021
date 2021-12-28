@@ -167,7 +167,6 @@ double Matrix::det(){
     Matrix temp(*this);
     double det = 1.0;
     double div = 0.0;           //Хранит результат деления элементов строк для последующей триангуляция матрицы
-    int swap_count = 0;
     for (int i = 0; i < rows-1; ++i) {
         for (int j = i + 1; j < cols; ++j) {
             div = -(temp.matrix[i + cols * j] / temp.matrix[i + cols * i]);
@@ -175,9 +174,6 @@ double Matrix::det(){
                 temp.matrix[k + j * cols] += temp.matrix[k + i * cols] * div;
             }
         }
-    }
-    if (swap_count % 2 == 1) {
-        det = -1.0;
     }
     for (int i = 0; i < rows; ++i) {
         det *= temp.matrix[i + i*cols];
