@@ -137,7 +137,7 @@ void Matrix::print() {
 }
 
 double Matrix::trace() {
-    double trace = 0;
+    double trace = 0.0;
     if (column != row) {
         cout << "ошибка операции нахождения следа матрицы: матрица должна быть квадратной\n" << endl;
         return 0;
