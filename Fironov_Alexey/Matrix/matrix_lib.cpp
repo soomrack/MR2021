@@ -28,7 +28,7 @@ Matrix::Matrix(Matrix &income_matrix) {
 Matrix::Matrix(Matrix &&income_matrix) {
     rows_num = income_matrix.rows_num;
     columns_num = income_matrix.columns_num;
-    data =
+    data = income_matrix.data;
     income_matrix.data = nullptr;
     income_matrix.rows_num = 0;
     income_matrix.columns_num = 0;
