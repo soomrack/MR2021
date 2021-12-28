@@ -57,6 +57,18 @@ Matrix & Matrix::operator = (const Matrix &matrix) {
     return *this;
 }
 
+Matrix & Matrix::operator = (Matrix &&matrix) {
+    if (&matrix == this) {
+        return *this;
+    }
+    free_memory();
+    width = matrix.width;
+    height = matrix.height;
+    data = matrix.data;
+    matrix.data = nullptr;
+    return *this;
+}
+
 Matrix Matrix::operator + (const Matrix &matrix) {
     if (height != matrix.height || width != matrix.width) {
         std::cout<<"=> Несоответствие размеров матриц."<<std::endl;

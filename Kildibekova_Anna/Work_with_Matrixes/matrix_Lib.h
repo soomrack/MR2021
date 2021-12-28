@@ -22,6 +22,7 @@ public:
     ~Matrix();
 public:
     Matrix & operator = (const Matrix &matrix);
+    Matrix & operator = (Matrix &&matrix);
     Matrix operator + (const Matrix &matrix);
     Matrix operator * (const Matrix &matrix);
 public:
