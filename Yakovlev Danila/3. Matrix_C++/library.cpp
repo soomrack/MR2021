@@ -1,9 +1,9 @@
 #include "library.h"
 
-Matrix:: Matrix() { //матрица
+Matrix:: Matrix() { //матрица по умолчанию
     this -> rows = rows=0;
     this -> columns = columns=0;
-    data = new double [rows * columns];
+    data = nullptr;
 }
 
 Matrix:: Matrix(unsigned int rows,unsigned  int columns) { //матрица с заданными размерами
@@ -34,7 +34,8 @@ Matrix &Matrix::operator = (Matrix &&m) noexcept{//перегрузка опер
 
 Matrix Matrix:: operator + (Matrix &m) { //операция сложения
     if ((rows!=m.rows)||(columns!=m.columns)){
-        printf("Error. Матрицы не равны по размерам");
+        printf("Error. The sizes of the matrices are not equal");
+        return Matrix();
     }
     Matrix res(rows, columns);
     for (int i = 0; i < rows * columns; i++)
@@ -44,8 +45,8 @@ Matrix Matrix:: operator + (Matrix &m) { //операция сложения
 
 Matrix Matrix:: operator - (Matrix &m) { //операция разности
     if ((rows!=m.rows)||(columns!=m.columns)){
-        printf("Error. Матрицы не равны по размерам");
-        exit;
+        printf("Error. The sizes of the matrices are not equal");
+        return Matrix();
     }
     Matrix res(rows, columns);
     for (int i = 0; i < rows * columns; i++) {
@@ -55,20 +56,21 @@ Matrix Matrix:: operator - (Matrix &m) { //операция разности
 }
 
 Matrix Matrix:: operator * (Matrix &m) { //операция умножения
-    if (rows!=m.columns){
-        printf("Error. Число строк в первой матрице не равно столбцам второй матрицы");
+    if (columns!=m.rows){
+        printf("Error. The number of columns in the first matrix is not equal to the number of rows in the second matrix");
+        return Matrix();
     }
     Matrix res2(rows, m.columns);
-    for (int i = 0; i < rows*m.columns; i++) {
+    for (int i = 0; i < columns*m.rows; i++) {
         res2.data[i]=0;
-        for (int j = 0; j < m.columns; j++) {//(i+1)%(m.columns)==jj && ((i+1)%(rows)==(ii)
-            res2.data[i] = res2.data[i] + data[(i/rows)*m.columns+j] * m.data[(i%m.columns)+j*m.columns];
+        for (int j = 0; j < columns; j++) {
+            res2.data[i] = res2.data[i] + data[(i/columns)*columns+j] * m.data[(i%columns)+j*columns];
             /*
-            * data[(i/rows)*m.columns+j] - идем по строке. целочисленное деление на длинну строки(=колво столбцов), чтобы, прибавив это, получить
-            * на какой мы строке и передвижение по строке уже с помощью +j
+             * (i/columns) - номер строки множителей матрицы 1.
+             * (i/columns)*m.columns+j - номер множителя матрицы 1 (движется вдоль строки матрицы 1)
              *
-            * m.data[(i%m.columns)+j*m.columns] - идем по столбцу. остаток от деления на столбец покажет на каком мы столбце и дальше
-            * передвигаемся вдоль него прибавляя при каждом переходе длину строки(=колво столбцов)
+             *(i%m.columns) - номер столбца множителей матрицы 2.
+             *(i%m.columns)+j*m.columns - номер множителя матрицы 2 (движется вдоль столбца матрицы 2)
             */
         }
     }
@@ -79,6 +81,9 @@ Matrix:: Matrix (Matrix &&m) noexcept{ //конструктор перемеще
     rows = m.rows;
     columns = m.columns;
     data = m.data;
+    m.rows=0;
+    m.columns=0;
+    m.data=nullptr;
 }
 
 void Matrix:: zero_matrix() { //нулевая матрица
@@ -88,7 +93,7 @@ void Matrix:: zero_matrix() { //нулевая матрица
 
 void Matrix:: unit_matrix() { //единичная матрица
     for (int i = 0; i < rows * columns; i++){
-        if ((i/rows)==(i%columns)){//номер строки==номеру столбца
+        if ((i/columns)==(i%columns)){ //номер строки = номеру столбца
             data[i] = 1;
         }
         else{
@@ -99,11 +104,9 @@ void Matrix:: unit_matrix() { //единичная матрица
 
 double Matrix:: trace(){ //след матрицы
     double trace=0.0;
-    if ((rows!=0)&&(columns!=0)){
-        for (int i = 0; i < rows * columns; i++){
-            if ((i/rows)==(i%columns)){
-                trace = trace+data[i];
-            }
+    for (int i = 0; i < rows * columns; i++){
+        if ((i/rows)==(i%columns)){
+            trace = trace+data[i];
         }
     }
     return trace;
