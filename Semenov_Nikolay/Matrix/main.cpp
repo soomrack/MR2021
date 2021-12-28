@@ -16,8 +16,10 @@ void assign_V(int *A_Rows, int *A_Columns, int *B_Rows, int *B_Columns) {
 int main() {
     int A_Rows, A_Columns, B_Rows, B_Columns;
     assign_V(&A_Rows, &A_Columns, &B_Rows, &B_Columns);
-    Matrix A(A_Rows, A_Columns, RANDOM);
-    Matrix B(B_Rows, B_Columns, RANDOM);
+    Matrix A(A_Rows, A_Columns);
+    Matrix B(B_Rows, B_Columns);
+    A.set_Random();
+    B.set_Random();
     cout << "\n Matrix A:\n";
     A.output();
     cout << "\n Matrix B:\n";

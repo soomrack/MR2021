@@ -12,21 +12,14 @@ Matrix::Matrix(){
 }
 
 /* Базовый конструктор */
-Matrix::Matrix(unsigned int height, unsigned int width, M_type type) {
+Matrix::Matrix(unsigned int height, unsigned int width) {
     this->height = height;
     this->width = width;
     data = (int *) malloc(height * width * sizeof(int));
-    if (data != nullptr) {                                             //Проверка успешного выделения памяти
-        switch (type) {
-            case RANDOM: set_Random();break;
-            case IDENTITY: set_Identity(); break;
-            case ZERO: set_Zero(); break;
-            default: set_Zero(); break;
-        }
-    }
-    else {
+    if (data == nullptr) {                                             //Проверка успешного выделения памяти
         this->height = 0;
         this->width = 0;
+        return;
     }
 }
 
@@ -35,13 +28,12 @@ Matrix::Matrix(const Matrix &other) {
     this->height = other.height;
     this->width = other.width;
     data = (int *) malloc(height * width * sizeof(int));
-    if (data != nullptr) {                                             //Проверка успешного выделения памяти
-        std::memcpy(this->data, other.data, width * height * sizeof(int));
-    }
-    else{
+    if (data == nullptr) {                                             //Проверка успешного выделения памяти
         this->height = 0;
         this->width = 0;
+        return;
     }
+    std::memcpy(this->data, other.data, width * height * sizeof(int));
 }
 
 /* Конструктор перемещения */
@@ -68,15 +60,14 @@ Matrix& Matrix::operator= (const Matrix &other){
     }
     height = other.height;
     width = other.width;
-    Matrix::~Matrix();
+    free(data);
     data = (int *) malloc(height * width * sizeof(int));
-    if (data != nullptr) {                                             //Проверка успешного выделения памяти
-        memcpy(data, other.data, other.height * other.width * sizeof(int));
-    }
-    else {
-        this->width = 0;
+    if (data == nullptr) {                                             //Проверка успешного выделения памяти
         this->height = 0;
+        this->width = 0;
+        return *this;
     }
+    memcpy(data, other.data, other.height * other.width * sizeof(int));
     return *this;
 }
 
@@ -87,7 +78,7 @@ Matrix& Matrix::operator= (Matrix &&other) noexcept {
     }
     this->height = other.height;
     this->width = other.width;
-    Matrix::~Matrix();
+    free(data);
     this->data = other.data;
     other.data = nullptr;
     other.height = 0;
@@ -98,10 +89,10 @@ Matrix& Matrix::operator= (Matrix &&other) noexcept {
 /* Перегрузка оператора сложения */
 Matrix Matrix::operator + (const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        Matrix Error(0, 0, ZERO);
+        Matrix Error(0, 0);
         return Error;
     }
-    Matrix summarize(this->height, this->width, ZERO);
+    Matrix summarize(this->height, this->width);
     for (int i = 0; i < this->width * other.height; i++){
         summarize.data[i] = this->data[i] + other.data[i];
     }
@@ -111,10 +102,10 @@ Matrix Matrix::operator + (const Matrix &other) {
 /* Перегрузка оператора вычитания */
 Matrix Matrix::operator - (const Matrix &other) {
     if ((this->width != other.width) || (this->height != other.height)) {
-        Matrix Error(0, 0, ZERO);
+        Matrix Error(0, 0);
         return Error;
     }
-    Matrix subtraction(this->height, this->width, ZERO);
+    Matrix subtraction(this->height, this->width);
     for (int i = 0; i < this->width * other.height; i++){
         subtraction.data[i] = this->data[i] - other.data[i];
     }
@@ -124,10 +115,11 @@ Matrix Matrix::operator - (const Matrix &other) {
 /* Перегрузка оператора умножения */
 Matrix Matrix::operator * (const Matrix &other) {
     if (this->width != other.height) {
-        Matrix Error(0, 0, ZERO);
+        Matrix Error(0, 0);
         return Error;
     }
-    Matrix multiplication(this->height, other.width, ZERO);
+    Matrix multiplication(this->height, other.width);
+    multiplication.set_Zero();
     for(int row = 0; row < this->height; row++) {
         for(int col_B = 0; col_B < other.width; col_B++) {
             for(int col_A = 0; col_A < other.width; col_A++) {
@@ -141,14 +133,8 @@ Matrix Matrix::operator * (const Matrix &other) {
 /* След матрицы */
 int Matrix::trace() {
     int tr = 0;
-    unsigned int length;
-    if (width < height) {
-        length = width;
-    } else {
-        length = height;
-    }
-    for(int i = 0; i < length; i++){
-        tr += data[length * i + i];
+    for (int i = 0; i < height*width; i+=width+1){
+        tr += data[i];
     }
     return tr;
 }
@@ -206,14 +192,8 @@ void Matrix::set_Zero() {
 /* Создание единичной матрицы */
 void Matrix::set_Identity() {
     set_Zero();
-    unsigned int length;
-    if (width < height) {
-        length = width;
-    } else {
-        length = height;
-    }
-    for(int i = 0; i < length; i++){
-        data[length * i + i]= 1;
+    for (int i = 0; i < height*width; i+=width+1){
+        data[i]= 1;
     }
 }
 
