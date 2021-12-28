@@ -11,7 +11,9 @@ public:
     Matrix();                                                    //Создание м-цы размером 1*1 со значением 0
     Matrix(int height, int width);                               // Создание м-цы размером height*width, заполненной нулями
 
-    Matrix(int height, int width, double (&data)[]);
+    template<unsigned int S>
+    Matrix(int height, int width, double (&data)[S]);
+
     Matrix(const Matrix &m);
     Matrix(Matrix &&m) noexcept;
     Matrix & operator= (const Matrix &m);

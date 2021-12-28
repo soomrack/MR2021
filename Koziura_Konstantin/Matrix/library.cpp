@@ -18,19 +18,24 @@ Matrix::Matrix(int height, int width) {
     if (data == nullptr){
         this->height = 0;
         this->width = 0;
-    } else for (int i = 0; i < height * width; ++i){
+        return;
+    }
+    for (int i = 0; i < height * width; ++i){
             data[i] = 0;
     }
 }
 
-Matrix::Matrix(int height, int width, double (&data)[]) {
+template<unsigned int S>
+Matrix::Matrix(int height, int width, double (&data)[S]) {
     this->height = height;
     this->width = width;
     this->data = (double *)malloc(height * width * sizeof(double));
     if (this->data == nullptr){
         this->height = 0;
         this->width = 0;
-    } else for (int i = 0; i < width * height; ++i) {
+        return;
+    }
+    for (int i = 0; i < width * height; ++i) {
         this->data[i] = data[i];
     }
 }
@@ -50,7 +55,9 @@ Matrix::Matrix(const Matrix &m) {
     if (data == nullptr){
         height = 0;
         width = 0;
-    } else memcpy(data,  m.data,height * width * (sizeof(double)));
+        return;
+    }
+    memcpy(data,  m.data,height * width * (sizeof(double)));
 }
 
 Matrix & Matrix::operator= (const Matrix &m) {
@@ -62,7 +69,9 @@ Matrix & Matrix::operator= (const Matrix &m) {
     if (data == nullptr){
         height = 0;
         width = 0;
-    } else memcpy(data, m.data, height * width * (sizeof(double)));
+        return *this;
+    }
+    memcpy(data, m.data, height * width * (sizeof(double)));
     return *this;
 }
 
@@ -73,7 +82,7 @@ Matrix Matrix::operator+ (const Matrix &m){
     }
 
     auto * matrix = new Matrix(m.height, m.width);
-    //Проверка выделения памяти производится в конструкторе
+
     for (int i = 0; i < matrix->height * matrix->width; ++i) {
         matrix->data[i] = this->data[i] + m.data[i];
     }
@@ -87,7 +96,7 @@ Matrix Matrix::operator* (const Matrix &m){
         return {0,0};
     }
     auto * matrix = new Matrix(this->height, m.width);
-    //Проверка выделения памяти производится в конструкторе
+
     for (int i = 0; i < this->height; ++i) {
         for (int j = 0; j < m.width; ++j) {
             double Temp = 0.0;
