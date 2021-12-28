@@ -85,15 +85,10 @@ Matrix Matrix:: operator * (Matrix &m) { //операция умножения
     Matrix res2(rows, m.columns);
     for (int i = 0; i < columns*m.rows; i++) {
         res2.data[i]=0;
+        int d1=i/columns*columns;
+        int d2=i%columns;
         for (int j = 0; j < columns; j++) {
-            res2.data[i] = res2.data[i] + data[(i/columns)*columns+j] * m.data[(i%columns)+j*columns];
-            /*
-             * (i/columns) - номер строки множителей матрицы 1.
-             * (i/columns)*m.columns+j - номер множителя матрицы 1 (движется вдоль строки матрицы 1)
-             *
-             *(i%m.columns) - номер столбца множителей матрицы 2.
-             *(i%m.columns)+j*m.columns - номер множителя матрицы 2 (движется вдоль столбца матрицы 2)
-            */
+            res2.data[i] = res2.data[i] + data[d1+j] * m.data[d2+j*columns];
         }
     }
     return res2;
