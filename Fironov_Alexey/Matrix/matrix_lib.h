@@ -26,14 +26,12 @@ public:
     double det();
     void set_identity ();
     void set_reverse ();
+    void set_zero_matrix ();    //turns matrix into matrix filled with 0
 
     Matrix operator= (const Matrix &);
     Matrix operator+ (const Matrix &);
     Matrix operator- (const Matrix &);
     Matrix operator* (const Matrix &);
-
-private:
-    void set_zero_matrix ();    //turns matrix into matrix filled with 0
 };
 
 #endif //MATRIX_MATRIX_LIB_H

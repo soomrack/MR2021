@@ -1,32 +1,34 @@
 #include <iomanip>
 #include "matrix_lib.h"
 
-void Error_output () {
-    std::cout<<"Size error\n";
+void Size_error () {
+    std::cout<<"ERROR: Size is incorrect\n";
 };
 
+void OutOfRange_error () {
+    std::cout<<"ERROR: Your destination cell is out of range\n";
+}
+
 Matrix::Matrix(unsigned int rows_num, unsigned int columns_num, double value) {
-    Matrix::rows_num = rows_num;
-    Matrix::columns_num = columns_num;
-    Matrix::data = new double [rows_num*columns_num];
-        for (unsigned long int i = 0; i < rows_num*columns_num; i++){
-                data[i] = value;
-        }
+    this->rows_num = rows_num;
+    this->columns_num = columns_num;
+    this->data = new double [rows_num*columns_num];
+    for (unsigned long int i = 0; i < rows_num*columns_num; i++){
+            data[i] = value;
+    }
 }
 
 Matrix::Matrix(Matrix &income_matrix) {
     rows_num = income_matrix.rows_num;
     columns_num = income_matrix.columns_num;
-    data = new double [income_matrix.rows_num*income_matrix.columns_num];
-    for (unsigned long int i = 0; i < rows_num * columns_num; i++){
-        data[i]=income_matrix.data[i];
-    }
+    data = new double [rows_num * columns_num];
+    memcpy (data, income_matrix.data, rows_num * columns_num * sizeof(double));
 }
 
 Matrix::Matrix(Matrix &&income_matrix) {
     rows_num = income_matrix.rows_num;
     columns_num = income_matrix.columns_num;
-    data = income_matrix.data;
+    memcpy (data, income_matrix.data, rows_num * columns_num * sizeof(double));
     income_matrix.data = nullptr;
     income_matrix.rows_num = 0;
     income_matrix.columns_num = 0;
@@ -50,23 +52,31 @@ void Matrix::print () {
 }
 
 void Matrix::set_zero_matrix() {
-    for (unsigned int i = 0; rows_num * columns_num> i; i++){
+    for (unsigned long int i = 0; rows_num * columns_num> i; i++){
                 data[i] = 0.0;
     }
 }
 
 void Matrix::set_cell(unsigned int row, unsigned int column, double value) {
-    data[row * rows_num + column] = value;
+    if (row <= rows_num && column <= columns_num){
+        data[row * rows_num + column] = value;
+    } else {
+        OutOfRange_error();
+    }
 }
 
 double Matrix::get_cell(unsigned int row, unsigned int column) {
-    return data[row * rows_num + column];
+    if (row <= rows_num && column <= columns_num){
+        return data[row * rows_num + column];
+    } else {
+        OutOfRange_error();
+    }
 }
 
 double Matrix::diagonal_trace() {
     double temp_value = 0.0;
     unsigned int temp_border = rows_num > columns_num ? columns_num : rows_num;
-    for (unsigned int i = 0; i < temp_border; i++){
+    for (unsigned long int i = 0; i < temp_border; i++){
         temp_value+= data[i * rows_num + i];
     }
     return temp_value;
@@ -74,14 +84,14 @@ double Matrix::diagonal_trace() {
 
 void Matrix::diagonal_filling(double value) {
     unsigned int min = rows_num > columns_num ? columns_num : rows_num;
-    for (unsigned int i = 0; i < min; i++) {
+    for (unsigned long int i = 0; i < min; i++) {
         data[i * rows_num + i] = value;
     }
 }
 
 double Matrix::det() {
     if (rows_num != columns_num){
-        Error_output;
+        Size_error();
         return 0;
     }
 
@@ -153,12 +163,12 @@ Matrix Matrix::operator= (const Matrix &other){
 }
 
 Matrix Matrix::operator+ (const Matrix &other) {
-    Matrix temp_M(rows_num, other.columns_num, 0.0);
     if (rows_num != other.rows_num || columns_num != other.columns_num) {
-        Error_output();
+        Size_error();
         Matrix Zero(0,0,0.0);
         return Zero;
     }
+    Matrix temp_M(rows_num, other.columns_num, 0.0);
     for (int i = 0; i < temp_M.rows_num * temp_M.columns_num; ++i) {
             temp_M.data[i] = data[i* temp_M.rows_num] + other.data[i * temp_M.columns_num];
     }
@@ -166,25 +176,25 @@ Matrix Matrix::operator+ (const Matrix &other) {
 }
 
 Matrix Matrix::operator- (const Matrix &other) {
-    Matrix temp_M(rows_num, other.columns_num, 0.0);
     if (this->rows_num != other.rows_num || this->columns_num != other.columns_num) {
-        Error_output();
+        Size_error();
         Matrix Zero(0,0,0.0);
         return Zero;
     }
-    for (int i = 0; i < temp_M.rows_num * temp_M.columns_num; ++i) {
+    Matrix temp_M(rows_num, other.columns_num, 0.0);
+    for (unsigned long int i = 0; i < temp_M.rows_num * temp_M.columns_num; ++i) {
         temp_M.data[i] = data[i* temp_M.rows_num] - other.data[i * temp_M.columns_num];
     }
     return temp_M;
 }
 
 Matrix Matrix::operator* (const Matrix &other) {
-    Matrix temp_M(rows_num, other.columns_num, 0.0);
     if (columns_num != other.rows_num) {
-        Error_output();
+        Size_error();
         Matrix Zero(0,0,0.0);
         return Zero;
     }
+    Matrix temp_M(rows_num, other.columns_num, 0.0);
     for (unsigned int i = 0; i < this->rows_num; ++i) {
         for (unsigned int j = 0; j < this->columns_num; ++j) {
             for (unsigned int k = 0; k < this->columns_num; ++k) {
