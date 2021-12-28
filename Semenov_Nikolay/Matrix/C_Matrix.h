@@ -4,6 +4,12 @@
 #include <cstdlib>
 #include <iostream>
 
+typedef enum {
+    RANDOM,
+    ZERO,
+    IDENTITY
+}M_type;
+
 class Matrix {
 private:
     unsigned int height;
@@ -11,18 +17,24 @@ private:
     int *data;
 public:
     Matrix();
-    Matrix(unsigned int height, unsigned int width);
+    Matrix(unsigned int height, unsigned int width, M_type type);
     Matrix(const Matrix &Matrix);
     Matrix(Matrix &&Matrix) noexcept;
     ~Matrix();
-    void set_Random(int height, int width);
-    void set_Identity();
-    void set_Zero();
-    void output();
+public:
+    Matrix& operator= (const Matrix &other);
+    Matrix& operator= (Matrix &&other) noexcept;
     Matrix operator+ (const Matrix &other);
     Matrix operator- (const Matrix &other);
     Matrix operator* (const Matrix &other);
+public:
+    void set_Random();
+    void set_Identity();
+    void set_Zero();
+public:
     int trace(); // Сумма главной диагонали матрицы
     double determinant(); // Определитель матрицы
+public:
+    void output();
 };
 #endif //C_MATRIX_C_MATRIX_H
