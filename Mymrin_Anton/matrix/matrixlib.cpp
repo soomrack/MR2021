@@ -53,7 +53,7 @@ Matrix::Matrix(const Matrix &m) {
     this->row=m.row;
     this->col=m.col;
     this->data=new double [row*col];
-    memcpy(data,m.data,sizeof(int)*row*col);
+    memcpy(data,m.data,sizeof(double)*row*col);
 }
 
 Matrix & Matrix::operator =(const Matrix &m) {
@@ -113,10 +113,7 @@ double Matrix::trace() {
         return 0;
     }
     for (unsigned int i=0;i<row;i++)
-        for (unsigned int j=0;j<col;j++)
-            if (i==j){
-                trace+=data[i*col+j];
-            }
+        trace+=data[i*row+i];
     return trace;
 }
 
