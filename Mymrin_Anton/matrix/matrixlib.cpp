@@ -46,7 +46,7 @@ Matrix::Matrix(unsigned int size){
 }
 
 Matrix::~Matrix(){
-    free (data);
+    delete[] data;
 }
 
 Matrix::Matrix(const Matrix &m) {
