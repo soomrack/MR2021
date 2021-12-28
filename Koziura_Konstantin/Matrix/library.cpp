@@ -8,7 +8,12 @@ Matrix::Matrix(){
     height = 1;
     width = 1;
     data = (double *)malloc(sizeof(double));
-    data[0]=0;
+    if (data == nullptr){
+        this->height = 0;
+        this->width = 0;
+        return;
+    }
+    data[0]=0.0;
 }
 
 Matrix::Matrix(int height, int width) {
@@ -21,7 +26,7 @@ Matrix::Matrix(int height, int width) {
         return;
     }
     for (int i = 0; i < height * width; ++i){
-            data[i] = 0;
+            data[i] = 0.0;
     }
 }
 
@@ -35,9 +40,7 @@ Matrix::Matrix(int height, int width, double (&data)[S]) {
         this->width = 0;
         return;
     }
-    for (int i = 0; i < width * height; ++i) {
-        this->data[i] = data[i];
-    }
+    memcpy(this->data,  data,height * width * (sizeof(double)));
 }
 
 Matrix::Matrix(Matrix &&m)  noexcept {
@@ -76,38 +79,39 @@ Matrix & Matrix::operator= (const Matrix &m) {
 }
 
 Matrix Matrix::operator+ (const Matrix &m){
-    if ((m.width != this->width) or (m.height != this->height)){
+    if ((m.width != width) or (m.height != height)){
         std::cout<<"Summation error\n";
-        return {0,0};
+        return Matrix(0,0);
     }
 
-    auto * matrix = new Matrix(m.height, m.width);
+    Matrix result(m.height, m.width);
 
-    for (int i = 0; i < matrix->height * matrix->width; ++i) {
-        matrix->data[i] = this->data[i] + m.data[i];
+    for (int i = 0; i < result.height * result.width; ++i) {
+        result.data[i] = data[i] + m.data[i];
     }
-
-    return * matrix;
+    std::cout<<m.width<<" "<< m.height;
+    return result;
 }
 
-Matrix Matrix::operator* (const Matrix &m){
-    if (m.height != this->width){
-        std::cout<<"Multiplication error\n";
-        return {0,0};
-    }
-    auto * matrix = new Matrix(this->height, m.width);
 
-    for (int i = 0; i < this->height; ++i) {
+Matrix Matrix::operator* (const Matrix &m){
+    if (m.height != width){
+        std::cout<<"Multiplication error\n";
+        return Matrix(0,0);
+    }
+    Matrix result(m.height, m.width);
+
+    for (int i = 0; i < height; ++i) {
         for (int j = 0; j < m.width; ++j) {
             double Temp = 0.0;
             for (int k = 0; k < m.height; ++k) {
-                Temp += this->data[ i * this->width + k] * m.data[m.width * k + j];
+                Temp += data[ i * width + k] * m.data[m.width * k + j];
             }
-            matrix->data[i * width + j] = Temp;
+            result.data[i * width + j] = Temp;
         }
     }
 
-    return * matrix;
+    return result;
 }
 
 void Matrix::print() {
