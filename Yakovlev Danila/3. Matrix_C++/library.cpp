@@ -1,8 +1,8 @@
 #include "library.h"
 
 Matrix:: Matrix() { //матрица по умолчанию
-    this -> rows = rows=0;
-    this -> columns = columns=0;
+    this -> rows = 0;
+    this -> columns = 0;
     data = nullptr;
 }
 
