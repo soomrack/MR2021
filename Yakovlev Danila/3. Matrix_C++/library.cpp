@@ -12,7 +12,7 @@ Matrix:: Matrix(unsigned int rows,unsigned  int columns) { //матрица с �
     data = new double [rows * columns];
 }
 
-Matrix:: Matrix(Matrix &m) { //конструктор копирования
+Matrix:: Matrix(const Matrix &m) { //конструктор копирования
     rows = m.rows;
     columns = m.columns;
     data = new double [rows * columns];
@@ -32,10 +32,13 @@ Matrix &Matrix::operator = (Matrix &&m) noexcept{//приравнивание ч
     rows = m.rows;
     columns = m.columns;
     data = m.data;
+    m.rows=0;
+    m.columns=0;
+    m.data=nullptr;
     return *this;
 }
 
-Matrix &Matrix::operator = (Matrix &m){//перегрузка операции присваивания
+Matrix &Matrix::operator = (const Matrix &m){//перегрузка операции присваивания
     rows = m.rows;
     columns = m.columns;
     delete[] data;
