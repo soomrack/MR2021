@@ -47,12 +47,12 @@ Matrix &Matrix::operator = (const Matrix &m){//перегрузка операц
     return *this;
 }
 
-void Matrix:: set_value(unsigned int p_row,unsigned int p_column, double numeric_value) {//присваивание значения
-    if((p_row>rows)||(p_column>columns)){
+void Matrix:: set_value(unsigned int number_row,unsigned int number_column, double numeric_value) {//присваивание значения
+    if((number_row>rows)||(number_column>columns)){
         printf("Error. Going beyond the boundaries of the matrix");
     }
     else{
-        data[p_row*columns + p_column] = numeric_value;
+        data[number_row*columns + number_column] = numeric_value;
     }
 }
 
