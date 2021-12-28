@@ -28,7 +28,7 @@ Matrix::Matrix(Matrix &income_matrix) {
 Matrix::Matrix(Matrix &&income_matrix) {
     rows_num = income_matrix.rows_num;
     columns_num = income_matrix.columns_num;
-    memcpy (data, income_matrix.data, rows_num * columns_num * sizeof(double));
+    data =
     income_matrix.data = nullptr;
     income_matrix.rows_num = 0;
     income_matrix.columns_num = 0;
@@ -58,19 +58,18 @@ void Matrix::set_zero_matrix() {
 }
 
 void Matrix::set_cell(unsigned int row, unsigned int column, double value) {
-    if (row <= rows_num && column <= columns_num){
-        data[row * rows_num + column] = value;
-    } else {
+    if (row > rows_num && column > columns_num) {
         OutOfRange_error();
     }
+    data[row * rows_num + column] = value;
 }
 
 double Matrix::get_cell(unsigned int row, unsigned int column) {
-    if (row <= rows_num && column <= columns_num){
-        return data[row * rows_num + column];
-    } else {
+    if (row > rows_num && column> columns_num){
         OutOfRange_error();
+        return 0.0;
     }
+    return data[row * rows_num + column];
 }
 
 double Matrix::diagonal_trace() {
@@ -156,9 +155,26 @@ void Matrix::set_reverse() { //Matrix * Reverse_Matrix = E_Matrix
 }
 
 Matrix Matrix::operator= (const Matrix &other){
-    for (unsigned long int i = 0; i < rows_num * columns_num; ++i) {
-            data[i] = other.data[i];
+    if (&other == this) {
+        return *this;
     }
+    rows_num = other.rows_num;
+    columns_num = other.columns_num;
+    delete [] data;
+    data = new double [rows_num * columns_num];
+    memcpy(data, other.data, rows_num * columns_num * sizeof(double));
+    return *this;
+}
+
+Matrix Matrix::operator= (Matrix &&other) {
+    rows_num = other.rows_num;
+    columns_num = other.columns_num;
+    delete [] data;
+    data = new double [rows_num * columns_num];
+    memcpy(data, other.data, rows_num * columns_num * sizeof(double));
+    delete [] other.data;
+    other.rows_num = 0;
+    other.columns_num = 0;
     return *this;
 }
 

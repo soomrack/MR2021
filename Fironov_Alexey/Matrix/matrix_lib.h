@@ -18,9 +18,9 @@ public:
     ~Matrix();
 public:
     void print ();
-    void set_cell (unsigned int N_row, unsigned int N_calumn,
+    void set_cell (unsigned int N_row, unsigned int N_column,
                    double value);
-    double get_cell (unsigned int N_row, unsigned int N_calumn);
+    double get_cell (unsigned int N_row, unsigned int N_column);
     void diagonal_filling (double value);
     double diagonal_trace();    //sum of cells[i][i]
     double det();
@@ -29,6 +29,7 @@ public:
     void set_zero_matrix ();    //turns matrix into matrix filled with 0
 
     Matrix operator= (const Matrix &);
+    Matrix operator= (Matrix &&);
     Matrix operator+ (const Matrix &);
     Matrix operator- (const Matrix &);
     Matrix operator* (const Matrix &);
