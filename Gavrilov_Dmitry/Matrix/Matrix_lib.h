@@ -15,7 +15,9 @@ private:
     unsigned int rows;
     unsigned int columns;
     int * data;
-
+    void creat_zero_matrix();
+    void creat_identity_matrix();
+    void creat_random_matrix();
 public:
 
     Matrix(unsigned int rows = 0, unsigned int columns =0  , int type = ZERO_MATRIX );
