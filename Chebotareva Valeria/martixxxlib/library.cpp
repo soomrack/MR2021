@@ -25,7 +25,7 @@ Matrix::Matrix(unsigned int column, unsigned int row, double value) {
 Matrix::Matrix(const Matrix &m) {
     row = m.row;
     column = m.column;
-    free(data);
+    delete(data);
     data = (double *) malloc(row * column * sizeof(double));
     memcpy(this->data, m.data, row * column * sizeof(double));
 }
