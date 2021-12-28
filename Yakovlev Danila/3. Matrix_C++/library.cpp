@@ -12,24 +12,46 @@ Matrix:: Matrix(unsigned int rows,unsigned  int columns) { //матрица с �
     data = new double [rows * columns];
 }
 
-Matrix:: Matrix(const Matrix &m) { //конструктор копирования
+Matrix:: Matrix(Matrix &m) { //конструктор копирования
     rows = m.rows;
     columns = m.columns;
     data = new double [rows * columns];
     memcpy(data, m.data,sizeof(double)* rows * columns);
 }
 
-void Matrix:: set_value(unsigned int place_in_line,unsigned int place_in_the_column, double numeric_value) {//создание матрицы - присваивание значения
-    data[place_in_line*columns + place_in_the_column] = numeric_value;
-}
-
-Matrix &Matrix::operator = (Matrix &&m) noexcept{//перегрузка операции присваивания
+Matrix:: Matrix (Matrix &&m) noexcept{ //конструктор перемещений
     rows = m.rows;
     columns = m.columns;
-    free (data);
+    data = m.data;
+    m.rows=0;
+    m.columns=0;
+    m.data=nullptr;
+}
+
+Matrix &Matrix::operator = (Matrix &&m) noexcept{//приравнивание через перенос //****************************************
+    rows = m.rows;
+    columns = m.columns;
+    data = m.data;
+    memcpy(data, m.data,sizeof(double)* rows * columns);
+    return *this;
+}
+
+Matrix &Matrix::operator = (Matrix &m){//перегрузка операции присваивания
+    rows = m.rows;
+    columns = m.columns;
+    delete[] data;
     data = new double [rows * columns];
     memcpy(data, m.data,sizeof(double)* rows * columns);
     return *this;
+}
+
+void Matrix:: set_value(unsigned int row,unsigned int column, double numeric_value) {//присваивание значения
+    if((row>rows)||(column>columns)){
+        printf("Error. Going beyond the boundaries of the matrix");
+    }
+    else{
+        data[row*columns + column] = numeric_value;
+    }
 }
 
 Matrix Matrix:: operator + (Matrix &m) { //операция сложения
@@ -77,37 +99,23 @@ Matrix Matrix:: operator * (Matrix &m) { //операция умножения
     return res2;
 }
 
-Matrix:: Matrix (Matrix &&m) noexcept{ //конструктор перемещений
-    rows = m.rows;
-    columns = m.columns;
-    data = m.data;
-    m.rows=0;
-    m.columns=0;
-    m.data=nullptr;
-}
 
 void Matrix:: zero_matrix() { //нулевая матрица
     for (int i = 0; i < rows * columns; i++)
-        data[i] = 0;
+        data[i] = 0.0;
 }
 
 void Matrix:: unit_matrix() { //единичная матрица
-    for (int i = 0; i < rows * columns; i++){
-        if ((i/columns)==(i%columns)){ //номер строки = номеру столбца
-            data[i] = 1;
-        }
-        else{
-            data[i] = 0;
-        }
+    zero_matrix();
+    for (unsigned int i = 0; i < rows * columns; i=i+columns+1){
+        data[i] = 1.0;
     }
 }
 
 double Matrix:: trace(){ //след матрицы
     double trace=0.0;
-    for (int i = 0; i < rows * columns; i++){
-        if ((i/columns)==(i%columns)){
-            trace = trace+data[i];
-        }
+    for (unsigned int i = 0; i < rows * columns; i=i+columns+1){
+        trace = trace+data[i];
     }
     return trace;
 }
@@ -124,5 +132,5 @@ int Matrix:: print() {//вывод матрицы в консоль
 }
 
 Matrix:: ~Matrix() { //деструктор
-        free (data);
+    delete[] data;
 }
