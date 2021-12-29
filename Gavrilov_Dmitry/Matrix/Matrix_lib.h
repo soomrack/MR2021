@@ -3,11 +3,11 @@
 #define MATRIX_MATRIX_LIB_H
 #include <iostream>
 
-enum Matrix_type {
-    ZERO_MATRIX = 0,
-    IDENITY_MATRIX = 1,
-    RAND_MATRIX = 2
-};
+typedef enum  {
+    ZERO_MATRIX,
+    IDENITY_MATRIX,
+    RAND_MATRIX
+}Matrix_type;
 
 class Matrix {
 private:
@@ -20,7 +20,7 @@ private:
     void creat_random_matrix();
 public:
 
-    Matrix(unsigned int rows = 0, unsigned int columns =0  , int type = ZERO_MATRIX );
+    Matrix(unsigned int rows = 0, unsigned int columns =0  , Matrix_type type = ZERO_MATRIX );
     ~Matrix();
     Matrix(const Matrix &other);
     Matrix(Matrix &&other) noexcept;

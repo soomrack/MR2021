@@ -2,9 +2,9 @@
 #include <ctime>
 #include "Matrix_lib.h."
 
-Matrix::Matrix(unsigned int rows ,unsigned int columns, int type){
-    rows = rows;
-    columns = columns;
+Matrix::Matrix(unsigned int rows ,unsigned int columns, Matrix_type type){
+    this->rows = rows;
+    this->columns = columns;
 
     data = new int[rows * columns];
 
@@ -13,7 +13,10 @@ Matrix::Matrix(unsigned int rows ,unsigned int columns, int type){
             creat_zero_matrix();
             break;
         case IDENITY_MATRIX:
-            creat_identity_matrix();
+            if (rows != columns)
+                std::cout << "Matrix must be square" << std::endl;
+            else
+                creat_identity_matrix();
             break;
         default:
             creat_random_matrix();
@@ -22,18 +25,15 @@ Matrix::Matrix(unsigned int rows ,unsigned int columns, int type){
 }
 
 void Matrix::creat_zero_matrix() {
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            data[j + rows * i] = 0;
-        }
+    for (int i = 0; i < rows*columns; ++i) {
+        data[i] = 0;
+
     }
 }
 
 void Matrix::creat_identity_matrix() {
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < columns; ++j) {
-            if (rows != columns)
-                std::cout << "Matrix must be square" << std::endl;
             if (i == j) data[j + rows * i] = 1;
             else data[j + rows * i] = 0;
         }
@@ -42,9 +42,7 @@ void Matrix::creat_identity_matrix() {
 
 void Matrix::creat_random_matrix() {
     for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            data[j + rows * i] = rand() % 10;
-        }
+        data[i] = rand() % 10;
     }
 }
 
