@@ -84,8 +84,9 @@ Matrix Matrix:: operator * (Matrix &m) { //операция умножения
     Matrix res(rows, m.columns);
     for (int i = 0; i < res.rows; i++) {
         for (int j = 0; j < res.columns; j++) {
+            int i_res = i*res.columns + j;
+            res.data[i_res]=0;
             for (int n = 0; n < m.rows; n++) {
-                int i_res = i*res.columns + j;
                 int i_M1 = i*columns + n;
                 int i_M2 = j + n*columns;
                 res.data[i_res] = res.data[i_res] + data[i_M1] * m.data[i_M2];
