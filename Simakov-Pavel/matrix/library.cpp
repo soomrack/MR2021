@@ -5,8 +5,8 @@
 
 Matrix::Matrix()
 {
-    rows = 0;
-    columns = 0;
+    this->rows = 0;
+    this->columns = 0;
     elements = nullptr;
 }
 
