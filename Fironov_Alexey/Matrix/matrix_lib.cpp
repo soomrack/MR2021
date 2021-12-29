@@ -12,7 +12,7 @@ void OutOfRange_error () {
 Matrix::Matrix(unsigned int rows_num, unsigned int columns_num, double value) {
     this->rows_num = rows_num;
     this->columns_num = columns_num;
-    this->data = new double [rows_num*columns_num];
+    data = new double [rows_num*columns_num];
     for (unsigned long int i = 0; i < rows_num*columns_num; i++){
             data[i] = value;
     }
@@ -169,10 +169,8 @@ Matrix Matrix::operator= (const Matrix &other){
 Matrix Matrix::operator= (Matrix &&other) {
     rows_num = other.rows_num;
     columns_num = other.columns_num;
-    delete [] data;
-    data = new double [rows_num * columns_num];
     data = other.data;
-    delete [] other.data;
+    other.data = nullptr;
     other.rows_num = 0;
     other.columns_num = 0;
     return *this;
