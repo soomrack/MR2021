@@ -73,7 +73,8 @@ Matrix Matrix::operator =(Matrix &&m) {
     col=m.col;
     delete[] data;
     data=new double [row*col];
-    delete[] m.data;
+    data=m.data;
+    m.data= nullptr;
     m.row = 0;
     m.col = 0;
     return *this;
