@@ -5,8 +5,8 @@
 
 Matrix::Matrix()
 {
-    this->rows = 0;
-    this->columns = 0;
+    rows = 0;
+    columns = 0;
     elements = nullptr;
 }
 
@@ -14,7 +14,7 @@ Matrix::Matrix(unsigned int rows, unsigned int columns) // constructor with para
 {
     this -> rows = rows;
     this -> columns = columns;
-    elements = new double[rows*columns];
+    this -> elements = new double[rows*columns];
 }
 
 Matrix::Matrix(unsigned int range,Type type) // constructor for 0-1 order
@@ -54,12 +54,9 @@ void Matrix::fill_zeros()
 void Matrix::fill_ones()
 {
     fill_zeros();
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < rows*columns; i+=rows)
     {
-        for (int j = 0; j < columns; j++)
-        {
-            if (i == j) elements[i * columns + j] = 1.;
-        }
+        elements[i] = 1.;
     }
 }
 
