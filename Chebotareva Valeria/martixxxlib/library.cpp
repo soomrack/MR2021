@@ -112,7 +112,7 @@ Matrix Matrix::operator = (const Matrix &other){
     this->column = other.column;
     this->data = new double [row * column];
     if (data != nullptr){
-        memcpy(data,other.data,sizeof(int)*row * column);
+        memcpy(data,other.data,sizeof(double)*row * column);
     }else{
         this->row = 0;
         this->column = 0;
