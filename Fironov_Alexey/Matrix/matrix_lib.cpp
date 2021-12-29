@@ -167,6 +167,9 @@ Matrix Matrix::operator= (const Matrix &other){
 }
 
 Matrix Matrix::operator= (Matrix &&other) {
+    if (&other == this) {
+        return *this;
+    }
     rows_num = other.rows_num;
     columns_num = other.columns_num;
     data = other.data;
