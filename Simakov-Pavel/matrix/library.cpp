@@ -14,7 +14,7 @@ Matrix::Matrix(unsigned int rows, unsigned int columns) // constructor with para
 {
     this -> rows = rows;
     this -> columns = columns;
-    this -> elements = new double[rows*columns];
+    elements = new double[rows*columns];
 }
 
 Matrix::Matrix(unsigned int range,Type type) // constructor for 0-1 order
