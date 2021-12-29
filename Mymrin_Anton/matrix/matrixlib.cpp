@@ -73,7 +73,6 @@ Matrix Matrix::operator =(Matrix &&m) {
     col=m.col;
     delete[] data;
     data=new double [row*col];
-    memcpy(data,m.data,sizeof(double)*row*col);
     delete[] m.data;
     m.row = 0;
     m.col = 0;
