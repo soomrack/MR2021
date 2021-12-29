@@ -132,9 +132,11 @@ Matrix Matrix::operator * (const Matrix &other){
 
 int Matrix::trace() {
     int matrix_trace = 0;
-    if (rows != columns)
+    if (rows != columns){
         std::cout << "Matrix isn't square" << std::endl;
-
+        matrix_trace = 0;
+        return matrix_trace;
+    }
     for (int i = 0; i < rows; ++i) {
         if(INT_MAX - data[i + rows * i] > matrix_trace) //// overflow check
             matrix_trace += data[i + rows * i];
