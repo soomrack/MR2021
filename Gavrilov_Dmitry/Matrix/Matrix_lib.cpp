@@ -83,10 +83,12 @@ Matrix & Matrix::operator = (Matrix &&other) noexcept {
     return *this;
 }
 
-Matrix Matrix::operator- (const Matrix &other){
-    if (rows != other.rows || columns != other.columns)
+Matrix Matrix::operator- (const Matrix &other) {
+    if (rows != other.rows || columns != other.columns){
         std::cout << "Matrix aren't equal" << std::endl;
-
+        Matrix    temp(0,0,ZERO_MATRIX);
+        return temp;
+    }
     Matrix temp(rows, columns);
     temp.data = new int [rows*columns];
     for (int i = 0; i < rows*columns; ++i){
@@ -96,8 +98,11 @@ Matrix Matrix::operator- (const Matrix &other){
 }
 
 Matrix Matrix::operator+ (const Matrix &other){
-    if (rows != other.rows || columns != other.columns)
+    if (rows != other.rows || columns != other.columns){
         std::cout << "Matrix aren't same" << std::endl;
+        Matrix temp(0 0 ZERO_MATRIX);
+        return temp;
+  }
 
     Matrix temp(rows, columns, ZERO_MATRIX);
     temp.data = new int [rows*columns];
