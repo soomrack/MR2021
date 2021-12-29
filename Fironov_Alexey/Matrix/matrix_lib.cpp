@@ -10,9 +10,9 @@ void OutOfRange_error () {
 }
 
 Matrix::Matrix(unsigned int rows_num, unsigned int columns_num, double value) {
-    rows_num = rows_num;
-    columns_num = columns_num;
-    data = new double [rows_num*columns_num];
+    this->rows_num = rows_num;
+    this->columns_num = columns_num;
+    this->data = new double [rows_num*columns_num];
     for (unsigned long int i = 0; i < rows_num*columns_num; i++){
             data[i] = value;
     }
@@ -113,8 +113,8 @@ double Matrix::det() {
 }
 
 void Matrix::set_identity () { //Turns matrix into E
-    this->set_zero_matrix();
-    this->diagonal_filling(1.0);
+    set_zero_matrix();
+    diagonal_filling(1.0);
 }
 
 void Matrix::set_reverse() { //Matrix * Reverse_Matrix = E_Matrix
@@ -192,7 +192,7 @@ Matrix Matrix::operator+ (const Matrix &other) {
 }
 
 Matrix Matrix::operator- (const Matrix &other) {
-    if (this->rows_num != other.rows_num || this->columns_num != other.columns_num) {
+    if (rows_num != other.rows_num || columns_num != other.columns_num) {
         Size_error();
         Matrix Zero(0,0,0.0);
         return Zero;
