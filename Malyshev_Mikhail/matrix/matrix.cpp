@@ -12,11 +12,20 @@ Matrix::Matrix(unsigned int height, unsigned int width) { // инициализ�
     this->height = height;
     this->width = width;
     data = (int *) malloc(height * width * sizeof(int));
+    if (data == nullptr) {
+        height = 0;
+        width = 0;
+        return;
+    }
     std::cout << "zero matrix has been created" << std::endl;
 }
 
 void Matrix::set_values(unsigned int n_row, unsigned int n_col, int value) { //заполнение одного элемента матрицы
-    this->data[(n_row)*width+(n_col)] = value;
+    if ((n_row > height) || (n_col > width)) {
+        std::cout << "element does not exist" << std::endl;
+        return;
+    }
+    data[(n_row)*width+(n_col)] = value;
 }
 
 void Matrix::set_zeros() { // нулевая матрица
@@ -26,8 +35,6 @@ void Matrix::set_zeros() { // нулевая матрица
 }
 
 void Matrix::set_unit() { // единичная матрица
-    this->height = height;
-    this->width = width;
     if (height != width) {
         std::cout << "not square matrix" << std::endl;
         return;
@@ -43,6 +50,11 @@ Matrix::Matrix(const Matrix &m) { // копирование
     width = m.width;
     free(data);
     data = (int *) malloc(height * width * sizeof(int));
+    if (data == nullptr) {
+        height = 0;
+        width = 0;
+        return;
+    }
     std::memcpy(this->data, m.data, width * height * sizeof(int));
 }
 
@@ -61,7 +73,22 @@ Matrix &Matrix :: operator =(const Matrix& m) { // перегрузка =
     width = m.width;
     free(data);
     data = (int *) malloc(height * width * sizeof(int));
+    if (data == nullptr) {
+        height = 0;
+        width = 0;
+        return *this;
+    }
     std::memcpy(this->data, m.data, height * width * sizeof(int));
+    return *this;
+}
+
+Matrix &Matrix :: operator= (Matrix &&m) noexcept {
+    height = m.height;
+    width = m.width;
+    data = m.data;
+    m.height = 0;
+    m.width = 0;
+    m.data = nullptr;
     return *this;
 }
 
@@ -96,20 +123,18 @@ Matrix Matrix :: operator *(const Matrix& m) { //перегрузка *
         Matrix Error(0,0);
         return Error;
     }
-    else {
-        Matrix result(height, m.width);
-
-        int element = 0;
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < m.width; j++) {
-                for (int k = 0; k < height; k++) {
-                    element = data[width * i + k] * m.data[m.width * k + j];
-                }
-                result.data[i * m.width + j] += element;
+    Matrix result(height, m.width);
+    int element = 0;
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < m.width; j++) {
+            for (int k = 0; k < height; k++) {
+                element += data[width * i + k] * m.data[m.width * k + j];
             }
+            result.data[i * m.width + j] = element;
+            element = 0;
         }
-        return result;
     }
+    return result;
 }
 
 Matrix::~Matrix() { // деструктор

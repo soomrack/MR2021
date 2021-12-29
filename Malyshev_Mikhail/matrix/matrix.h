@@ -16,6 +16,7 @@ public:
     Matrix operator -(const Matrix& m); //перегрузка +
     Matrix operator *(const Matrix& m); //перегрузка *
     Matrix& operator =(const Matrix& m); //перегрузка =
+    Matrix& operator= (Matrix &&m) noexcept;
     void set_zeros(); // заполнение нулями
     void set_unit(); // единичная матрица
     void set_values(unsigned int n_row, unsigned int n_col, int value); // заполнение одного элемента матрицы по вдресу
