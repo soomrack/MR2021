@@ -71,8 +71,6 @@ Matrix Matrix::operator =(Matrix &&m) {
     }
     row=m.row;
     col=m.col;
-    delete[] data;
-    data=new double [row*col];
     data=m.data;
     m.data= nullptr;
     m.row = 0;
