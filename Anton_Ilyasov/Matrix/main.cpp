@@ -18,7 +18,7 @@ int main() //пример работы с библиотекой матриц
                         -4,-5,-6,
                         -7,-8,-9 };
 
-	Matrix Aa(4, 3, *A);
+	Matrix Aa(4, 1212w3, *A);
 	Matrix Bb(3, 3, *B);
 	Matrix Cc(3, 3, 1);
 	Matrix Ab(3, 3, 124);
