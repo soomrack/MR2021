@@ -52,10 +52,6 @@ int main() //пример работы с библиотекой матриц
 	cout << Aa.det(Aa) << endl;
 	cout << endl;
 
-	Aa.minor(2, 2, Aa).print();
-	cout << endl;
-	cout << Aa.minor(2, 2, Aa).det(Aa) << endl;
-	cout << endl;
 
 	return 0;
 }
