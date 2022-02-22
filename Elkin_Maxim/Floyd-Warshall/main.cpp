@@ -2,60 +2,69 @@
 #include <vector>
 #include <cmath>
 #include <tuple>
-#include <ctime>
+#include <random>
 
 #define INF numeric_limits<int>::max()
 using namespace std;
 
+template<class T>
 class Floyd {
 public:
-    explicit Floyd(vector<int> &);
+    explicit Floyd(vector<T> &);
 
-    vector<int> FW_clear();
+    vector<T> FW_clear();
 
-    tuple<vector<int>, vector<int>> FW_alg_ways();
+    tuple<vector<T>, vector<int>> FW_alg_ways();
 
     vector<int> restore_path(int, int);
 
-    vector<int> get_paths_matrix() { return paths_matrix; };
+    vector<T> get_paths_matrix() { return paths_matrix; };
 
     vector<int> get_restore_matrix() { return restore_matrix; };
+
+    vector<int> get_restored_path() { return restored_path; };
+
+    vector<T> get_dist_matrix() { return dist_matrix; };
 
     void print_restored_path();
 
 private:
     int nodes;
-    vector<int> dist_matrix;
-    vector<int> paths_matrix;
+    vector<T> dist_matrix;
+    vector<T> paths_matrix;
     vector<int> restore_matrix;
     vector<int> restored_path;
 
-    int min(int, int, int);
+    T min(int, int, int);
 };
 
+template<class T>
 class Dijkstra {
 public:
-    explicit Dijkstra(vector<int> &);
+    explicit Dijkstra(vector<T> &);
 
-    vector<int> Dijkstra_alg(int);
+    vector<T> Dijkstra_alg(int);
 
-    vector<int> paths_matrix_Dij();
+    vector<T> paths_matrix_Dij();
 
-    vector<int> get_paths_matrix() { return paths_matrix; };
+    vector<T> get_paths_matrix() { return paths_matrix; };
 
-    vector<int> get_shortest_distances() { return shortest_distances; };
+    vector<T> get_shortest_distances() { return shortest_distances; };
+
+    vector<T> get_dist_matrix() { return dist_matrix; };
 private:
     int nodes;
-    vector<int> dist_matrix;
-    vector<int> paths_matrix;
-    vector<int> shortest_distances;
+    vector<T> dist_matrix;
+    vector<T> paths_matrix;
+    vector<T> shortest_distances;
 };
 
 ////////////////////////////////////////////////
 ////other functions
 ////////////////////////////////////////////////
 
-bool check_dist_matrix(vector<int> &grid) {
+template<typename T>
+bool check_dist_matrix(vector<T> &grid) {
     //Checking matrix to be square
     if (grid.size() != pow((int) sqrt(grid.size()), 2)) {
         return false;
@@ -70,7 +79,8 @@ bool check_dist_matrix(vector<int> &grid) {
     return true;
 }
 
-void print_paths_matrix(vector<int> grid) {
+template<typename T>
+void print_paths_matrix(vector<T> grid) {
     int nodes = (int) sqrt(grid.size());
     if (nodes < 1) return;
     cout << "  || ";
@@ -87,11 +97,12 @@ void print_paths_matrix(vector<int> grid) {
     cout << endl;
 }
 
-vector<int> random_grid(int nodes) {
+vector<int> random_grid(int nodes, int lower, int upper) {
+    uniform_int_distribution<int> distr(lower, upper);
+    mt19937 generator;
     vector<int> grid(nodes * nodes, 0);
-    srand(time(nullptr));
     for (int i = 0; i < grid.size(); i++) {
-        grid[i] = rand() % 100;
+        grid[i] = distr(generator);
     }
     for (int i = 0; i < nodes; i++) {
         grid[i * nodes + i] = 0;
@@ -100,23 +111,42 @@ vector<int> random_grid(int nodes) {
 }
 
 void example() {
-    vector<int> grid = {0, 50, 45, 10, INF, INF,
-                        INF, 0, 10, 15, INF, INF,
-                        INF, INF, 0, INF, 30, INF,
-                        10, INF, INF, 0, 15, INF,
-                        INF, 20, 35, INF, 0, INF,
-                        INF, INF, INF, INF, 3, 0};
+    //Examples of grids
+
+    //0, 3, INF, 5,
+    //INF, 0, INF, INF,
+    //INF, -10, 0, -INF,
+    //INF, INF, 2, 0
+
+    //{0, 50, 45, 10, INF, INF,
+    //INF, 0, 10, 15, INF, INF,
+    //INF, INF, 0, INF, 30, INF,
+    //10, INF, INF, 0, 15, INF,
+    //INF, 20, 35, INF, 0, INF,
+    //INF, INF, INF, INF, 3, 0};
+
+    //0, 3, INF, 7,
+    //8, 0, 2, INF,
+    //5, INF, 0, 1,
+    //2, INF, INF, 0
+
+    vector<double> grid = {0, 50.5, 45, 10.09, INF, INF,
+                           INF, 0, 10.7, 15, INF, INF,
+                           INF, INF, 0, INF, 30.4, INF,
+                           10, INF, INF, 0, 15.96, INF,
+                           INF, 20.12, 35.62, INF, 0, INF,
+                           INF, INF, INF, INF, 3.1, 0};
 
     cout << "==========================================" << endl;
     cout << "        FLoyd-Warshall algorithm" << endl;
     cout << "==========================================" << endl;
     Floyd map_floyd(grid);
     map_floyd.FW_alg_ways();
-    map_floyd.restore_path(6, 1);
     cout << endl << "Paths matrix:" << endl;
     print_paths_matrix(map_floyd.get_paths_matrix());
     cout << endl << "Restore matrix:" << endl;
     print_paths_matrix(map_floyd.get_restore_matrix());
+    map_floyd.restore_path(6, 1);
     cout << endl << "From node 6 to 1 ";
     map_floyd.print_restored_path();
     cout << endl;
@@ -136,7 +166,7 @@ void time_compare() {
     cout << "===================" << endl;
     cout << "it   F-W      Dijk " << endl;
     for (int i = 3; i <= 150; i++) {
-        vector<int> grid = random_grid(i);
+        vector<int> grid = random_grid(i, 0, 1000);
         unsigned int start = 0;
         unsigned int end = 0;
         Floyd map_floyd(grid);
@@ -147,12 +177,12 @@ void time_compare() {
         map_floyd.FW_clear();
         end = clock();
         unsigned int FW_time = end - start;
+
         //measuring time for Dijkstra algorithm
         start = clock();
         map_dijkstra.paths_matrix_Dij();
         end = clock();
         unsigned int Dij_time = end - start;
-
         cout << i << "    " << FW_time << "        " << Dij_time << endl;
     }
 }
@@ -161,16 +191,18 @@ void time_compare() {
 ////Class Floyd
 ////////////////////////////////////////////////
 
-Floyd::Floyd(vector<int> &grid) {
+template<typename T>
+Floyd<T>::Floyd(vector<T> &grid) {
     dist_matrix = grid;
     nodes = (int) sqrt(grid.size());
 }
 
 //Floyd-Warshall algorithm without restore matrix
-vector<int> Floyd::FW_clear() {
+template<typename T>
+vector<T> Floyd<T>::FW_clear() {
 // Checking correct input of the matrix
     if (!check_dist_matrix(dist_matrix)) {
-        vector<int> zero;
+        vector<T> zero;
         return zero;
     }
     paths_matrix = dist_matrix;
@@ -180,7 +212,9 @@ vector<int> Floyd::FW_clear() {
             for (int destination = 0; destination < nodes; destination++) {
                 //let paths_matrix = A, then
                 //A(k)[x,y] = min(A(k-1)[x,y], A(k-1)[x,k] + A(k-1)[k,y])
-                paths_matrix[origin * nodes + destination] = min(destination, origin, intermediate);
+                if (paths_matrix[origin * nodes + destination] > min(origin, destination, intermediate)) {
+                    paths_matrix[origin * nodes + destination] = min(origin, destination, intermediate);
+                }
             }
         }
     }
@@ -188,11 +222,13 @@ vector<int> Floyd::FW_clear() {
 }
 
 //Floyd-Warshall algorithm with restore matrix
-tuple<vector<int>, vector<int>> Floyd::FW_alg_ways() {
+template<typename T>
+tuple<vector<T>, vector<int>> Floyd<T>::FW_alg_ways() {
     // Checking correct input of the matrix
     if (!check_dist_matrix(dist_matrix)) {
+        vector<T> zero0;
         vector<int> zero;
-        return make_tuple(zero, zero);
+        return make_tuple(zero0, zero);
     }
     paths_matrix = dist_matrix;
     //initializing vector to restore the paths
@@ -223,31 +259,34 @@ tuple<vector<int>, vector<int>> Floyd::FW_alg_ways() {
     for (int node = 0; node < nodes; node++) {
         if (paths_matrix[node * nodes + node] < 0) {
             paths_matrix.clear();
+            vector<int> zero;
             cout << "negr" << endl;
-            return make_tuple(paths_matrix, paths_matrix);
+            return make_tuple(paths_matrix, zero);
         }
     }
     return make_tuple(paths_matrix, restore_matrix);
 }
 
 //prints the shortest way from restored path
-void Floyd::print_restored_path() {
+template<typename T>
+void Floyd<T>::print_restored_path() {
     if (restored_path.empty()) {
         cout << "No way" << endl;
         return;
     }
     cout << "The way is";
-    for (int i = 0; i < restored_path.size(); i++) {
-        cout << " - " << restored_path[i] + 1;
+    for (const auto &i: restored_path) {
+        cout << " - " << i + 1;
     }
     cout << endl;
 }
 
 //uses restore_matrix from FW_alg to restore paths
-vector<int> Floyd::restore_path(int from, int to) {
+template<typename T>
+vector<int> Floyd<T>::restore_path(int from, int to) {
     if ((nodes < from) || (nodes < to)) {
-        restored_path.clear();
-        return restored_path;
+        vector<int> zero;
+        return zero;
     }
     if (paths_matrix[from * nodes + to] == INF) {
         vector<int> zero;
@@ -268,9 +307,10 @@ vector<int> Floyd::restore_path(int from, int to) {
     return restored_path;
 }
 
-int Floyd::min(int origin, int destination, int intermediate) {
-    int actual = paths_matrix[origin * nodes + destination];
-    int alternative = 0;
+template<typename T>
+T Floyd<T>::min(int origin, int destination, int intermediate) {
+    T actual = paths_matrix[origin * nodes + destination];
+    T alternative = 0;
     if (paths_matrix[origin * nodes + intermediate] == INF || paths_matrix[nodes * intermediate + destination] == INF) {
         alternative = INF;
     } else alternative = paths_matrix[origin * nodes + intermediate] + paths_matrix[nodes * intermediate + destination];
@@ -282,16 +322,18 @@ int Floyd::min(int origin, int destination, int intermediate) {
 ////Class Dijkstra
 ////////////////////////////////////////////////
 
-Dijkstra::Dijkstra(vector<int> &grid) {
+template<typename T>
+Dijkstra<T>::Dijkstra(vector<T> &grid) {
     dist_matrix = grid;
     nodes = (int) sqrt(grid.size());
 }
 
-vector<int> Dijkstra::Dijkstra_alg(int origin) {
+template<typename T>
+vector<T> Dijkstra<T>::Dijkstra_alg(int origin) {
     origin--;
     // Checking correct input of the matrix and origin
     if ((!check_dist_matrix(dist_matrix)) || (origin > nodes)) {
-        vector<int> zero;
+        vector<T> zero;
         return zero;
     }
     //vector to store passed nodes
@@ -311,8 +353,8 @@ vector<int> Dijkstra::Dijkstra_alg(int origin) {
         for (int node = 0; node < nodes; node++) {
             //We can't go through passed nodes
             bool skip = false;
-            for (int i = 0; i < passed.size(); i++) {
-                if ((node + 1) == passed[i]) {
+            for (const auto i: passed) {
+                if ((node + 1) == i) {
                     skip = true;
                 }
             }
@@ -329,8 +371,8 @@ vector<int> Dijkstra::Dijkstra_alg(int origin) {
         for (int node = 0; node < nodes; node++) {
             // We can't go through passed nodes
             bool skip = false;
-            for (int i = 0; i < passed.size(); i++) {
-                if ((node + 1) == passed[i]) {
+            for (const auto i: passed) {
+                if ((node + 1) == i) {
                     skip = true;
                 }
             }
@@ -347,7 +389,8 @@ vector<int> Dijkstra::Dijkstra_alg(int origin) {
 }
 
 //Performs Dijkstra algorithm for every node to make paths matrix
-vector<int> Dijkstra::paths_matrix_Dij() {
+template<typename T>
+vector<T> Dijkstra<T>::paths_matrix_Dij() {
     for (int i = 1; i <= nodes; i++) {
         Dijkstra_alg(i);
         paths_matrix.insert(paths_matrix.end(), shortest_distances.begin(), shortest_distances.end());
@@ -359,22 +402,3 @@ int main() {
     example();
     return 0;
 }
-
-//Examples of grids
-
-//0, 3, INF, 5,
-//INF, 0, INF, INF,
-//INF, -10, 0, -INF,
-//INF, INF, 2, 0
-
-//{0, 50, 45, 10, INF, INF,
-//INF, 0, 10, 15, INF, INF,
-//INF, INF, 0, INF, 30, INF,
-//10, INF, INF, 0, 15, INF,
-//INF, 20, 35, INF, 0, INF,
-//INF, INF, INF, INF, 3, 0};
-
-//0, 3, INF, 7,
-//8, 0, 2, INF,
-//5, INF, 0, 1,
-//2, INF, INF, 0
