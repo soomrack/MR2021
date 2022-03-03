@@ -1,8 +1,8 @@
-#include <iostream>
+п»ї#include <iostream>
 #include "graph.h"
 using namespace std;
-#include <queue> // очередь
-#include <stack> // стек
+#include <queue> // РѕС‡РµСЂРµРґСЊ
+#include <stack> // СЃС‚РµРє
 
 Graph::Graph(int numVertices) {
     this->numVertices = numVertices;
@@ -50,25 +50,25 @@ void Graph::toString() {
 
 void Graph::bfs_search() {
     cout << endl;
-    int* nodes = new int[numVertices]; // вершины графа (0 - все вершины не рассмотрены)
+    int* nodes = new int[numVertices]; // РІРµСЂС€РёРЅС‹ РіСЂР°С„Р° (0 - РІСЃРµ РІРµСЂС€РёРЅС‹ РЅРµ СЂР°СЃСЃРјРѕС‚СЂРµРЅС‹)
     for (int i = 0; i < numVertices; i++) {
         nodes[i] = 0;
     }
 
     queue<int> Queue;
-    Queue.push(0); // помещаем в очередь первую вершину
-    while (!Queue.empty()) // пока очередь не пуста
+    Queue.push(0); // РїРѕРјРµС‰Р°РµРј РІ РѕС‡РµСЂРµРґСЊ РїРµСЂРІСѓСЋ РІРµСЂС€РёРЅСѓ
+    while (!Queue.empty()) // РїРѕРєР° РѕС‡РµСЂРµРґСЊ РЅРµ РїСѓСЃС‚Р°
     {
-        int node = Queue.front(); // извлекаем вершину
+        int node = Queue.front(); // РёР·РІР»РµРєР°РµРј РІРµСЂС€РёРЅСѓ
         Queue.pop();
-        nodes[node] = 2; // отмечаем ее как посещенную
-        for (int j = 0; j < numVertices; j++) { // проверяем для нее все смежные вершины
-            if (adjMatrix[node][j] == true && nodes[j] == 0) { // если вершина смежная и не обнаружена
-                Queue.push(j); // добавляем ее в очередь
-                nodes[j] = 1; // отмечаем вершину как обнаруженную
+        nodes[node] = 2; // РѕС‚РјРµС‡Р°РµРј РµРµ РєР°Рє РїРѕСЃРµС‰РµРЅРЅСѓСЋ
+        for (int j = 0; j < numVertices; j++) { // РїСЂРѕРІРµСЂСЏРµРј РґР»СЏ РЅРµРµ РІСЃРµ СЃРјРµР¶РЅС‹Рµ РІРµСЂС€РёРЅС‹
+            if (adjMatrix[node][j] == true && nodes[j] == 0) { // РµСЃР»Рё РІРµСЂС€РёРЅР° СЃРјРµР¶РЅР°СЏ Рё РЅРµ РѕР±РЅР°СЂСѓР¶РµРЅР°
+                Queue.push(j); // РґРѕР±Р°РІР»СЏРµРј РµРµ РІ РѕС‡РµСЂРµРґСЊ
+                nodes[j] = 1; // РѕС‚РјРµС‡Р°РµРј РІРµСЂС€РёРЅСѓ РєР°Рє РѕР±РЅР°СЂСѓР¶РµРЅРЅСѓСЋ
             }
         }
-        //cout << node << " "; // выводим номер вершины
+        //cout << node << " "; // РІС‹РІРѕРґРёРј РЅРѕРјРµСЂ РІРµСЂС€РёРЅС‹
     }
     delete[] nodes;
     nodes = nullptr;
@@ -76,25 +76,25 @@ void Graph::bfs_search() {
 
 void Graph::dfs_search() {
     cout << endl;
-    int* nodes = new int[numVertices]; // вершины графа (0 - все вершины не рассмотрены)
+    int* nodes = new int[numVertices]; // РІРµСЂС€РёРЅС‹ РіСЂР°С„Р° (0 - РІСЃРµ РІРµСЂС€РёРЅС‹ РЅРµ СЂР°СЃСЃРјРѕС‚СЂРµРЅС‹)
     for (int i = 0; i < numVertices; i++) {
         nodes[i] = 0;
     }
 
     stack<int> Stack;
-    Stack.push(0); // помещаем в очередь первую вершину
+    Stack.push(0); // РїРѕРјРµС‰Р°РµРј РІ РѕС‡РµСЂРµРґСЊ РїРµСЂРІСѓСЋ РІРµСЂС€РёРЅСѓ
     while (!Stack.empty()) {
-        int node = Stack.top(); // извлекаем вершину
+        int node = Stack.top(); // РёР·РІР»РµРєР°РµРј РІРµСЂС€РёРЅСѓ
         Stack.pop();
         if (nodes[node] == 2) continue;
-        nodes[node] = 2; // отмечаем ее как посещенную
-        for (int j = numVertices - 1; j >= 0; j--) { // проверяем для нее все смежные вершины
-            if (adjMatrix[node][j] == true && nodes[j] != 2) { // если вершина смежная и не обнаружена
-                Stack.push(j); // добавляем ее в cтек
-                nodes[j] = 1; // отмечаем вершину как обнаруженную
+        nodes[node] = 2; // РѕС‚РјРµС‡Р°РµРј РµРµ РєР°Рє РїРѕСЃРµС‰РµРЅРЅСѓСЋ
+        for (int j = numVertices - 1; j >= 0; j--) { // РїСЂРѕРІРµСЂСЏРµРј РґР»СЏ РЅРµРµ РІСЃРµ СЃРјРµР¶РЅС‹Рµ РІРµСЂС€РёРЅС‹
+            if (adjMatrix[node][j] == true && nodes[j] != 2) { // РµСЃР»Рё РІРµСЂС€РёРЅР° СЃРјРµР¶РЅР°СЏ Рё РЅРµ РѕР±РЅР°СЂСѓР¶РµРЅР°
+                Stack.push(j); // РґРѕР±Р°РІР»СЏРµРј РµРµ РІ cС‚РµРє
+                nodes[j] = 1; // РѕС‚РјРµС‡Р°РµРј РІРµСЂС€РёРЅСѓ РєР°Рє РѕР±РЅР°СЂСѓР¶РµРЅРЅСѓСЋ
             }
         }
-        //cout << node << " "; // выводим номер вершины
+        //cout << node << " "; // РІС‹РІРѕРґРёРј РЅРѕРјРµСЂ РІРµСЂС€РёРЅС‹
     }
     delete[] nodes;
     nodes = nullptr;
@@ -106,6 +106,3 @@ Graph::~Graph() {
     delete[] adjMatrix;
     adjMatrix = nullptr;
 }
-
-
-

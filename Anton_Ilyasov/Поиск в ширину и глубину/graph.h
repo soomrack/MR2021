@@ -1,8 +1,8 @@
-#ifndef BIF_AND_DIF_H
+п»ї#ifndef BIF_AND_DIF_H
 #define BIF_AND_DIF_H
 #include <string>
 
-class Graph { //граф, представленный матрицей смежности
+class Graph { //РіСЂР°С„, РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅС‹Р№ РјР°С‚СЂРёС†РµР№ СЃРјРµР¶РЅРѕСЃС‚Рё
 private:
     bool** adjMatrix;
     int numVertices;
@@ -22,6 +22,3 @@ public:
 };
 
 #endif
-
-
-

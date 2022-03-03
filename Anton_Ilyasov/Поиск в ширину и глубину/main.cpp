@@ -1,7 +1,7 @@
-#include<iostream>
+п»ї#include<iostream>
 #include "graph.h"
-#include <queue> // очередь
-#include <stack> // стек
+#include <queue> // РѕС‡РµСЂРµРґСЊ
+#include <stack> // СЃС‚РµРє
 #include <ctime>
 
 void bfs_search_time(int numVertices) {
@@ -25,7 +25,7 @@ void dfs_search_time(int numVertices) {
 }
 
 int main() {
-    //тест BFS
+    //С‚РµСЃС‚ BFS
     std::cout << "BFS tests...\n ";
     bfs_search_time(1);
     bfs_search_time(10);
@@ -37,7 +37,7 @@ int main() {
     bfs_search_time(8000);
     bfs_search_time(10000);
 
-    //тест DFS
+    //С‚РµСЃС‚ DFS
     std::cout << "\nDFS tests...\n ";
     dfs_search_time(1);
     dfs_search_time(10);
@@ -51,6 +51,3 @@ int main() {
 
     return 0;
 }
-
-
-
