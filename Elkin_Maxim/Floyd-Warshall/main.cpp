@@ -11,80 +11,313 @@ template<class T>
 class Graph {
 public:
     explicit Graph(vector<T> &);
-    //Floyd-Warshall methods
-    vector<T> FW_clear();
-    tuple<vector<T>, vector<int>> FW_alg_ways();
+    explicit Graph(vector<vector<T>> &);
+    Graph<T> & operator= (const Graph<T> &);
+    ~Graph();
+public:
+    ////Floyd-Warshall methods
+    //Floyd-Warshall algorithm without restore matrix
+    vector<vector<T>> FW_clear();
+    //Floyd-Warshall algorithm with restore matrix
+    tuple<vector<vector<T>>, vector<vector<int>>> FW_alg_ways();
+    //Uses restore_matrix from FW_alg to restore paths
     vector<int> restore_path(int, int);
-    void print_restored_path();
-    //Dijkstra methods
+public:
+    ////Dijkstra methods
+    //receives start node and finds the shortest distances from it
     vector<T> Dijkstra_alg(int);
-    vector<T> paths_matrix_Dij();
+    //Applies Dijkstra algorithm for every node to make paths matrix
+    vector<vector<T>> paths_matrix_Dij();
+public:
+    ////auxiliary functions of class
     //getters
-    vector<T> get_paths_matrix() { return paths_matrix; };
-    vector<int> get_restore_matrix() { return restore_matrix; };
+    vector<vector<T>> get_dist_matrix() { return dist_matrix; };
+    vector<vector<T>> get_paths_matrix() { return paths_matrix; };
+    vector<vector<int>> get_restore_matrix() { return restore_matrix; };
     vector<int> get_restored_path() { return restored_path; };
-    vector<T> get_dist_matrix() { return dist_matrix; };
     vector<T> get_shortest_distances() { return shortest_distances; };
+    //print functions
+    void print_paths_matrix();
+    void print_restored_path();
 
 private:
-    int nodes;
-    vector<T> dist_matrix;
-    vector<T> paths_matrix;
-    vector<int> restore_matrix;
+    int nodes = 0;
+    //initial matrix with direct distances between nodes
+    vector<vector<T>> dist_matrix;
+    //resulting matrix with the shortest paths between all nodes
+    vector<vector<T>> paths_matrix;
+    //matrix, used to restore paths with Floyd-Warshall algorithm modification
+    vector<vector<int>> restore_matrix;
+    //vector, used to store restored path
     vector<int> restored_path;
+    //vector, used to store the shortest distances from one node in original Dijkstra algorithm
     vector<T> shortest_distances;
+    //compares path from origin node to destination with path through intermediate node and returns the shortest
     T min(int, int, int);
+    void clean();
 };
 
-//constructor
 template<typename T>
 Graph<T>::Graph(vector<T> &grid) {
-    dist_matrix = grid;
+    //checking a size of input matrix
+    if (grid.size() != pow((int) sqrt(grid.size()), 2)) {
+        return;
+    }
+    //checking the main diagonal
     nodes = (int) sqrt(grid.size());
+    for (int node = 0; node < nodes; node++) {
+        if (grid[node * nodes + node] != 0) {
+            nodes = 0;
+            return;
+        }
+    }
+    dist_matrix.assign(nodes, vector<T> (nodes));
+    for (int row = 0; row < nodes; row++) {
+        for (int col = 0; col < nodes; col++) {
+            dist_matrix[row][col] = grid[row * nodes + col];
+        }
+    }
+}
+
+template<typename T>
+Graph<T>::Graph(vector<vector<T>> &grid) {
+    nodes = grid.size();
+    //checking a size of input matrix
+    for (int row = 0; row < nodes; row++) {
+        if (grid[row].size() != nodes) {
+            nodes = 0;
+            return;
+        }
+    }
+    //checking the main diagonal
+    for (int node = 0; node < nodes; node++) {
+        if (grid[node][node] != 0) {
+            nodes = 0;
+            return;
+        }
+    }
+    dist_matrix = grid;
+}
+
+template<typename T>
+Graph<T> & Graph<T>::operator= (const Graph<T> &other) {
+    if (this == &other) {
+        return *this;
+    }
+    this->nodes = other.nodes;
+    this->paths_matrix = other.paths_matrix;
+    this->shortest_distances = other.shortest_distances;
+    this->restored_path = other.restored_path;
+    this->restore_matrix = other.restore_matrix;
+    this->dist_matrix = other.dist_matrix;
+}
+
+template<typename T>
+Graph<T>::~Graph(){
+    nodes = 0;
+    clean();
+}
+
+template<typename T>
+void Graph<T>::clean() {
+    dist_matrix.clear();
+    paths_matrix.clear();
+    restore_matrix.clear();
+    restored_path.clear();
+    shortest_distances.clear();
+}
+
+////////////////////////////////////////////////
+////Floyd-Warshall methods
+////////////////////////////////////////////////
+
+template<typename T>
+vector<vector<T>> Graph<T>::FW_clear() {
+    paths_matrix = dist_matrix;
+    // Floyd-Warshall algorithm realization
+    for (int intermediate = 0; intermediate < nodes; intermediate++) {
+        for (int origin = 0; origin < nodes; origin++) {
+            for (int destination = 0; destination < nodes; destination++) {
+                //let paths_matrix = A, then
+                //A(k)[x,y] = min(A(k-1)[x,y], A(k-1)[x,k] + A(k-1)[k,y])
+                paths_matrix[origin][destination] = min(origin, destination, intermediate);
+            }
+        }
+    }
+    return paths_matrix;
+}
+
+template<typename T>
+tuple<vector<vector<T>>, vector<vector<int>>> Graph<T>::FW_alg_ways() {
+    paths_matrix = dist_matrix;
+    //initializing vector to restore the paths
+    restore_matrix.assign(nodes, vector<int> (nodes));
+    for (int row = 0; row < nodes; row++) {
+        for (int col = 0; col < nodes; col++) {
+            if (paths_matrix[row][col] == INF) {
+                restore_matrix[row][col] = 0;
+            } else
+                restore_matrix[row][col] = col + 1;
+        }
+    }
+    // Floyd-Warshall algorithm realization
+    for (int intermediate = 0; intermediate < nodes; intermediate++) {
+        for (int origin = 0; origin < nodes; origin++) {
+            for (int destination = 0; destination < nodes; destination++) {
+                //let paths_matrix = A, then
+                //A(k)[x,y] = min(A(k-1)[x,y], A(k-1)[x,k] + A(k-1)[k,y])
+                if (paths_matrix[origin][destination] > min(origin, destination, intermediate)) {
+                    paths_matrix[origin][destination] = min(origin, destination, intermediate);
+                    //saving previous nodes to restore paths
+                    restore_matrix[origin][destination] = restore_matrix[origin][intermediate];
+                }
+            }
+        }
+    }
+    //Check for negative cycle
+    for (int node = 0; node < nodes; node++) {
+        if (paths_matrix[node][node] != 0) {
+            paths_matrix.clear();
+            restore_matrix.clear();
+            cout << "negative cycle" << endl;
+        }
+    }
+    return make_tuple(paths_matrix, restore_matrix);
+}
+
+template<typename T>
+vector<int> Graph<T>::restore_path(int from, int to) {
+    restored_path.clear();
+    if ((nodes < from) || (nodes < to)) return restored_path;
+    if (restore_matrix.empty()) return restored_path;
+    int current = from - 1;
+    int destination = to - 1;
+    if (paths_matrix[current][destination] == INF) return restored_path;
+    while (current != destination) {
+        restored_path.push_back(current);
+        current = restore_matrix[current][destination] - 1;
+        if (current < 0) {
+            restored_path.clear();
+            return restored_path;
+        }
+    }
+    restored_path.push_back(current);
+    return restored_path;
+}
+
+template<typename T>
+T Graph<T>::min(int origin, int destination, int intermediate) {
+    T actual = paths_matrix[origin][destination];
+    T alternative = 0;
+    if (paths_matrix[origin][intermediate] == INF || paths_matrix[intermediate][destination] == INF) alternative = INF;
+    else alternative = paths_matrix[origin][intermediate] + paths_matrix[intermediate][destination];
+    if (actual > alternative) return alternative;
+    else return actual;
+}
+
+////////////////////////////////////////////////
+////Dijkstra methods
+////////////////////////////////////////////////
+
+template<typename T>
+vector<T> Graph<T>::Dijkstra_alg(int origin) {
+    origin--;
+    shortest_distances.clear();
+    // Checking correct input of the matrix and origin
+    if (origin > nodes) return shortest_distances;
+    //vector to store passed nodes
+    vector<bool> passed(nodes);
+    //vector to store the shortest distance from origin to all nodes
+    shortest_distances.resize(nodes);
+    //initializing vectors
+    passed[origin] = true;
+    for (int node = 0; node < nodes; node++) {
+        shortest_distances[node] = dist_matrix[origin][node];
+    }
+    //Dijkstra algorithm realization
+    for (int in_cln = 1; in_cln < nodes; in_cln++) {
+        int min = INF;
+        int next_node = -1;
+        //Finding the nearest node
+        for (int node = 0; node < nodes; node++) {
+            //We can't go through passed nodes
+            if (!passed[node]) {
+                if (min > shortest_distances[node]) {
+                    min = shortest_distances[node];
+                    next_node = node;
+                }
+            }
+        }
+        if (next_node == -1) return shortest_distances;
+        passed[next_node] = true;
+        //Finding the shortest paths through this node
+        for (int node = 0; node < nodes; node++) {
+            // We can't go through passed nodes
+            if (!passed[node]) {
+                if (dist_matrix[next_node][node] != INF) {
+                    if (min + dist_matrix[next_node][node] < shortest_distances[node]) {
+                        shortest_distances[node] = min + dist_matrix[next_node][node];
+                    }
+                }
+            }
+        }
+    }
+    return shortest_distances;
+}
+
+template<typename T>
+vector<vector<T>> Graph<T>::paths_matrix_Dij() {
+    paths_matrix.assign(nodes, vector<T> (nodes));
+    for (int i = 1; i <= nodes; i++) {
+        Dijkstra_alg(i);
+        paths_matrix[i-1] = shortest_distances;
+    }
+    return paths_matrix;
+}
+
+////////////////////////////////////////////////
+////auxiliary functions of class
+////////////////////////////////////////////////
+
+template<typename T>
+void Graph<T>::print_paths_matrix() {
+    if (nodes < 1) return;
+    cout << "0  || ";
+    for (int i = 1; i <= nodes; i++) {
+        cout << i << " | ";
+    }
+    for (int row = 0; row < nodes; row++) {
+        cout << endl << row + 1 << " || ";
+        for (int col = 0; col < nodes; col++) {
+            if (paths_matrix[row][col] == INF) cout << "#";
+            else cout << paths_matrix[row][col];
+            cout << " | ";
+        }
+    }
+    cout << endl;
+}
+
+template<typename T>
+void Graph<T>::print_restored_path() {
+    if (restored_path.empty()) {
+        cout << "No way" << endl;
+        return;
+    }
+    cout << "The way is";
+    for (const auto &i: restored_path) {
+        cout << " - " << i + 1;
+    }
+    cout << endl;
 }
 
 ////////////////////////////////////////////////
 ////other functions
 ////////////////////////////////////////////////
 
-template<typename T>
-bool check_dist_matrix(vector<T> &grid) {
-    //Checking matrix to be square
-    if (grid.size() != pow((int) sqrt(grid.size()), 2)) {
-        return false;
-    }
-    int nodes = (int) sqrt(grid.size());
-    // Checking diagonal to be zero
-    for (int node = 0; node < nodes; node++) {
-        if (grid[(node * nodes) + node] != 0) {
-            return false;
-        }
-    }
-    return true;
-}
-
-template<typename T>
-void print_paths_matrix(vector<T> grid) {
-    int nodes = (int) sqrt(grid.size());
-    if (nodes < 1) return;
-    cout << "  || ";
-    for (int i = 1; i <= nodes; i++) {
-        cout << i << " | ";
-    }
-    cout << endl;
-    for (int i = 0; i < grid.size(); i++) {
-        if ((i % nodes) == 0) cout << endl << i / nodes + 1 << " || ";
-        if (grid[i] == INF) cout << "#";
-        else cout << grid[i];
-        cout << " | ";
-    }
-    cout << endl;
-}
-
 vector<int> random_grid(int nodes, int lower, int upper) {
     uniform_int_distribution<int> distr(lower, upper);
     mt19937 generator;
-    vector<int> grid(nodes * nodes, 0);
+    vector<int> grid(nodes * nodes);
     for (int i = 0; i < grid.size(); i++) {
         grid[i] = distr(generator);
     }
@@ -95,25 +328,6 @@ vector<int> random_grid(int nodes, int lower, int upper) {
 }
 
 void example() {
-    //Examples of grids
-
-    //0, 3, INF, 5,
-    //INF, 0, INF, INF,
-    //INF, -10, 0, -INF,
-    //INF, INF, 2, 0
-
-    //{0, 50, 45, 10, INF, INF,
-    //INF, 0, 10, 15, INF, INF,
-    //INF, INF, 0, INF, 30, INF,
-    //10, INF, INF, 0, 15, INF,
-    //INF, 20, 35, INF, 0, INF,
-    //INF, INF, INF, INF, 3, 0};
-
-    //0, 3, INF, 7,
-    //8, 0, 2, INF,
-    //5, INF, 0, 1,
-    //2, INF, INF, 0
-
     vector<double> grid = {0, 50.5, 45, 10.09, INF, INF,
                            INF, 0, 10.7, 15, INF, INF,
                            INF, INF, 0, INF, 30.4, INF,
@@ -127,9 +341,7 @@ void example() {
     Graph map_floyd(grid);
     map_floyd.FW_alg_ways();
     cout << endl << "Paths matrix:" << endl;
-    print_paths_matrix(map_floyd.get_paths_matrix());
-    cout << endl << "Restore matrix:" << endl;
-    print_paths_matrix(map_floyd.get_restore_matrix());
+    map_floyd.print_paths_matrix();
     map_floyd.restore_path(6, 1);
     cout << endl << "From node 6 to 1 ";
     map_floyd.print_restored_path();
@@ -141,7 +353,7 @@ void example() {
     Graph map_dijkstra(grid);
     map_dijkstra.paths_matrix_Dij();
     cout << endl << "Paths matrix:" << endl;
-    print_paths_matrix(map_dijkstra.get_paths_matrix());
+    map_dijkstra.print_paths_matrix();
 }
 
 void time_compare() {
@@ -149,7 +361,7 @@ void time_compare() {
     cout << "    Time Compare   " << endl;
     cout << "===================" << endl;
     cout << "it   F-W      Dijk " << endl;
-    for (int i = 3; i <= 150; i++) {
+    for (int i = 3; i <= 250; i++) {
         vector<int> grid = random_grid(i, 0, 1000);
         unsigned int start = 0;
         unsigned int end = 0;
@@ -171,206 +383,8 @@ void time_compare() {
     }
 }
 
-////////////////////////////////////////////////
-////Floyd-Warshall methods
-////////////////////////////////////////////////
-
-//Floyd-Warshall algorithm without restore matrix
-template<typename T>
-vector<T> Graph<T>::FW_clear() {
-// Checking correct input of the matrix
-    if (!check_dist_matrix(dist_matrix)) {
-        vector<T> zero;
-        return zero;
-    }
-    paths_matrix = dist_matrix;
-    // Floyd-Warshall algorithm realization
-    for (int intermediate = 0; intermediate < nodes; intermediate++) {
-        for (int origin = 0; origin < nodes; origin++) {
-            for (int destination = 0; destination < nodes; destination++) {
-                //let paths_matrix = A, then
-                //A(k)[x,y] = min(A(k-1)[x,y], A(k-1)[x,k] + A(k-1)[k,y])
-                if (paths_matrix[origin * nodes + destination] > min(origin, destination, intermediate)) {
-                    paths_matrix[origin * nodes + destination] = min(origin, destination, intermediate);
-                }
-            }
-        }
-    }
-    return paths_matrix;
-}
-
-//Floyd-Warshall algorithm with restore matrix
-template<typename T>
-tuple<vector<T>, vector<int>> Graph<T>::FW_alg_ways() {
-    // Checking correct input of the matrix
-    if (!check_dist_matrix(dist_matrix)) {
-        vector<T> zero0;
-        vector<int> zero;
-        return make_tuple(zero0, zero);
-    }
-    paths_matrix = dist_matrix;
-    //initializing vector to restore the paths
-    restore_matrix.resize(dist_matrix.size());
-    for (int i = 0; i < nodes; i++) {
-        for (int j = 0; j < nodes; j++) {
-            if (paths_matrix[i * nodes + j] == INF) {
-                restore_matrix[i * nodes + j] = 0;
-            } else
-                restore_matrix[i * nodes + j] = j + 1;
-        }
-    }
-    // Floyd-Warshall algorithm realization
-    for (int intermediate = 0; intermediate < nodes; intermediate++) {
-        for (int origin = 0; origin < nodes; origin++) {
-            for (int destination = 0; destination < nodes; destination++) {
-                //let paths_matrix = A, then
-                //A(k)[x,y] = min(A(k-1)[x,y], A(k-1)[x,k] + A(k-1)[k,y])
-                if (paths_matrix[origin * nodes + destination] > min(origin, destination, intermediate)) {
-                    paths_matrix[origin * nodes + destination] = min(origin, destination, intermediate);
-                    //saving previous nodes to restore paths
-                    restore_matrix[origin * nodes + destination] = restore_matrix[origin * nodes + intermediate];
-                }
-            }
-        }
-    }
-    //Check for negative cycle
-    for (int node = 0; node < nodes; node++) {
-        if (paths_matrix[node * nodes + node] < 0) {
-            paths_matrix.clear();
-            vector<int> zero;
-            cout << "negative cycle" << endl;
-            return make_tuple(paths_matrix, zero);
-        }
-    }
-    return make_tuple(paths_matrix, restore_matrix);
-}
-
-//prints the shortest way from restored path
-template<typename T>
-void Graph<T>::print_restored_path() {
-    if (restored_path.empty()) {
-        cout << "No way" << endl;
-        return;
-    }
-    cout << "The way is";
-    for (const auto &i: restored_path) {
-        cout << " - " << i + 1;
-    }
-    cout << endl;
-}
-
-//uses restore_matrix from FW_alg to restore paths
-template<typename T>
-vector<int> Graph<T>::restore_path(int from, int to) {
-    if ((nodes < from) || (nodes < to)) {
-        vector<int> zero;
-        return zero;
-    }
-    if (paths_matrix[from * nodes + to] == INF) {
-        vector<int> zero;
-        return zero;
-    }
-    //vector to store the path (nodes)
-    int current = from - 1;
-    int destination = to - 1;
-    while (current != destination) {
-        restored_path.push_back(current);
-        current = restore_matrix[current * nodes + destination] - 1;
-        if (current < 0) {
-            restored_path.clear();
-            return restored_path;
-        }
-    }
-    restored_path.push_back(current);
-    return restored_path;
-}
-
-template<typename T>
-T Graph<T>::min(int origin, int destination, int intermediate) {
-    T actual = paths_matrix[origin * nodes + destination];
-    T alternative = 0;
-    if (paths_matrix[origin * nodes + intermediate] == INF || paths_matrix[nodes * intermediate + destination] == INF) {
-        alternative = INF;
-    } else alternative = paths_matrix[origin * nodes + intermediate] + paths_matrix[nodes * intermediate + destination];
-    if (actual > alternative) return alternative;
-    else return actual;
-}
-
-////////////////////////////////////////////////
-////Dijkstra methods
-////////////////////////////////////////////////
-
-template<typename T>
-vector<T> Graph<T>::Dijkstra_alg(int origin) {
-    origin--;
-    // Checking correct input of the matrix and origin
-    if ((!check_dist_matrix(dist_matrix)) || (origin > nodes)) {
-        vector<T> zero;
-        return zero;
-    }
-    //vector to store passed nodes
-    vector<int> passed;
-    //vector to store the shortest distance from origin to all nodes
-    shortest_distances.resize(nodes);
-    //initializing vectors
-    passed.push_back(origin + 1);
-    for (int node = 0; node < nodes; node++) {
-        shortest_distances[node] = dist_matrix[origin * nodes + node];
-    }
-    //Dijkstra algorithm realization
-    for (int in_cln = 1; in_cln < nodes; in_cln++) {
-        int min = INF;
-        int next_node = -1;
-        //Finding the nearest node
-        for (int node = 0; node < nodes; node++) {
-            //We can't go through passed nodes
-            bool skip = false;
-            for (const auto i: passed) {
-                if ((node + 1) == i) {
-                    skip = true;
-                }
-            }
-            if (!skip) {
-                if (min > shortest_distances[node]) {
-                    min = shortest_distances[node];
-                    next_node = node + 1;
-                }
-            }
-        }
-        if (next_node == -1) return shortest_distances;
-        passed.push_back(next_node);
-        //Finding the shortest paths through this node
-        for (int node = 0; node < nodes; node++) {
-            // We can't go through passed nodes
-            bool skip = false;
-            for (const auto i: passed) {
-                if ((node + 1) == i) {
-                    skip = true;
-                }
-            }
-            if (!skip) {
-                if (dist_matrix[(next_node - 1) * nodes + node] != INF) {
-                    if (min + dist_matrix[(next_node - 1) * nodes + node] < shortest_distances[node]) {
-                        shortest_distances[node] = min + dist_matrix[(next_node - 1) * nodes + node];
-                    }
-                }
-            }
-        }
-    }
-    return shortest_distances;
-}
-
-//Performs Dijkstra algorithm for every node to make paths matrix
-template<typename T>
-vector<T> Graph<T>::paths_matrix_Dij() {
-    for (int i = 1; i <= nodes; i++) {
-        Dijkstra_alg(i);
-        paths_matrix.insert(paths_matrix.end(), shortest_distances.begin(), shortest_distances.end());
-    }
-    return paths_matrix;
-}
-
 int main() {
-    example();
+
     return 0;
 }
+
