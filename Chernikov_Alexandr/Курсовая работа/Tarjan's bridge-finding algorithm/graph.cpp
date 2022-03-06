@@ -20,6 +20,16 @@ Graph::Graph(std::vector<std::list<int>> &adj){
     this->adj = adj;
 }
 
+Graph::Graph(const Graph &other) {
+    num_of_vertices = other.num_of_vertices;
+    adj = other.adj;
+}
+
+Graph::Graph(Graph &&other) noexcept {
+    num_of_vertices = other.num_of_vertices;
+    adj = other.adj;
+}
+
 void Graph::add_edge(int v, int w){
     adj[v].push_back(w);
     adj[w].push_back(v);
@@ -43,8 +53,8 @@ bool Graph::edge_is_in_graph(int v, int w){
     return false;
 }
 
-// DFS based function to find all bridges. It uses recursive function bridge_dfs
-void Graph::find_bridges()
+// DFS based function to find all bridges. It uses recursive function tarjan_s_bridge_finding_dfs
+std::vector<std::pair<int, int>> Graph::find_bridges()
 {
     // Mark all the vertices as not visited
     std::vector<bool> visited(num_of_vertices, false);
@@ -60,16 +70,18 @@ void Graph::find_bridges()
     // in DFS tree rooted with vertex 'i'
     for (int i = 0; i < num_of_vertices; i++)
         if (!visited[i])
-            bridge_dfs(i, visited, disc, low, parent, bridges);
+            tarjan_s_bridge_finding_dfs(i, visited, disc, low, parent, bridges);
+
+    return bridges;
 }
 
 // A recursive function that finds bridges using DFS traversal
-void Graph::bridge_dfs(int u,
-                       std::vector<bool> &visited,
-                       std::vector<int> &disc,
-                       std::vector<int> &low,
-                       std::vector<int> &parent,
-                       std::vector<std::pair<int, int>> &bridges) {
+void Graph::tarjan_s_bridge_finding_dfs(int u,
+                                        std::vector<bool> &visited,
+                                        std::vector<int> &disc,
+                                        std::vector<int> &low,
+                                        std::vector<int> &parent,
+                                        std::vector<std::pair<int, int>> &bridges) {
 
     // Mark the current node as visited
     visited[u] = true;
@@ -83,7 +95,7 @@ void Graph::bridge_dfs(int u,
         // If v is not visited yet, then recur for it
         if (!visited[v]) {
             parent[v] = u;
-            bridge_dfs(v, visited, disc, low, parent, bridges);
+            tarjan_s_bridge_finding_dfs(v, visited, disc, low, parent, bridges);
 
             // Check if the subtree rooted with v has a
             // connection to one of the ancestors of u
