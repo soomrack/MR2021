@@ -1,0 +1,3 @@
+D:/CLionProjects/MR2021/Gavrilov_Dmitry/tic-tac-tao_gtl_with_bot/cmake-build-debug/CMakeFiles/main.c.dir
+D:/CLionProjects/MR2021/Gavrilov_Dmitry/tic-tac-tao_gtl_with_bot/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/CLionProjects/MR2021/Gavrilov_Dmitry/tic-tac-tao_gtl_with_bot/cmake-build-debug/CMakeFiles/rebuild_cache.dir

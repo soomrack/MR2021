@@ -1,0 +1,3 @@
+"D:\Users\Alex\AppData\Local\JetBrains\CLion 2021.2.1\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\gtk-test.dir/objects.a
+D:\msys64\mingw64\bin\ar.exe cr CMakeFiles\gtk-test.dir/objects.a @CMakeFiles\gtk-test.dir\objects1.rsp
+D:\msys64\mingw64\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\gtk-test.dir/objects.a -Wl,--no-whole-archive -o gtk-test.exe -Wl,--out-implib,libgtk-test.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\gtk-test.dir\linklibs.rsp

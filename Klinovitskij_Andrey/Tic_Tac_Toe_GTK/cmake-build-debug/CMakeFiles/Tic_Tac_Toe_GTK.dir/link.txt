@@ -1,0 +1,3 @@
+"D:\Users\Alex\AppData\Local\JetBrains\CLion 2021.2.1\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\Tic_Tac_Toe_GTK.dir/objects.a
+D:\msys64\mingw64\bin\ar.exe cr CMakeFiles\Tic_Tac_Toe_GTK.dir/objects.a @CMakeFiles\Tic_Tac_Toe_GTK.dir\objects1.rsp
+D:\msys64\mingw64\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\Tic_Tac_Toe_GTK.dir/objects.a -Wl,--no-whole-archive -o Tic_Tac_Toe_GTK.exe -Wl,--out-implib,libTic_Tac_Toe_GTK.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Tic_Tac_Toe_GTK.dir\linklibs.rsp
