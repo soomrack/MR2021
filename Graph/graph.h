@@ -3,10 +3,11 @@
 
 #include <vector>
 
+template <typename T>
 class Graph {
 // Матрица смежности, которая содержит информацию о графе
 private:
-    std::vector<std::vector<int>> adjacency_matrix;
+    std::vector<std::vector<T>> adjacency_matrix;
 
 // Различные приватные переменные, которые могут использовать алгоритмы
 private:
@@ -17,7 +18,7 @@ private:
 public:
     Graph();
     explicit Graph(int num_of_vertices);
-    explicit Graph(std::vector<std::vector<int>> &adjacency_matrix);
+    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix);
     Graph(const Graph &other);
     Graph(Graph &&other) noexcept;
 
