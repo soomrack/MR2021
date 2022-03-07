@@ -1,4 +1,0 @@
-D:/CLionProjects/MR2021/Matveev_Viktor/Matrix/cmake-build-debug/CMakeFiles/Matrix_liba.dir
-D:/CLionProjects/MR2021/Matveev_Viktor/Matrix/cmake-build-debug/CMakeFiles/Matrix.dir
-D:/CLionProjects/MR2021/Matveev_Viktor/Matrix/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/CLionProjects/MR2021/Matveev_Viktor/Matrix/cmake-build-debug/CMakeFiles/rebuild_cache.dir

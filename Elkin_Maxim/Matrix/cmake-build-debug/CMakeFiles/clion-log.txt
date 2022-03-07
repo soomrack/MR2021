@@ -1,4 +1,0 @@
-"D:\Users\Alex\AppData\Local\JetBrains\CLion 2021.2.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - MinGW Makefiles" D:\CLionProjects\MR2021\Elkin_Maxim\Matrix
--- Configuring done
--- Generating done
--- Build files have been written to: D:/CLionProjects/MR2021/Elkin_Maxim/Matrix/cmake-build-debug

@@ -1,3 +1,0 @@
-"D:\Users\Alex\AppData\Local\JetBrains\CLion 2021.2.1\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\Matrica.dir/objects.a
-D:\msys64\mingw64\bin\ar.exe cr CMakeFiles\Matrica.dir/objects.a @CMakeFiles\Matrica.dir\objects1.rsp
-D:\msys64\mingw64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\Matrica.dir/objects.a -Wl,--no-whole-archive -o Matrica.exe -Wl,--out-implib,libMatrica.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Matrica.dir\linklibs.rsp
