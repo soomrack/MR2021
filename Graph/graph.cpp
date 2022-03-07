@@ -1,48 +1,40 @@
 #include<iostream>
 #include <vector>
 #include <algorithm>
-#include <cstdint>
 #include "graph.h"
 
-#define INF std::numeric_limits<T>::max()
+#define INF std::numeric_limits<int>::max()
 
-template <typename T>
-Graph<T>::Graph() = default;
+Graph::Graph() = default;
 
-template <typename T>
-Graph<T>::Graph(int num_of_vertices){
+Graph::Graph(int num_of_vertices){
     for (int i = 0; i < num_of_vertices; i++) {
-        std::vector<T> row(num_of_vertices, INF);
+        std::vector<int> row(num_of_vertices, INF);
         row[i] = 0;
         adjacency_matrix.push_back(row);
     }
 }
 
-template <typename T>
-Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix){
+Graph::Graph(std::vector<std::vector<int>> &adjacency_matrix){
     this->adjacency_matrix = adjacency_matrix;
 }
 
-template <typename T>
-Graph<T>::Graph(const Graph &other) {
+Graph::Graph(const Graph &other) {
     adjacency_matrix = other.adjacency_matrix;
 }
 
-template <typename T>
-Graph<T>::Graph(Graph &&other) noexcept {
+Graph::Graph(Graph &&other) noexcept {
     adjacency_matrix = other.adjacency_matrix;
 }
 
-template <typename T>
-void Graph<T>::add_edge(int u, int v, int weight){
+void Graph::add_edge(int u, int v, int weight){
     adjacency_matrix[u][v] = weight;
     adjacency_matrix[v][u] = weight;
 }
 
 
 // DFS based function to find all bridges. It uses recursive function tarjan_s_bridge_finding_dfs
-template <typename T>
-std::vector<std::pair<int, int>> Graph<T>::tarjans_find_bridges()
+std::vector<std::pair<int, int>> Graph::tarjans_find_bridges()
 {
     int num_of_vertices = adjacency_matrix.size();
     // Mark all the vertices as not visited
@@ -66,8 +58,7 @@ std::vector<std::pair<int, int>> Graph<T>::tarjans_find_bridges()
 }
 
 // A recursive function that finds bridges using DFS traversal
-template <typename T>
-void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
+void Graph::tarjan_s_bridge_finding_dfs(int u,
                                         std::vector<bool> &visited,
                                         std::vector<int> &disc,
                                         std::vector<int> &low,
@@ -110,14 +101,3 @@ void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
             low[u]  = std::min(low[u], disc[v]);
     }
 }
-
-
-// explicit instantiation
-
-template class Graph<int16_t>;
-template class Graph<int32_t>;
-template class Graph<int64_t>;
-template class Graph<int8_t>;
-
-template class Graph<float>;
-template class Graph<double>;
