@@ -3,11 +3,14 @@
 
 #include <vector>
 
+template<typename T>
+T get_inf();
+
 template <typename T>
 class Graph {
-// Матрица смежности, которая содержит информацию о графе
 private:
-    std::vector<std::vector<T>> adjacency_matrix;
+    std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности, которая содержит информацию о графе
+    T inf;                                          // Условная бесконечность, которая означает отсутствие ребра
 private:
     //матрица для восстановления кратчайшего пути
     std::vector<std::vector<int>> restore_matrix;
@@ -68,5 +71,6 @@ public:
 private:
     std::vector<T> Dijkstra_from_one_vertex(int origin);
 };
+
 
 #endif
