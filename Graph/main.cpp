@@ -12,7 +12,7 @@ int main() {
     g1.add_edge(3, 4);
     g1.add_edge(4, 5, get_inf<int>());
     g1.tarjans_find_bridges();
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << get_inf<float>() << std::endl;
 
 
     std::vector<int> grid = {0,3,88,7,

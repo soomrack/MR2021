@@ -10,25 +10,24 @@ template <typename T>
 class Graph {
 private:
     std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности, которая содержит информацию о графе
-    T inf;                                          // Условная бесконечность, которая означает отсутствие ребра
-private:
-    //матрица для восстановления кратчайшего пути
-    std::vector<std::vector<int>> restore_matrix;
-    //вектор, в котором хранится путь восстановленный методом restore_path
-    std::vector<int> restored_path;
+    bool is_directed = false;                       // Переменная, показывающая, ориентированный ли граф
+    T inf;                                          // Условная бесконечность, которая означает отсутствие ребра с таким весом
 
 // Различные приватные переменные, которые могут использовать алгоритмы
+// (лучше не захламлять конструкторы их инициализацией)
 private:
     int tarjan_s_time = 0;
+private:
     int vertices = 0;
-    // ...
+    std::vector<std::vector<int>> restore_matrix;   // Матрица для восстановления кратчайшего пути
+    std::vector<int> restored_path;                 // Вектор, в котором хранится путь восстановленный методом restore_path
 
 // Конструкторы
 public:
     Graph();
-    explicit Graph(int num_of_vertices);
-    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix);
-    explicit Graph(std::vector<T> &adjacency_matrix);
+    explicit Graph(int num_of_vertices = 0, bool is_directed = false);
+    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix, bool is_directed = false);
+    explicit Graph(std::vector<T> &adjacency_matrix, bool is_directed = false);
     Graph(const Graph &other);
     Graph(Graph &&other) noexcept;
 
@@ -41,14 +40,14 @@ public:
 
 // В качестве примера здесь уже вставлен алгоритм Тарьяна (для поиска мостов), Флойда и Дейкстры
 // Список алгоритмов
-// *** Место для ваших алгоритмов *** //
+// *** Место для алгоритмов *** //
 public:
     std::vector<std::pair<int, int>> tarjans_find_bridges();
     std::vector<std::vector<T>> Floyd_Warshall();
     std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> Floyd_Warshall_ways();
     std::vector<std::vector<T>> Dijkstra();
 
-// *** Место для ваших вспомогательных функций *** //
+// *** Место для вспомогательных функций *** //
 // Вспомогательная приватная рекурсивная функция для алгоритма Тарьяна
 private:
     void tarjan_s_bridge_finding_dfs(int u,

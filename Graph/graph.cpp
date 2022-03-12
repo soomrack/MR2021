@@ -12,8 +12,9 @@ Graph<T>::Graph() {
 }
 
 template <typename T>
-Graph<T>::Graph(int num_of_vertices){
-    inf = get_inf<T>();
+Graph<T>::Graph(int num_of_vertices, bool is_directed){
+    this->inf = get_inf<T>();
+    this->is_directed = is_directed;
 
     for (int i = 0; i < num_of_vertices; i++) {
         std::vector<T> row(num_of_vertices, inf);
@@ -23,19 +24,19 @@ Graph<T>::Graph(int num_of_vertices){
 }
 
 template <typename T>
-Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix){
+Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix, bool is_directed){
     inf = get_inf<T>();
     this->adjacency_matrix = adjacency_matrix;
 }
 
 template <typename T>
-Graph<T>::Graph(std::vector<T> &adjacency_matrix){
+Graph<T>::Graph(std::vector<T> &adjacency_matrix, bool is_directed){
     inf = get_inf<T>();
-    vertices = (int) sqrt(adjacency_matrix.size());
-    this->adjacency_matrix.assign(vertices, std::vector<T> (vertices));
-    for (int row = 0; row < vertices; row++) {
-        for (int col = 0; col < vertices; col++) {
-            this->adjacency_matrix[row][col] = adjacency_matrix[row * vertices + col];
+    vertices = (int) sqrt(adjacency_matrix.size()); // replace!!!
+    this->adjacency_matrix.assign(vertices, std::vector<T> (vertices));                 //WTF?!
+    for (int row = 0; row < vertices; row++) {                                              //
+        for (int col = 0; col < vertices; col++) {                                          //
+            this->adjacency_matrix[row][col] = adjacency_matrix[row * vertices + col];      //
         }
     }
 }
@@ -43,19 +44,26 @@ Graph<T>::Graph(std::vector<T> &adjacency_matrix){
 template <typename T>
 Graph<T>::Graph(const Graph &other) {
     inf = other.inf;
+    this->is_directed = is_directed;
     adjacency_matrix = other.adjacency_matrix;
 }
 
 template <typename T>
 Graph<T>::Graph(Graph &&other) noexcept {
     inf = other.inf;
+    this->is_directed = is_directed;
     adjacency_matrix = other.adjacency_matrix;
 }
 
 template <typename T>
 void Graph<T>::add_edge(int u, int v, int weight){
-    adjacency_matrix[u][v] = weight;
-    adjacency_matrix[v][u] = weight;
+    if (is_directed) {
+        adjacency_matrix[u][v] = weight;
+    }
+    else {
+        adjacency_matrix[u][v] = weight;
+        adjacency_matrix[v][u] = weight;
+    }
 }
 
 
