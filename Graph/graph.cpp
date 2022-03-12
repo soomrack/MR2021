@@ -6,6 +6,16 @@
 #include <tuple>
 #include "graph.h"
 
+// Explicit instantiation
+template class Graph<int8_t>;
+template class Graph<int16_t>;
+template class Graph<int32_t>;
+template class Graph<int64_t>;
+
+template class Graph<float>;
+template class Graph<double>;
+
+
 template <typename T>
 Graph<T>::Graph() {
     inf = get_inf<T>();
@@ -26,14 +36,16 @@ Graph<T>::Graph(int num_of_vertices, bool is_directed){
 template <typename T>
 Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix, bool is_directed){
     inf = get_inf<T>();
+    this->is_directed = is_directed;
     this->adjacency_matrix = adjacency_matrix;
 }
 
 template <typename T>
 Graph<T>::Graph(std::vector<T> &adjacency_matrix, bool is_directed){
     inf = get_inf<T>();
+    this->is_directed = is_directed;
     vertices = (int) sqrt(adjacency_matrix.size()); // replace!!!
-    this->adjacency_matrix.assign(vertices, std::vector<T> (vertices));                 //WTF?!
+    this->adjacency_matrix.assign(vertices, std::vector<T> (vertices));                     // Strange
     for (int row = 0; row < vertices; row++) {                                              //
         for (int col = 0; col < vertices; col++) {                                          //
             this->adjacency_matrix[row][col] = adjacency_matrix[row * vertices + col];      //
@@ -66,17 +78,24 @@ void Graph<T>::add_edge(int u, int v, int weight){
     }
 }
 
+template <typename T>
+bool Graph<T>::get_is_directed() {
+    return is_directed;
+}
 
 // DFS based function to find all bridges. It uses recursive function tarjan_s_bridge_finding_dfs
 template <typename T>
 std::vector<std::pair<int, int>> Graph<T>::tarjans_find_bridges()
 {
     int num_of_vertices = adjacency_matrix.size();
+
     // Mark all the vertices as not visited
     std::vector<bool> visited(num_of_vertices, false);
 
     std::vector<int> disc(num_of_vertices);
     std::vector<int> low(num_of_vertices);
+
+    // initially parents are not specified
     std::vector<int> parent(num_of_vertices, -1);
 
     std::vector<std::pair<int, int>> bridges;
@@ -129,7 +148,6 @@ void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
             // is a tarjans_find_bridges
             if (low[v] > disc[u]){
                 bridges.emplace_back(u, v);
-                std::cout << u << ' ' << v << '\n';
             }
         }
         // Update low value of u for parent function calls.
@@ -323,13 +341,3 @@ T get_inf() {
    }
    return inf;
 }
-
-// Explicit instantiation
-
-template class Graph<int8_t>;
-template class Graph<int16_t>;
-template class Graph<int32_t>;
-template class Graph<int64_t>;
-
-template class Graph<float>;
-template class Graph<double>;

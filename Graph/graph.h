@@ -4,7 +4,7 @@
 #include <vector>
 
 template<typename T>
-T get_inf();
+T get_inf();            // Получить бесконечность для типа T
 
 template <typename T>
 class Graph {
@@ -34,20 +34,20 @@ public:
 // Методы для взаимодействия с графом (т.е. геттеры, сеттеры и т.д.)
 public:
     void add_edge(int v, int w, int weight = 0);
-    // ...
+    bool get_is_directed();
 
 /* Далее следуют наши методы из курсовых работ */
 
 // В качестве примера здесь уже вставлен алгоритм Тарьяна (для поиска мостов), Флойда и Дейкстры
-// Список алгоритмов
-// *** Место для алгоритмов *** //
+
+// *** Список публичных методов алгоритмов *** //
 public:
     std::vector<std::pair<int, int>> tarjans_find_bridges();
     std::vector<std::vector<T>> Floyd_Warshall();
     std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> Floyd_Warshall_ways();
     std::vector<std::vector<T>> Dijkstra();
 
-// *** Место для вспомогательных функций *** //
+// *** Место для вспомогательных приватных функций *** //
 // Вспомогательная приватная рекурсивная функция для алгоритма Тарьяна
 private:
     void tarjan_s_bridge_finding_dfs(int u,
