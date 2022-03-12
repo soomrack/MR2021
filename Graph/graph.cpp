@@ -2,6 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <cstdint>
+#include <cmath>
+#include <tuple>
 #include "graph.h"
 
 #define INF std::numeric_limits<T>::max()
@@ -21,6 +23,17 @@ Graph<T>::Graph(int num_of_vertices){
 template <typename T>
 Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix){
     this->adjacency_matrix = adjacency_matrix;
+}
+
+template <typename T>
+Graph<T>::Graph(std::vector<T> &adjacency_matrix){
+    vertices = (int) sqrt(adjacency_matrix.size());
+    this->adjacency_matrix.assign(vertices, std::vector<T> (vertices));
+    for (int row = 0; row < vertices; row++) {
+        for (int col = 0; col < vertices; col++) {
+            this->adjacency_matrix[row][col] = adjacency_matrix[row * vertices + col];
+        }
+    }
 }
 
 template <typename T>
@@ -111,6 +124,182 @@ void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
     }
 }
 
+//Floyd-Warshall algorithm without restore matrix
+template<typename T>
+std::vector<std::vector<T>> Graph<T>::Floyd_Warshall() {
+    if (!check_adjacency_matrix()){
+        std::vector<std::vector<T>> zero;
+        return zero;
+    }
+    // Floyd-Warshall algorithm realization
+    for (int intermediate = 0; intermediate < vertices; intermediate++) {
+        for (int origin = 0; origin < vertices; origin++) {
+            for (int destination = 0; destination < vertices; destination++) {
+                //let paths_matrix = A, then
+                //A(k)[x,y] = min(A(k-1)[x,y], A(k-1)[x,k] + A(k-1)[k,y])
+                adjacency_matrix[origin][destination] = min(origin, destination, intermediate);
+            }
+        }
+    }
+    return adjacency_matrix;
+}
+
+//Floyd-Warshall algorithm with restore matrix
+template<typename T>
+std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> Graph<T>::Floyd_Warshall_ways() {
+    if (!check_adjacency_matrix()) {
+        adjacency_matrix.clear();
+        restore_matrix.clear();
+        return std::make_tuple(adjacency_matrix, restore_matrix);
+    }
+    //initializing vector to restore the paths
+    restore_matrix.assign(vertices, std::vector<int> (vertices));
+    for (int row = 0; row < vertices; row++) {
+        for (int col = 0; col < vertices; col++) {
+            if (adjacency_matrix[row][col] == INF) {
+                restore_matrix[row][col] = 0;
+            } else
+                restore_matrix[row][col] = col + 1;
+        }
+    }
+    // Floyd-Warshall algorithm realization
+    for (int intermediate = 0; intermediate < vertices; intermediate++) {
+        for (int origin = 0; origin < vertices; origin++) {
+            for (int destination = 0; destination < vertices; destination++) {
+                //let paths_matrix = A, then
+                //A(k)[x,y] = min(A(k-1)[x,y], A(k-1)[x,k] + A(k-1)[k,y])
+                if (adjacency_matrix[origin][destination] > min(origin, destination, intermediate)) {
+                    adjacency_matrix[origin][destination] = min(origin, destination, intermediate);
+                    //saving previous nodes to restore paths
+                    restore_matrix[origin][destination] = restore_matrix[origin][intermediate];
+                }
+            }
+        }
+    }
+    //Check for negative cycle
+    for (int node = 0; node < vertices; node++) {
+        if (adjacency_matrix[node][node] != 0) {
+            adjacency_matrix.clear();
+            restore_matrix.clear();
+        }
+    }
+    return make_tuple(adjacency_matrix, restore_matrix);
+}
+
+//Uses restore_matrix from Floyd_Warshall_ways to restore paths
+template<typename T>
+std::vector<int> Graph<T>::restore_path(int from, int to) {
+    restored_path.clear();
+    if ((vertices < from) || (vertices < to)) return restored_path;
+    if (restore_matrix.empty()) return restored_path;
+    int current = from - 1;
+    int destination = to - 1;
+    if (adjacency_matrix[current][destination] == INF) return restored_path;
+    while (current != destination) {
+        restored_path.push_back(current);
+        current = restore_matrix[current][destination] - 1;
+        if (current < 0) {
+            restored_path.clear();
+            return restored_path;
+        }
+    }
+    restored_path.push_back(current);
+    return restored_path;
+}
+
+//method finds if the way through an intermediate vertex is the shortest or not
+template<typename T>
+T Graph<T>::min(int origin, int destination, int intermediate) {
+    T actual = adjacency_matrix[origin][destination];
+    T alternative = 0;
+    if (adjacency_matrix[origin][intermediate] == INF || adjacency_matrix[intermediate][destination] == INF) alternative = INF;
+    else alternative = adjacency_matrix[origin][intermediate] + adjacency_matrix[intermediate][destination];
+    if (actual > alternative) return alternative;
+    else return actual;
+}
+
+//check matrix to prevent undefined behaviour
+template<typename T>
+bool Graph<T>::check_adjacency_matrix() {
+    vertices = adjacency_matrix.size();
+    //checking a size of input matrix
+    for (int row = 0; row < vertices; row++) {
+        if (adjacency_matrix[row].size() != vertices) {
+            vertices = 0;
+            return false;
+        }
+    }
+    //checking the main diagonal
+    for (int node = 0; node < vertices; node++) {
+        if (adjacency_matrix[node][node] != 0) {
+            vertices = 0;
+            return false;
+        }
+    }
+    return true;
+}
+
+//receives start node and finds the shortest distances from it
+template<typename T>
+std::vector<T> Graph<T>::Dijkstra_from_one_vertex(int origin) {
+    origin--;
+    std::vector<T> shortest_distances;
+    // Checking correct input of the matrix and origin
+    if (origin > vertices) return shortest_distances;
+    //vector to store passed nodes
+    std::vector<bool> passed(vertices);
+    //vector to store the shortest distance from origin to all nodes
+    shortest_distances.resize(vertices);
+    //initializing vectors
+    passed[origin] = true;
+    for (int node = 0; node < vertices; node++) {
+        shortest_distances[node] = adjacency_matrix[origin][node];
+    }
+    //Dijkstra algorithm realization
+    for (int in_cln = 1; in_cln < vertices; in_cln++) {
+        T min = INF;
+        int next_node = -1;
+        //Finding the nearest node
+        for (int node = 0; node < vertices; node++) {
+            //We can't go through passed nodes
+            if (!passed[node]) {
+                if (min > shortest_distances[node]) {
+                    min = shortest_distances[node];
+                    next_node = node;
+                }
+            }
+        }
+        if (next_node == -1) return shortest_distances;
+        passed[next_node] = true;
+        //Finding the shortest paths through this node
+        for (int node = 0; node < vertices; node++) {
+            // We can't go through passed nodes
+            if (!passed[node]) {
+                if (adjacency_matrix[next_node][node] != INF) {
+                    if (min + adjacency_matrix[next_node][node] < shortest_distances[node]) {
+                        shortest_distances[node] = min + adjacency_matrix[next_node][node];
+                    }
+                }
+            }
+        }
+    }
+    return shortest_distances;
+}
+
+//Applies Dijkstra algorithm for every node to make paths matrix
+template<typename T>
+std::vector<std::vector<T>> Graph<T>::Dijkstra() {
+    if (!check_adjacency_matrix()) {
+        std::vector<std::vector<T>> zero;
+        return zero;
+    }
+    std::vector<std::vector<T>> paths_matrix (vertices, std::vector<T> (vertices));
+    for (int i = 1; i <= vertices; i++) {
+        paths_matrix[i-1] = Dijkstra_from_one_vertex(i);
+    }
+    adjacency_matrix = paths_matrix;
+    return adjacency_matrix;
+}
 
 // Explicit instantiation
 
