@@ -41,19 +41,6 @@ Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix, bool is_directed)
 }
 
 template <typename T>
-Graph<T>::Graph(std::vector<T> &adjacency_matrix, bool is_directed){
-    inf = get_inf<T>();
-    this->is_directed = is_directed;
-    vertices = (int) sqrt(adjacency_matrix.size()); // replace!!!
-    this->adjacency_matrix.assign(vertices, std::vector<T> (vertices));                     // Strange
-    for (int row = 0; row < vertices; row++) {                                              //
-        for (int col = 0; col < vertices; col++) {                                          //
-            this->adjacency_matrix[row][col] = adjacency_matrix[row * vertices + col];      //
-        }
-    }
-}
-
-template <typename T>
 Graph<T>::Graph(const Graph &other) {
     inf = other.inf;
     this->is_directed = is_directed;
@@ -114,11 +101,11 @@ std::vector<std::pair<int, int>> Graph<T>::tarjans_find_bridges()
 // A recursive function that finds bridges using DFS traversal
 template <typename T>
 void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
-                                        std::vector<bool> &visited,
-                                        std::vector<int> &disc,
-                                        std::vector<int> &low,
-                                        std::vector<int> &parent,
-                                        std::vector<std::pair<int, int>> &bridges) {
+                                           std::vector<bool> &visited,
+                                           std::vector<int> &disc,
+                                           std::vector<int> &low,
+                                           std::vector<int> &parent,
+                                           std::vector<std::pair<int, int>> &bridges) {
 
     // Mark the current node as visited
     visited[u] = true;
@@ -150,7 +137,7 @@ void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
                 bridges.emplace_back(u, v);
             }
         }
-        // Update low value of u for parent function calls.
+            // Update low value of u for parent function calls.
         else if (v != parent[u])
             low[u]  = std::min(low[u], disc[v]);
     }
@@ -158,7 +145,7 @@ void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
 
 //Floyd-Warshall algorithm without restore matrix
 template<typename T>
-std::vector<std::vector<T>> Graph<T>::Floyd_Warshall() {
+std::vector<std::vector<T>> Graph<T>::floyd_warshall() {
     if (!check_adjacency_matrix()){
         std::vector<std::vector<T>> zero;
         return zero;
@@ -178,7 +165,7 @@ std::vector<std::vector<T>> Graph<T>::Floyd_Warshall() {
 
 //Floyd-Warshall algorithm with restore matrix
 template<typename T>
-std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> Graph<T>::Floyd_Warshall_ways() {
+std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> Graph<T>::floyd_warshall_ways() {
     if (!check_adjacency_matrix()) {
         adjacency_matrix.clear();
         restore_matrix.clear();
@@ -273,7 +260,7 @@ bool Graph<T>::check_adjacency_matrix() {
 
 //receives start node and finds the shortest distances from it
 template<typename T>
-std::vector<T> Graph<T>::Dijkstra_from_one_vertex(int origin) {
+std::vector<T> Graph<T>::dijkstra_from_one_vertex(int origin) {
     origin--;
     std::vector<T> shortest_distances;
     // Checking correct input of the matrix and origin
@@ -320,14 +307,14 @@ std::vector<T> Graph<T>::Dijkstra_from_one_vertex(int origin) {
 
 //Applies Dijkstra algorithm for every node to make paths matrix
 template<typename T>
-std::vector<std::vector<T>> Graph<T>::Dijkstra() {
+std::vector<std::vector<T>> Graph<T>::dijkstra() {
     if (!check_adjacency_matrix()) {
         std::vector<std::vector<T>> zero;
         return zero;
     }
     std::vector<std::vector<T>> paths_matrix (vertices, std::vector<T> (vertices));
     for (int i = 1; i <= vertices; i++) {
-        paths_matrix[i-1] = Dijkstra_from_one_vertex(i);
+        paths_matrix[i-1] = dijkstra_from_one_vertex(i);
     }
     adjacency_matrix = paths_matrix;
     return adjacency_matrix;
@@ -335,9 +322,9 @@ std::vector<std::vector<T>> Graph<T>::Dijkstra() {
 
 template<typename T>
 T get_inf() {
-   T inf = std::numeric_limits<T>::infinity();
-   if (inf == (T) 0) {
-       return std::numeric_limits<T>::max();
-   }
-   return inf;
+    T inf = std::numeric_limits<T>::infinity();
+    if (inf == (T) 0) {
+        return std::numeric_limits<T>::max();
+    }
+    return inf;
 }

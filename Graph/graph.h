@@ -43,9 +43,9 @@ public:
 // *** Список публичных методов алгоритмов *** //
 public:
     std::vector<std::pair<int, int>> tarjans_find_bridges();
-    std::vector<std::vector<T>> Floyd_Warshall();
-    std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> Floyd_Warshall_ways();
-    std::vector<std::vector<T>> Dijkstra();
+    std::vector<std::vector<T>> floyd_warshall();
+    std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> floyd_warshall_ways();
+    std::vector<std::vector<T>> dijkstra();
 
 // *** Место для вспомогательных приватных функций *** //
 // Вспомогательная приватная рекурсивная функция для алгоритма Тарьяна
@@ -68,7 +68,7 @@ public:
 
 // вспомогательные приватные функции для алгоритма Дейкстры
 private:
-    std::vector<T> Dijkstra_from_one_vertex(int origin);
+    std::vector<T> dijkstra_from_one_vertex(int origin);
 };
 
 

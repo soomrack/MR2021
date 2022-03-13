@@ -23,10 +23,10 @@ void test_floyd_warshall_ways() {
                                           {5,99,0,1},
                                           {2,49,54,0}};
     Graph<int> dij(grid);
-    dij.Dijkstra();
+    dij.dijkstra();
 
     Graph<int> fw(grid);
-    fw.Floyd_Warshall_ways();
+    fw.floyd_warshall_ways();
     fw.restore_path(2, 4);
 }
 
