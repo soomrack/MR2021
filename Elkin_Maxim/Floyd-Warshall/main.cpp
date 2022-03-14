@@ -4,8 +4,8 @@
 #include <tuple>
 #include <random>
 
-#define INF numeric_limits<int>::max()
 using namespace std;
+#define INF numeric_limits<T>::max()
 
 template<class T>
 class Graph {
@@ -17,17 +17,17 @@ public:
 public:
     ////Floyd-Warshall methods
     //Floyd-Warshall algorithm without restore matrix
-    vector<vector<T>> FW_clear();
+    vector<vector<T>> floyd_warshall();
     //Floyd-Warshall algorithm with restore matrix
-    tuple<vector<vector<T>>, vector<vector<int>>> FW_alg_ways();
+    tuple<vector<vector<T>>, vector<vector<int>>> floyd_warshall_ways();
     //Uses restore_matrix from FW_alg to restore paths
     vector<int> restore_path(int, int);
 public:
     ////Dijkstra methods
     //receives start node and finds the shortest distances from it
-    vector<T> Dijkstra_alg(int);
+    vector<T> dijkstra_from_one_node(int);
     //Applies Dijkstra algorithm for every node to make paths matrix
-    vector<vector<T>> paths_matrix_Dij();
+    vector<vector<T>> dijkstra();
 public:
     ////auxiliary functions of class
     //getters
@@ -132,7 +132,7 @@ void Graph<T>::clean() {
 ////////////////////////////////////////////////
 
 template<typename T>
-vector<vector<T>> Graph<T>::FW_clear() {
+vector<vector<T>> Graph<T>::floyd_warshall() {
     paths_matrix = dist_matrix;
     // Floyd-Warshall algorithm realization
     for (int intermediate = 0; intermediate < nodes; intermediate++) {
@@ -148,7 +148,7 @@ vector<vector<T>> Graph<T>::FW_clear() {
 }
 
 template<typename T>
-tuple<vector<vector<T>>, vector<vector<int>>> Graph<T>::FW_alg_ways() {
+tuple<vector<vector<T>>, vector<vector<int>>> Graph<T>::floyd_warshall_ways() {
     paths_matrix = dist_matrix;
     //initializing vector to restore the paths
     restore_matrix.assign(nodes, vector<int> (nodes));
@@ -220,7 +220,7 @@ T Graph<T>::min(int origin, int destination, int intermediate) {
 ////////////////////////////////////////////////
 
 template<typename T>
-vector<T> Graph<T>::Dijkstra_alg(int origin) {
+vector<T> Graph<T>::dijkstra_from_one_node(int origin) {
     origin--;
     shortest_distances.clear();
     // Checking correct input of the matrix and origin
@@ -236,7 +236,7 @@ vector<T> Graph<T>::Dijkstra_alg(int origin) {
     }
     //Dijkstra algorithm realization
     for (int in_cln = 1; in_cln < nodes; in_cln++) {
-        int min = INF;
+        T min = INF;
         int next_node = -1;
         //Finding the nearest node
         for (int node = 0; node < nodes; node++) {
@@ -266,10 +266,10 @@ vector<T> Graph<T>::Dijkstra_alg(int origin) {
 }
 
 template<typename T>
-vector<vector<T>> Graph<T>::paths_matrix_Dij() {
+vector<vector<T>> Graph<T>::dijkstra() {
     paths_matrix.assign(nodes, vector<T> (nodes));
     for (int i = 1; i <= nodes; i++) {
-        Dijkstra_alg(i);
+        dijkstra_from_one_node(i);
         paths_matrix[i-1] = shortest_distances;
     }
     return paths_matrix;
@@ -328,18 +328,19 @@ vector<int> random_grid(int nodes, int lower, int upper) {
 }
 
 void example() {
-    vector<double> grid = {0, 50.5, 45, 10.09, INF, INF,
-                           INF, 0, 10.7, 15, INF, INF,
-                           INF, INF, 0, INF, 30.4, INF,
-                           10, INF, INF, 0, 15.96, INF,
-                           INF, 20.12, 35.62, INF, 0, INF,
-                           INF, INF, INF, INF, 3.1, 0};
+    double inf = numeric_limits<double>::max();
+    vector<double> grid = {0, 50.5, 45, 10.09, inf, inf,
+                           inf, 0, 10.7, 15, inf, inf,
+                           inf, inf, 0, inf, 30.4, inf,
+                           10, inf, inf, 0, 15.96, inf,
+                           inf, 20.12, 35.62, inf, 0, inf,
+                           inf, inf, inf, inf, 3.1, 0};
 
     cout << "==========================================" << endl;
     cout << "        FLoyd-Warshall algorithm" << endl;
     cout << "==========================================" << endl;
     Graph map_floyd(grid);
-    map_floyd.FW_alg_ways();
+    map_floyd.floyd_warshall_ways();
     cout << endl << "Paths matrix:" << endl;
     map_floyd.print_paths_matrix();
     map_floyd.restore_path(6, 1);
@@ -351,7 +352,7 @@ void example() {
     cout << "           Dijkstra algorithm" << endl;
     cout << "==========================================" << endl;
     Graph map_dijkstra(grid);
-    map_dijkstra.paths_matrix_Dij();
+    map_dijkstra.dijkstra();
     cout << endl << "Paths matrix:" << endl;
     map_dijkstra.print_paths_matrix();
 }
@@ -370,13 +371,13 @@ void time_compare() {
 
         //measuring time for Floyd-Warshall algorithm
         start = clock();
-        map_floyd.FW_clear();
+        map_floyd.floyd_warshall();
         end = clock();
         unsigned int FW_time = end - start;
 
         //measuring time for Dijkstra algorithm
         start = clock();
-        map_dijkstra.paths_matrix_Dij();
+        map_dijkstra.dijkstra();
         end = clock();
         unsigned int Dij_time = end - start;
         cout << i << "    " << FW_time << "        " << Dij_time << endl;
@@ -384,7 +385,7 @@ void time_compare() {
 }
 
 int main() {
-
+    example();
     return 0;
 }
 
