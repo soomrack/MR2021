@@ -1,11 +1,44 @@
 #include "RPN.h"
 
-bool Interpretation::isDigit(char symb)
+Interpretation::Interpretation()  = default;
+
+Interpretation::Interpretation(const Interpretation & other)
+{
+	expression = other.expression;
+	prepared = other.prepared;
+	rp_string = other.rp_string;
+
+	input_id = other.input_id;
+	actual_symbol = other.actual_symbol;
+	prev_symbol = other.prev_symbol;
+
+}
+
+Interpretation::Interpretation(Interpretation && other) noexcept
+{
+	expression = other.expression;
+	prepared = other.prepared;
+	rp_string = other.rp_string;
+	input_id = other.input_id;
+	actual_symbol = other.actual_symbol;
+	prev_symbol = other.prev_symbol;
+
+	other.input_id = 0;
+	other.actual_symbol = '\0';
+	other.prev_symbol = '\0';
+	other.expression = "\0";
+	other.prepared = "\0";
+	other.rp_string = "\0";
+}
+
+Interpretation::~Interpretation() = default;
+
+bool Interpretation::is_digit(char symb)
 {
     return (symb >= '0' && symb <= '9');
 }
 
-int Interpretation::prior(char symb)
+int Interpretation::get_prior(char symb)
 {
     switch (symb)
     {
@@ -17,18 +50,18 @@ int Interpretation::prior(char symb)
         case '*':
         case '/':
             return 3;
-        case 'z':
-            return -1;
+        case '^':
+            return 4;
         default:
             return 0;
     }
 }
 
-char Interpretation::get_next_char(std::string scrl_str)
+char Interpretation::get_next_char(std::string go_throw_str)
 {
-    if(inp_index < scrl_str.size())
+    if(input_id < go_throw_str.size())
     {
-        return (actual_symbol = scrl_str[inp_index++]);
+        return (actual_symbol = go_throw_str[input_id++]);
     }
     else
     {
@@ -36,181 +69,299 @@ char Interpretation::get_next_char(std::string scrl_str)
     }
 }
 
-std::string Interpretation::get_str_output() const
+char Interpretation::get_prev_char(std::string go_throw_str)
 {
-    return str_output;
+	return (prev_symbol = go_throw_str[input_id]);
 }
 
-void Interpretation::convert(std::string orig_str)
+std::string Interpretation::prepare(std::string expression)
+{
+	int prev_oper = 0;
+	int bracket_num = 0;
+	input_id = 0;
+	while(get_next_char(expression) != '\0')
+	{
+		if(is_digit(actual_symbol))
+		{
+			prepared += actual_symbol;
+			prev_oper = 0;
+			if (get_prev_char(prepared) == '-')
+			{
+				prepared += ')';
+				bracket_num--;
+			}
+			continue;
+		}
+		switch (actual_symbol)
+		{
+			case '+': case '*': case '/': case '^':
+				prepared += actual_symbol;
+				prev_oper = 1;
+				continue;
+			case '-':
+				if (prev_oper == 0)
+				{
+					prepared += actual_symbol;
+					prev_oper = 1;
+					continue;
+				}
+				prepared += '(';
+				bracket_num++;
+				prepared += '0';
+				prepared += actual_symbol;
+				prev_oper = 1;
+				continue;
+			case '(':
+				prepared += actual_symbol;
+				bracket_num++;
+				continue;
+			case ')':
+				while (bracket_num > 0)
+				{
+					prepared += actual_symbol;
+					bracket_num--;
+				}
+				continue;
+
+		}
+
+	}
+
+	return prepared;
+}
+
+std::string Interpretation::convert(std::string middle_str)
 {
     int prev_oper = 0;
     int new_bracket = 0;
-    inp_index = 0;
+    input_id = 0;
 
-    std::stack <char> stack4operators;
-    str_input = orig_str;
-    str_output.clear();
+    std::stack <char> stack4convert;
+	std::stack <char> stack4operators;
+    rp_string.clear();
 
-    if((!isDigit(str_input[0])) && str_input[0] != '(')
+    if((!is_digit(middle_str[0])) && middle_str[0] != '(')
     {
-        throw std::runtime_error ("Syntax error! Something wrong with the first symbol");
+	    rp_string = "";
+		return ("Syntax error! Something wrong with the first symbol");
     }
 
-    while(get_next_char(str_input) != '\0')
+    while(get_next_char(middle_str) != '\0')
     {
-        if(isDigit(actual_symbol))
+        if(is_digit(actual_symbol))
         {
-            str_output += actual_symbol;
+            rp_string += actual_symbol;
             prev_oper = 0;
             continue;
         }
 
-
         switch (actual_symbol)
         {
             case '(':
-                stack4operators.push(actual_symbol);
+                stack4convert.push(actual_symbol);
                 new_bracket++;
                 prev_oper = 0;
                 break;
-            case '*': case '/': case '+': case '-':
-                if(inp_index == str_input.size())
-                {
-                    throw std::runtime_error ("Syntax error! Your last symbol - operator?!");
-                }
 
-                if(stack4operators.empty())
+			case '*': case '/': case '+': case '-': case '^':
+                if(input_id == middle_str.size())
+                {
+	                return ("Syntax error! Your last symbol - operator?!");
+                }
+                if(stack4convert.empty())
                 {
                     prev_oper = 1;
-                    stack4operators.push(actual_symbol);
+                    stack4convert.push(actual_symbol);
                     break;
                 }
-
-                else if((!prev_oper) && (!stack4operators.empty()))
+				if((!prev_oper) && (!stack4convert.empty()))
                 {
                     prev_oper = 1;
-                    while(prior(actual_symbol) <= prior(stack4operators.top()))
+                    while(get_prior(actual_symbol) <= get_prior(stack4convert.top()))
                     {
-                        str_output += stack4operators.top();
-                        stack4operators.pop();
-                        if (stack4operators.empty())
+                        rp_string += stack4convert.top();
+                        stack4convert.pop();
+                        if (stack4convert.empty())
                         {
-                            stack4operators.push(actual_symbol);
+                            stack4convert.push(actual_symbol);
                             break;
                         }
                     }
 
-                    if(prior(actual_symbol) > prior(stack4operators.top()))
+                    if(get_prior(actual_symbol) > get_prior(stack4convert.top()))
                     {
-                        stack4operators.push(actual_symbol);
+                        stack4convert.push(actual_symbol);
                     }
                     break;
                 }
-
-                else
-                {
-                    throw std::runtime_error ("Syntax error! You got 2 operators going sequence.");
-                }
-
+		        return ("Syntax error! You got 2 operators going sequence.");
             case ')':
                 if(prev_oper)
                 {
-                    throw std::runtime_error ("Syntax error! You got ')' after operator!");
+	                return ("Syntax error! You got ')' after operator!");
                 }
-                else
-                    while((actual_symbol = stack4operators.top())!= '(' && new_bracket>0)
-                    {
-                        str_output += actual_symbol;
-                        stack4operators.pop();
-                    }
-                new_bracket--;
+		        while((actual_symbol = stack4convert.top())!= '(' && new_bracket>0)
+		        {
+			        rp_string += actual_symbol;
+			        stack4convert.pop();
+		        }
+		        new_bracket--;
+				stack4convert.pop();
                 break;
             default:
-                throw std::runtime_error ("Error! Invalid symbol in the string.");
+	            return ("Error! Invalid symbol in the string.");
         }
     }
 
-    while(!stack4operators.empty())
+	char final_pop;
+    /*while(!stack4convert.empty())
     {
-        if(stack4operators.top() == '(')
-        {
-            stack4operators.pop();
-            continue;
-        }
-        str_output += stack4operators.top();
-        stack4operators.pop();
-    }
+	    final_pop = stack4convert.top();
+	    stack4convert.pop();
+	    if(final_pop == '(')
+	    {
+		    continue;
+	    }
+		stack4operators.push(final_pop);
+    }*/
+	while (!stack4convert.empty())
+	{
+		final_pop = stack4convert.top();
+		stack4convert.pop();
+		if(final_pop == '(')
+		{
+			continue;
+		}
+		if(stack4convert.empty())
+		{
+			rp_string += final_pop;
+			continue;
+		}
+		if (get_prior(final_pop) >= get_prior(stack4convert.top()))
+		{
+			rp_string += final_pop;
+			continue;
+		}
+		if (get_prior(final_pop) < stack4convert.top())
+		{
+			rp_string += stack4convert.top();
+			stack4convert.pop();
+			stack4convert.push(final_pop);
+		}
+	}
 
     if(new_bracket)
     {
-        throw std::runtime_error ("Error. Wrong number of brackets.");
+	    return ("Error. Wrong number of brackets.");
     }
-
-    std::cout << str_output << "\n";
-
-
-    std::stack <int> stack4calculation;
-    int f_num = 0;
-    int s_num = 0;
-    int temp = 0;
-    inp_index = 0;
-
-    while(get_next_char(str_output) != '\0')
-    {
-        if(isDigit(actual_symbol))
-        {
-            temp = actual_symbol - '0';
-            stack4calculation.push(temp);
-            continue;
-        }
-        else if(!isDigit(actual_symbol))
-        {
-            switch (actual_symbol)
-            {
-                case '+':
-                    f_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    s_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    temp = f_num + s_num;
-                    stack4calculation.push(temp);
-                    break;
-                case '-':
-                    s_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    f_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    temp = f_num - s_num;
-                    stack4calculation.push(temp);
-                    break;
-                case '*':
-                    f_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    s_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    temp = f_num * s_num;
-                    stack4calculation.push(temp);
-                    break;
-                case '/':
-                    s_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    f_num = stack4calculation.top();
-                    stack4calculation.pop();
-                    temp = f_num / s_num;
-                    stack4calculation.push(temp);
-                    break;
-            }
-        }
-    }
-    int answer = 0;
-    answer = stack4calculation.top();
-    stack4operators.pop();
-    std::cout << answer << "\n";
+	return rp_string;
 }
+
+float Interpretation::calculate(std::string rp_string)
+{
+	if((!is_digit(rp_string[0])) && rp_string[0] != '(')
+	{
+		rp_string = "";
+		std::cout << "Calculation terminated! Something wrong with the first symbol";
+		return 0.0;
+	}
+	std::stack <float> stack4calculation;
+	float f_num = 0.0;
+	float s_num = 0.0;
+	float temp = 0.0;
+	input_id = 0.0;
+
+	while(get_next_char(rp_string) != '\0')
+	{
+		if(is_digit(actual_symbol))
+		{
+			temp = float(actual_symbol - '0');
+			stack4calculation.push(temp);
+			continue;
+		}
+		else if(!is_digit(actual_symbol))
+		{
+			switch (actual_symbol)
+			{
+				case '+':
+					f_num = stack4calculation.top();
+					stack4calculation.pop();
+					s_num = stack4calculation.top();
+					stack4calculation.pop();
+					temp = f_num + s_num;
+					stack4calculation.push(temp);
+					break;
+				case '-':
+					s_num = stack4calculation.top();
+					stack4calculation.pop();
+					f_num = stack4calculation.top();
+					stack4calculation.pop();
+					temp = f_num - s_num;
+					stack4calculation.push(temp);
+					break;
+				case '*':
+					f_num = stack4calculation.top();
+					stack4calculation.pop();
+					s_num = stack4calculation.top();
+					stack4calculation.pop();
+					temp = f_num * s_num;
+					stack4calculation.push(temp);
+					break;
+				case '/':
+					s_num = stack4calculation.top();
+					stack4calculation.pop();
+					f_num = stack4calculation.top();
+					stack4calculation.pop();
+					if (s_num == 0)
+					{
+						rp_string = "";
+						std::cout << "Calculation terminated! You've tried to divide by 0";
+						return 0.0;
+					}
+					temp = f_num / s_num;
+					stack4calculation.push(temp);
+					break;
+				case '^':
+					s_num = stack4calculation.top();
+					stack4calculation.pop();
+					f_num = stack4calculation.top();
+					stack4calculation.pop();
+					temp = pow(f_num, s_num);
+					stack4calculation.push(temp);
+			}
+		}
+	}
+	float answer = 0.0;
+	answer = stack4calculation.top();
+	stack4calculation.pop();
+	return answer;
+}
+
 
 int main()
 {
-    Interpretation Test;
-    Test.convert("4/2*6-4");
-    return 0;
+	std::string test_prep;
+	std::string test_str;
+	float test_answ;
+
+	clock_t t1 = clock();
+
+	for(int i = 0; i <= 12500; i++)
+	{
+		Interpretation Test;
+		test_prep = Test.prepare("1/(7-(1+1))*3-(2+(1+1))*1/(7-(2+1))*3-(2+(1+1))*(1/(7-(1+1)))^-3-((2+(1+1)))+1/(7-((1+1)))*3-((2+(1+1)))");
+		//std::string test_prep = Test.prepare("(8+2*5)/(1+3*2-4)");
+		//std::cout << "Prepared string > "<< test_prep << "\n";
+		test_str = Test.convert(test_prep);
+		//std::cout << "String in RPN > " << test_str << "\n";
+		test_answ = Test.calculate(test_str);
+	}
+
+	clock_t t2 = clock();
+	double runtime = (double)(t2 - t1) / CLOCKS_PER_SEC;
+	std::cout << "Prepared string > "<< test_prep << "\n";
+	std::cout << "String in RPN > " << test_str << "\n";
+	std::cout << "Your answer > "<< test_answ << "\n";
+	std::cout << "Runtime > " << runtime << "\n";
+	return 0;
 }
