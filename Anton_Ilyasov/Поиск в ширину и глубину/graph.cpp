@@ -1,108 +1,129 @@
 ﻿#include <iostream>
 #include "graph.h"
-using namespace std;
 #include <queue> // очередь
 #include <stack> // стек
 
-Graph::Graph(int numVertices) {
-    this->numVertices = numVertices;
-    adjMatrix = new bool* [numVertices];
-    for (int i = 0; i < numVertices; i++) {
-        adjMatrix[i] = new bool[numVertices];
-        for (int j = 0; j < numVertices; j++)
-            adjMatrix[i][j] = false;
-    }
+Graph::Graph() { 
+    numVertices = 0;
+    adjMatrix = nullptr;
+    data = nullptr;
 }
 
-Graph::Graph(int numVertices, string type) {
-    //srand(time(NULL));
+Graph::Graph(int64_t numVertices, bool* other_matrix) { //матрица смежности создается на основе исходной матрицы
     this->numVertices = numVertices;
+    data = new bool[numVertices * numVertices];
     adjMatrix = new bool* [numVertices];
-    for (int i = 0; i < numVertices; i++) {
-        adjMatrix[i] = new bool[numVertices];
-        for (int j = 0; j < numVertices; j++) {
-            adjMatrix[i][j] = rand() % 2;
+    for (int64_t i = 0; i < numVertices; i++)
+    {
+        adjMatrix[i] = &data[i * numVertices];
+    }
+    memcpy(data, other_matrix, numVertices * numVertices * sizeof(bool));
+}
+
+Graph::Graph(int64_t numVertices, GraphType type) { //матрица смежности с разными данными
+    this->numVertices = numVertices;
+    data = new bool[numVertices * numVertices];
+    adjMatrix = new bool* [numVertices];
+    for (int64_t i = 0; i < numVertices; i++)
+    {
+        adjMatrix[i] = &data[i * numVertices];
+    }
+    switch (type)
+    {
+    case ZERO:
+        for (int64_t i = 0; i < numVertices * numVertices; i++)
+        {
+            data[i] = false;
         }
+        break;
+    case RANDOM:
+        //srand(time(NULL));
+        for (int64_t i = 0; i < numVertices; i++) {
+            for (int64_t j = 0; j < numVertices && i != j; j++) {
+                adjMatrix[i][j] = rand() % 2;
+            }
+            adjMatrix[i][i] = 0;
+        }
+        break;
     }
 }
 
-void Graph::addEdge(int i, int j) {
+void Graph::addEdge(int64_t i, int64_t j) {
     adjMatrix[i][j] = true;
     adjMatrix[j][i] = true;
 }
 
-void Graph::removeEdge(int i, int j) {
+void Graph::removeEdge(int64_t i, int64_t j) {
     adjMatrix[i][j] = false;
     adjMatrix[j][i] = false;
 }
 
-bool Graph::isEdge(int i, int j) {
+bool Graph::isEdge(int64_t i, int64_t j) {
     return adjMatrix[i][j];
 }
 
 void Graph::toString() {
-    for (int i = 0; i < numVertices; i++) {
-        for (int j = 0; j < numVertices; j++)
-            cout << adjMatrix[i][j] << " ";
-        cout << "\n";
+    for (int64_t i = 0; i < numVertices; i++) {
+        for (int64_t j = 0; j < numVertices; j++)
+            std::cout << adjMatrix[i][j] << " ";
+        std::cout << "\n";
     }
 }
 
 void Graph::bfs_search() {
-    cout << endl;
-    int* nodes = new int[numVertices]; // вершины графа (0 - все вершины не рассмотрены)
-    for (int i = 0; i < numVertices; i++) {
+    std::cout << "\n";
+    int64_t* nodes = new int64_t[numVertices]; // вершины графа (0 - все вершины не рассмотрены)
+    for (int64_t i = 0; i < numVertices; i++) {
         nodes[i] = 0;
     }
 
-    queue<int> Queue;
+    std::queue<int64_t> Queue;
     Queue.push(0); // помещаем в очередь первую вершину
     while (!Queue.empty()) // пока очередь не пуста
     {
-        int node = Queue.front(); // извлекаем вершину
+        int64_t node = Queue.front(); // извлекаем вершину
         Queue.pop();
         nodes[node] = 2; // отмечаем ее как посещенную
-        for (int j = 0; j < numVertices; j++) { // проверяем для нее все смежные вершины
+        for (int64_t j = 0; j < numVertices; j++) { // проверяем для нее все смежные вершины
             if (adjMatrix[node][j] == true && nodes[j] == 0) { // если вершина смежная и не обнаружена
                 Queue.push(j); // добавляем ее в очередь
                 nodes[j] = 1; // отмечаем вершину как обнаруженную
             }
         }
-        //cout << node << " "; // выводим номер вершины
+        //std::cout << node << " "; // выводим номер вершины
     }
     delete[] nodes;
     nodes = nullptr;
 }
 
 void Graph::dfs_search() {
-    cout << endl;
-    int* nodes = new int[numVertices]; // вершины графа (0 - все вершины не рассмотрены)
-    for (int i = 0; i < numVertices; i++) {
+    std::cout << "\n";
+    int64_t* nodes = new int64_t[numVertices]; // вершины графа (0 - все вершины не рассмотрены)
+    for (int64_t i = 0; i < numVertices; i++) {
         nodes[i] = 0;
     }
 
-    stack<int> Stack;
+    std::stack<int64_t> Stack;
     Stack.push(0); // помещаем в очередь первую вершину
     while (!Stack.empty()) {
-        int node = Stack.top(); // извлекаем вершину
+        int64_t node = Stack.top(); // извлекаем вершину
         Stack.pop();
-        if (nodes[node] == 2) continue;
         nodes[node] = 2; // отмечаем ее как посещенную
-        for (int j = numVertices - 1; j >= 0; j--) { // проверяем для нее все смежные вершины
-            if (adjMatrix[node][j] == true && nodes[j] != 2) { // если вершина смежная и не обнаружена
+        for (int64_t j = numVertices - 1; j >= 0; j--) { // проверяем для нее все смежные вершины
+            if (adjMatrix[node][j] == true && nodes[j] == 0) { // если вершина смежная и не обнаружена
                 Stack.push(j); // добавляем ее в cтек
                 nodes[j] = 1; // отмечаем вершину как обнаруженную
             }
         }
-        //cout << node << " "; // выводим номер вершины
+        //std::cout << node << " "; // выводим номер вершины
     }
     delete[] nodes;
     nodes = nullptr;
 }
 
 Graph::~Graph() {
-    for (int i = 0; i < numVertices; i++)
-        delete[] adjMatrix[i];
+    delete[] data;
     delete[] adjMatrix;
+    data = nullptr;
     adjMatrix = nullptr;
 }

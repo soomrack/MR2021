@@ -1,12 +1,11 @@
-﻿#include<iostream>
+﻿#pragma comment(linker, "/HEAP:400000000")
+#include<iostream>
 #include "graph.h"
-#include <queue> // очередь
-#include <stack> // стек
 #include <ctime>
 
-void bfs_search_time(int numVertices) {
-    Graph a(numVertices, "rand");
 
+void bfs_search_time(int64_t numVertices) {
+    Graph a(numVertices, RANDOM);
     int start = clock();
     a.bfs_search();
     int end = clock();
@@ -14,9 +13,8 @@ void bfs_search_time(int numVertices) {
     std::cout << (end - start) * 1000 / CLOCKS_PER_SEC << std::endl;
 }
 
-void dfs_search_time(int numVertices) {
-    Graph a(numVertices, "rand");
-
+void dfs_search_time(int64_t numVertices) {
+    Graph a(numVertices, RANDOM);
     int start = clock();
     a.dfs_search();
     int end = clock();
@@ -27,27 +25,45 @@ void dfs_search_time(int numVertices) {
 int main() {
     //тест BFS
     std::cout << "BFS tests...\n ";
-    bfs_search_time(1);
-    bfs_search_time(10);
-    bfs_search_time(100);
-    bfs_search_time(500);
-    bfs_search_time(1000);
-    bfs_search_time(3000);
-    bfs_search_time(5000);
-    bfs_search_time(8000);
     bfs_search_time(10000);
+    bfs_search_time(20000);
+    bfs_search_time(30000);
+    bfs_search_time(40000);
+    bfs_search_time(50000);
 
-    //тест DFS
+    ////тест DFS
     std::cout << "\nDFS tests...\n ";
-    dfs_search_time(1);
-    dfs_search_time(10);
-    dfs_search_time(100);
-    dfs_search_time(500);
-    dfs_search_time(1000);
-    dfs_search_time(3000);
-    dfs_search_time(5000);
-    dfs_search_time(8000);
     dfs_search_time(10000);
+    dfs_search_time(20000);
+    dfs_search_time(30000);
+    dfs_search_time(40000);
+    dfs_search_time(50000);
+
+    //тест отдельных графов
+    bool a[6][6] = { 0,1,1,0,0,0,
+        1,0,0,1,1,0,
+        1,0,0,0,0,0,
+        0,1,0,0,0,0,
+        0,1,0,0,0,1,
+        0,0,0,0,1,0 };
+
+    Graph aa(6, *a);
+    aa.bfs_search();
+    aa.dfs_search();
+
+    bool b[5][5] = { 0,0,1,1,0,
+        0,0,1,0,0,
+        1,1,0,0,1,
+        1,0,0,0,1,
+        0,0,1,1,0 };
+
+    Graph bb(5, *b);
+    bb.bfs_search();
+    bb.dfs_search();
 
     return 0;
 }
+
+
+
+
