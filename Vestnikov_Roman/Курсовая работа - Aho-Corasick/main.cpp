@@ -8,63 +8,36 @@ using namespace std;
 
 int main() {
 
-    ifstream text("text.txt");
-    string str;
-    getline(text, str);
+    //ifstream input("text_100k.txt");
+    ifstream input("text_100k_~alf.txt");
+    string str_input;
+    getline(input, str_input);
+    input.close();
+
 
     clock_t t1 = clock();
-
     Prefix_tree dictionary;
 
     // k = 10
-    // prefix tree creation
-    dictionary.add_str_to_tree("gcdbjgfbccaadijdaihhffbhedaagafajedcfcjihgghaajbfg");
-    dictionary.add_str_to_tree("ihbdejhghffcagchhgffjheiajgfdfccaifaaggbahdgcijhcb");
-    dictionary.add_str_to_tree("agibiibfgdcbdecfdeddihdaiehafefibdgfdbhdcddbihibgg");
-    dictionary.add_str_to_tree("fhgcgfihfjajbjafceiijddhffjcabjedediggedbjijfbidig");
+    string str_dict;
+    ifstream dict("dictionary.txt");
 
-    dictionary.add_str_to_tree("hchcgfbjbbddhij");
-    dictionary.add_str_to_tree("cidijeejhcgfaae");
-    dictionary.add_str_to_tree("icjhdciahhahdjg");
-    dictionary.add_str_to_tree("cfigfcfcdjaegfb");
+    while(getline(dict, str_dict )) {
+        if ((str_dict[str_dict.size() - 1]) == '\r') {
+            str_dict = str_dict.substr(0, str_dict.size()-1);
+        }
+        dictionary.add_str_to_tree(str_dict);
+    }
+    dict.close();
 
-    dictionary.add_str_to_tree("abjibibejd");
-    dictionary.add_str_to_tree("ijdgcdhbbi");
-    dictionary.add_str_to_tree("chgjgddggg");
-    dictionary.add_str_to_tree("aaicjefafi");
-
-    dictionary.add_str_to_tree("aceaf");
-    dictionary.add_str_to_tree("cbdbg");
-    dictionary.add_str_to_tree("bachb");
-    dictionary.add_str_to_tree("acgcj");
-
-    dictionary.add_str_to_tree("ciia");
-    dictionary.add_str_to_tree("bbgd");
-    dictionary.add_str_to_tree("cbjb");
-    dictionary.add_str_to_tree("ciig");
-
-    dictionary.add_str_to_tree("aef");
-    dictionary.add_str_to_tree("efc");
-    dictionary.add_str_to_tree("ebg");
-    dictionary.add_str_to_tree("cef");
-
-    /*add_str_to_bohr("ac");
-    dictionary.add_str_to_tree("be");
-    dictionary.add_str_to_tree("dg");
-    dictionary.add_str_to_tree("ff");*/
-
-    /*dictionary.add_str_to_tree("c");
-    dictionary.add_str_to_tree("e");
-    dictionary.add_str_to_tree("h");
-    dictionary.add_str_to_tree("i");*/
-
-    dictionary.find_all_pos(str);
-
-    clock_t t2 = clock();
+    dictionary.find_all_pos(str_input);
 
     // time evaluation
+    clock_t t2 = clock();
     double time = (double)(t2 - t1) / CLOCKS_PER_SEC;
-    cout << "Time: " << time << endl;
+    cout << "Time: " << time << " s" << endl;
+    time = time * 1000.0;
+    cout << "Time: " << time << " ms" << endl;
 
     return 0;
 }

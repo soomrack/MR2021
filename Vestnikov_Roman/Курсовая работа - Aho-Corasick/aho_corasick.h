@@ -33,7 +33,7 @@ private:
     vector<pr_tree_vertex> tree;
     vector<string> pattern;
 private:
-    pr_tree_vertex make_bohr_vertex(int p, char c);
+    pr_tree_vertex make_tree_vertex(int p, char c);
     int get_suff_link_comp(int v);
     int get_auto_move(int v, char ch);
     int get_suff_link(int v);

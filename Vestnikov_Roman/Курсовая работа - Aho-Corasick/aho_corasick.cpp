@@ -1,10 +1,10 @@
 #include "aho_corasick.h"
 
 Prefix_tree::Prefix_tree() {
-    tree.push_back(make_bohr_vertex(0, '$'));
+    tree.push_back(make_tree_vertex(0, '$'));
 }
 
-pr_tree_vertex Prefix_tree::make_bohr_vertex(int p, char c) {
+pr_tree_vertex Prefix_tree::make_tree_vertex(int p, char c) {
     pr_tree_vertex v;  //create tree
     memset(v.next_vertex, 255, sizeof(v.next_vertex));  //255 = -1
     memset(v.auto_move, 255, sizeof(v.auto_move));
@@ -21,7 +21,7 @@ void Prefix_tree::add_str_to_tree(const string &str) {
     for (int i = 0; i < str.length(); i++) {
         char ch = str[i] - 'a';  //get the number in the alphabet
         if (tree[num].next_vertex[ch] == -1) {  //-1 - the sign of the absence of an rib
-            tree.push_back(make_bohr_vertex(num, ch));
+            tree.push_back(make_tree_vertex(num, ch));
             tree[num].next_vertex[ch] = tree.size() - 1;
         }
         num = tree[num].next_vertex[ch];
@@ -78,7 +78,7 @@ int Prefix_tree::get_suff_link_comp(int v) {
 void Prefix_tree::check(int v, int i) {
     for (int u = v; u != 0; u = get_suff_link_comp(u)) {
         if (tree[u].flag) {
-            cout << i - pattern[tree[u].pat_num].length() + 1 << " " << pattern[tree[u].pat_num] << endl;
+            //cout << i - pattern[tree[u].pat_num].length() + 1 << " " << pattern[tree[u].pat_num] << endl;
         }
     }
 }
