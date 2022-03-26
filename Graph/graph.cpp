@@ -17,58 +17,63 @@ template class Graph<double>;
 
 
 template <typename T>
-Graph<T>::Graph() {
-    inf = get_inf<T>();
-}
-
-template <typename T>
-Graph<T>::Graph(int num_of_vertices, bool is_directed){
-    this->inf = get_inf<T>();
-    this->is_directed = is_directed;
-
+Graph<T>::Graph(int num_of_vertices){
+    conditional_inf = get_inf<T>();
     for (int i = 0; i < num_of_vertices; i++) {
-        std::vector<T> row(num_of_vertices, inf);
+        std::vector<T> row(num_of_vertices, conditional_inf);
         row[i] = 0;
         adjacency_matrix.push_back(row);
     }
 }
 
 template <typename T>
-Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix, bool is_directed){
-    inf = get_inf<T>();
-    this->is_directed = is_directed;
+Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix){
+    conditional_inf = get_inf<T>();
     this->adjacency_matrix = adjacency_matrix;
 }
 
 template <typename T>
+Graph<T>::Graph(std::vector<std::list<T>> &adjacency_list){
+    conditional_inf = get_inf<T>();
+    this->adjacency_list = adjacency_list;
+}
+
+template <typename T>
 Graph<T>::Graph(const Graph &other) {
-    inf = other.inf;
-    this->is_directed = is_directed;
+    conditional_inf = other.conditional_inf;
     adjacency_matrix = other.adjacency_matrix;
+    adjacency_list = other.adjacency_list;
 }
 
 template <typename T>
 Graph<T>::Graph(Graph &&other) noexcept {
-    inf = other.inf;
-    this->is_directed = is_directed;
+    conditional_inf = other.conditional_inf;
     adjacency_matrix = other.adjacency_matrix;
+    adjacency_list = other.adjacency_list;
 }
 
 template <typename T>
-void Graph<T>::add_edge(int u, int v, int weight){
-    if (is_directed) {
-        adjacency_matrix[u][v] = weight;
-    }
-    else {
-        adjacency_matrix[u][v] = weight;
-        adjacency_matrix[v][u] = weight;
+void Graph<T>::add_edge(int source, int target, int weight, EdgeType edge_type){
+    if (edge_type == UNDIRECTED) {
+        adjacency_matrix[source][target] = weight;
+        adjacency_matrix[target][source] = weight;
+    } else {
+        adjacency_matrix[source][target] = weight;
     }
 }
 
-template <typename T>
-bool Graph<T>::get_is_directed() {
-    return is_directed;
+template<typename T>
+void Graph<T>::synchronize_data(DataType source_data, DataType target_data) { // нужно позже реализовать
+    switch (source_data) {
+        case ADJACENCY_MATRIX:
+            break;
+        case ADJACENCY_LIST:
+            break;
+        default:
+            break;
+    }
 }
+
 
 // DFS based function to find all bridges. It uses recursive function tarjan_s_bridge_finding_dfs
 template <typename T>
@@ -117,7 +122,7 @@ void Graph<T>::tarjan_s_bridge_finding_dfs(int u,
     for (int v = 0; v < adjacency_matrix.size(); v++) {
 
         // if the edge between U and V does not exist, then skip it
-        if (adjacency_matrix[u][v] == inf) {
+        if (adjacency_matrix[u][v] == conditional_inf) {
             continue;
         }
 
@@ -175,7 +180,7 @@ std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> Graph<T>:
     restore_matrix.assign(vertices, std::vector<int> (vertices));
     for (int row = 0; row < vertices; row++) {
         for (int col = 0; col < vertices; col++) {
-            if (adjacency_matrix[row][col] == inf) {
+            if (adjacency_matrix[row][col] == conditional_inf) {
                 restore_matrix[row][col] = 0;
             } else
                 restore_matrix[row][col] = col + 1;
@@ -213,7 +218,7 @@ std::vector<int> Graph<T>::restore_path(int from, int to) {
     if (restore_matrix.empty()) return restored_path;
     int current = from - 1;
     int destination = to - 1;
-    if (adjacency_matrix[current][destination] == inf) return restored_path;
+    if (adjacency_matrix[current][destination] == conditional_inf) return restored_path;
     while (current != destination) {
         restored_path.push_back(current);
         current = restore_matrix[current][destination] - 1;
@@ -231,7 +236,7 @@ template<typename T>
 T Graph<T>::min(int origin, int destination, int intermediate) {
     T actual = adjacency_matrix[origin][destination];
     T alternative = 0;
-    if (adjacency_matrix[origin][intermediate] == inf || adjacency_matrix[intermediate][destination] == inf) alternative = inf;
+    if (adjacency_matrix[origin][intermediate] == conditional_inf || adjacency_matrix[intermediate][destination] == conditional_inf) alternative = conditional_inf;
     else alternative = adjacency_matrix[origin][intermediate] + adjacency_matrix[intermediate][destination];
     if (actual > alternative) return alternative;
     else return actual;
@@ -276,7 +281,7 @@ std::vector<T> Graph<T>::dijkstra_from_one_vertex(int origin) {
     }
     //Dijkstra algorithm realization
     for (int in_cln = 1; in_cln < vertices; in_cln++) {
-        T min = inf;
+        T min = conditional_inf;
         int next_node = -1;
         //Finding the nearest node
         for (int node = 0; node < vertices; node++) {
@@ -294,7 +299,7 @@ std::vector<T> Graph<T>::dijkstra_from_one_vertex(int origin) {
         for (int node = 0; node < vertices; node++) {
             // We can't go through passed nodes
             if (!passed[node]) {
-                if (adjacency_matrix[next_node][node] != inf) {
+                if (adjacency_matrix[next_node][node] != conditional_inf) {
                     if (min + adjacency_matrix[next_node][node] < shortest_distances[node]) {
                         shortest_distances[node] = min + adjacency_matrix[next_node][node];
                     }

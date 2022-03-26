@@ -2,19 +2,31 @@
 #define TARJAN_S_BRIDGE_FINDING_ALGORITHM_GRAPH_H
 
 #include <vector>
+#include <list>
 
 template<typename T>
-T get_inf();            // Получить бесконечность для типа T
+T get_inf();            // Получить "бесконечность" для типа T
+                        // (целочисленный тип - максимальное значение, с плавающей запятой - inf)
 
 template <typename T>
 class Graph {
 private:
-    std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности, которая содержит информацию о графе
-    bool is_directed = false;                       // Переменная, показывающая, ориентированный ли граф
-    T inf;                                          // Условная бесконечность, которая означает отсутствие ребра с таким весом
+    typedef enum{
+        UNDIRECTED,
+        DIRECTED,
+    } EdgeType;
+    typedef enum{
+        ADJACENCY_MATRIX,
+        ADJACENCY_LIST,
+    } DataType;
+private:
+    std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности
+    std::vector<std::list<T>> adjacency_list;       // Список смежности
+    T conditional_inf;                              // Условная бесконечность, которая означает отсутствие ребра
+                                                    // с таким весом в матрице смежности
 
 // Различные приватные переменные, которые могут использовать алгоритмы
-// (лучше не захламлять конструкторы их инициализацией)
+// (лучше не помещать в конструкторы их инициализацию)
 private:
     int tarjan_s_time = 0;
 private:
@@ -24,17 +36,16 @@ private:
 
 // Конструкторы
 public:
-    Graph();
-    explicit Graph(int num_of_vertices = 0, bool is_directed = false);
-    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix, bool is_directed = false);
-    explicit Graph(std::vector<T> &adjacency_matrix, bool is_directed = false);
+    explicit Graph(int num_of_vertices = 0);
+    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix);
+    explicit Graph(std::vector<std::list<T>> &adjacency_list);
     Graph(const Graph &other);
     Graph(Graph &&other) noexcept;
 
 // Методы для взаимодействия с графом (т.е. геттеры, сеттеры и т.д.)
 public:
-    void add_edge(int v, int w, int weight = 0);
-    bool get_is_directed();
+    void add_edge(int v, int w, int weight = 0, EdgeType edge_type = UNDIRECTED);
+    void synchronize_data(DataType source_data, DataType target_data);
 
 /* Далее следуют наши методы из курсовых работ */
 
