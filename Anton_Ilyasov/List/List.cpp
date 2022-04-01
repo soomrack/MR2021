@@ -1,4 +1,3 @@
-//реализация односвязного списка
 #include <iostream>
 #include "List.h"
 
