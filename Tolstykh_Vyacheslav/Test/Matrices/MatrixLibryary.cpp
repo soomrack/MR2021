@@ -27,19 +27,21 @@ Matrix::Matrix(unsigned int width, unsigned int height, int* other) //станд
 }
 
 Matrix::Matrix(unsigned int width, unsigned int height, MatrixType type) { //Конструктор единичной и нулевой матриц
-	this->width = width;
-	this->height = height;
-	data = new int[width * height]; 
 	switch (type)
 	{
 	case ZERO:
+		this->width = width;
+		this->height = height;
+		data = new int[width * height];
 		void set_zero();
 		break;
 	case IDENTITY:
+		this->width = width;
+		this->height = height;
+		data = new int[width * height];
 		void set_identity();
 		break;
 	default:
-		delete[] data;
 		data = nullptr;
 		width = 0;
 		height = 0;

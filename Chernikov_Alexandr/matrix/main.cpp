@@ -55,16 +55,16 @@ int main() {
     trace_test(Matrix(1, 1, 1), 1);
     trace_test(Matrix(2, 2, 2), 4);
     trace_test(Matrix(2, 4, 4), 8);
-    trace_test(Matrix((double*) test_array1, 2, 2), 4);
+    trace_test(Matrix(2, 2, (double*) test_array1), 4);
 
     determinant_test(Matrix(), 0);
     determinant_test(Matrix(3, 3, IDENTITY), 1);
     determinant_test(Matrix(1, 1, 1), 1);
     determinant_test(Matrix(2, 2, 3), 0);
     determinant_test(Matrix(2, 4, 4), std::nan("1"));
-    determinant_test(Matrix((double*) test_array1, 2, 2), -5);
-    determinant_test(Matrix((double*) test_array5, 3, 3), -20);
-    determinant_test(Matrix((double*) test_array6, 4, 4), 6);
+    determinant_test(Matrix(2, 2, (double*) test_array1), -5);
+    determinant_test(Matrix(3, 3, (double*) test_array5), -20);
+    determinant_test(Matrix(4, 4, (double*) test_array6), 6);
 
     return 0;
 }
@@ -106,7 +106,7 @@ void constructor_test(double (&arr)[lines][cols]){
     std::cout << "height = " << lines << std::endl;
     std::cout << "width = " << cols << std::endl;
 
-    std::cout << Matrix((double*) arr, lines, cols) << std::endl;
+    std::cout << Matrix(lines, cols, (double*) arr) << std::endl;
 }
 
 void copy_constructor_test(Matrix &&test_matrix){

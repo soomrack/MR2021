@@ -4,12 +4,6 @@
 #include <cstdlib>
 #include <iostream>
 
-typedef enum {
-    RANDOM,
-    ZERO,
-    IDENTITY
-}M_type;
-
 class Matrix {
 private:
     unsigned int height;
@@ -17,7 +11,7 @@ private:
     int *data;
 public:
     Matrix();
-    Matrix(unsigned int height, unsigned int width, M_type type);
+    Matrix(unsigned int height, unsigned int width);
     Matrix(const Matrix &Matrix);
     Matrix(Matrix &&Matrix) noexcept;
     ~Matrix();

@@ -16,7 +16,7 @@ public:
     Matrix();
     Matrix(unsigned int rows, unsigned int columns);
     Matrix(unsigned int range,Type type);
-    void fill_null();
+    void fill_zeros();
     void fill_ones();
     void user_input();
     void print();
