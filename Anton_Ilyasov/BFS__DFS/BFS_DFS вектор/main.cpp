@@ -48,7 +48,7 @@ int main() {
     //                                     {0,1,0,0,0,1},
     //                                     {0,0,0,0,1,0} };
 
-    //Graph aa(6, a);
+    //Graph aa(a);
     //aa.toString();
     //aa.bfs_search();
     //aa.dfs_search();

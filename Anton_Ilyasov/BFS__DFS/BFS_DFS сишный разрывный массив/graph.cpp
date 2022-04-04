@@ -8,14 +8,21 @@ Graph::Graph() {
     adjMatrix = nullptr;
 }
 
-Graph::Graph(int64_t numVertices, int* other_matrix) { //матрица смежности создается на основе исходной матрицы
+Graph::Graph(int64_t numVertices, const int other_matrix[][6]) { //матрица смежности создается на основе исходной матрицы
     this->numVertices = numVertices;
     adjMatrix = new int* [numVertices];
     for (int64_t i = 0; i < numVertices; i++)
     {
         adjMatrix[i] = new int [numVertices];
     }
-    memcpy(adjMatrix, other_matrix, numVertices * numVertices * sizeof(int));
+
+    for (int64_t i = 0; i < numVertices; i++)
+    {
+        for (int64_t j = 0; j < numVertices; j++)
+        {
+            adjMatrix[i][j] = other_matrix[i][j];
+        }
+    }
 }
 
 Graph::Graph(int64_t numVertices, GraphType type) { //матрица смежности с разными данными
@@ -46,6 +53,32 @@ Graph::Graph(int64_t numVertices, GraphType type) { //матрица смежн�
         }
         break;
     }
+}
+
+Graph::Graph(const Graph& other_matrix) //конструктор копирования
+{
+    numVertices = other_matrix.numVertices;
+    adjMatrix = new int* [numVertices];
+    for (int64_t i = 0; i < numVertices; i++)
+    {
+        adjMatrix[i] = new int[numVertices];
+    }
+
+    for (int64_t i = 0; i < numVertices; i++)
+    {
+        for (int64_t j = 0; j < numVertices; j++)
+        {
+            adjMatrix[i][j] = other_matrix.adjMatrix[i][j];
+        }
+    }
+}
+
+Graph::Graph(Graph&& other_matrix) //Конструктор перемещения
+{
+    numVertices = other_matrix.numVertices;
+    adjMatrix = other_matrix.adjMatrix;
+    other_matrix.numVertices = 0;
+    other_matrix.adjMatrix = nullptr;
 }
 
 void Graph::addEdge(int64_t i, int64_t j) {

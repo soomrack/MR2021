@@ -3,12 +3,14 @@
 #include <queue> // очередь
 #include <stack> // стек
 
-Graph::Graph() {
+Graph::Graph()
+{
     numVertices = 0;
 }
 
-Graph::Graph(int64_t numVertices, std::vector<std::vector<int>>& other_matrix) { //матрица смежности создается на основе исходной матрицы
-    this->numVertices = numVertices;
+Graph::Graph(std::vector<std::vector<int>>& other_matrix) //матрица смежности создается на основе исходной матрицы
+{
+    numVertices = other_matrix.size();
     adjMatrix = other_matrix;
 }
 
@@ -41,6 +43,18 @@ Graph::Graph(int64_t numVertices, GraphType type) { //матрица смежн�
         }
         break;
     }
+}
+
+Graph::Graph(const Graph& other_matrix)  //конструктор копирования
+{
+    numVertices = other_matrix.numVertices;
+    adjMatrix = other_matrix.adjMatrix;
+}
+
+Graph::Graph(const Graph&& other_matrix) //конструктор перемещения
+{
+    numVertices = other_matrix.numVertices;
+    adjMatrix = other_matrix.adjMatrix;
 }
 
 void Graph::addEdge(int64_t i, int64_t j) {

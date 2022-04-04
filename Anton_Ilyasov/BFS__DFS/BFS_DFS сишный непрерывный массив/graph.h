@@ -14,6 +14,8 @@ public:
     Graph();
     Graph(int64_t numVertices, int* other_matrix);
     Graph(int64_t numVertices, GraphType type);
+    Graph(const Graph& other_matrix);
+    Graph(Graph&& other_matrix);
     ~Graph();
 public:
     void addEdge(int64_t i, int64_t j);

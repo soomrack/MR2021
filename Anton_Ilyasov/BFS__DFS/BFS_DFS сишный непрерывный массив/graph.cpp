@@ -48,6 +48,28 @@ Graph::Graph(int64_t numVertices, GraphType type) { //матрица смежн�
     }
 }
 
+Graph::Graph(const Graph& other_matrix) //конструктор копирования
+{
+    numVertices = other_matrix.numVertices;
+    data = new int[numVertices * numVertices];
+    memcpy(data, other_matrix.data, sizeof(int) * numVertices * numVertices);
+    adjMatrix = new int* [numVertices];
+    for (int i = 0; i < numVertices; i++)
+    {
+        adjMatrix[i] = &data[i * numVertices];
+    }
+}
+
+Graph::Graph(Graph&& other_matrix) //Конструктор перемещения
+{
+    numVertices = other_matrix.numVertices;
+    data = other_matrix.data;
+    adjMatrix = other_matrix.adjMatrix;
+    other_matrix.numVertices = 0;
+    other_matrix.data = nullptr;
+    other_matrix.adjMatrix = nullptr;
+}
+
 void Graph::addEdge(int64_t i, int64_t j) {
     adjMatrix[i][j] = 1;
     adjMatrix[j][i] = 1;
