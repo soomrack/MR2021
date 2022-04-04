@@ -51,7 +51,7 @@ Graph::Graph(const Graph& other_matrix)  //конструктор копиров
     adjMatrix = other_matrix.adjMatrix;
 }
 
-Graph::Graph(const Graph&& other_matrix) //конструктор перемещения
+Graph::Graph(Graph&& other_matrix) //конструктор перемещения
 {
     numVertices = other_matrix.numVertices;
     adjMatrix = other_matrix.adjMatrix;
