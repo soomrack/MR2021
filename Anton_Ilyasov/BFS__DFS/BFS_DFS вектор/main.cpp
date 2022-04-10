@@ -3,7 +3,7 @@
 #include <ctime>
 #include <vector>
 
-void bfs_search_time(int64_t numVertices) {
+void bfs_search_time(int numVertices) {
     Graph a(numVertices, RANDOM);
     int start = clock();
     a.bfs_search();
@@ -12,7 +12,7 @@ void bfs_search_time(int64_t numVertices) {
     std::cout << (end - start) * 1000 / CLOCKS_PER_SEC << std::endl;
 }
 
-void dfs_search_time(int64_t numVertices) {
+void dfs_search_time(int numVertices) {
     Graph a(numVertices, RANDOM);
     int start = clock();
     a.dfs_search();
