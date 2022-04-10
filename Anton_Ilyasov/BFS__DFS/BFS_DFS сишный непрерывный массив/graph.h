@@ -9,18 +9,18 @@ class Graph { //граф, представленный матрицей смеж
 private:
     int** adjMatrix;
     int* data;
-    int64_t numVertices;
+    int numVertices;
 public:
     Graph();
-    Graph(int64_t numVertices, int* other_matrix);
-    Graph(int64_t numVertices, GraphType type);
+    Graph(int numVertices, const int* other_matrix);
+    Graph(int numVertices, GraphType type);
     Graph(const Graph& other_matrix);
     Graph(Graph&& other_matrix);
     ~Graph();
 public:
-    void addEdge(int64_t i, int64_t j);
-    void removeEdge(int64_t i, int64_t j);
-    bool isEdge(int64_t i, int64_t j);
+    void addEdge(int i, int j);
+    void removeEdge(int i, int j);
+    bool isEdge(int i, int j);
     void toString();
 public:
     void bfs_search();
