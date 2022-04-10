@@ -57,6 +57,8 @@ public:
     std::vector<std::vector<T>> floyd_warshall();
     std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> floyd_warshall_ways();
     std::vector<std::vector<T>> dijkstra();
+    void bfs_search_to_find_min_path(int vertice_1, int vertice_2); //для невзвешенного графа
+    void dfs_search_for_topological_sort();
 
 // *** Место для вспомогательных приватных функций *** //
 // Вспомогательная приватная рекурсивная функция для алгоритма Тарьяна

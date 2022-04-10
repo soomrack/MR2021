@@ -1,5 +1,7 @@
 #include<iostream>
 #include <vector>
+#include <queue>
+#include <stack>
 #include <algorithm>
 #include <cstdint>
 #include <cmath>
@@ -28,6 +30,7 @@ Graph<T>::Graph(int num_of_vertices){
 
 template <typename T>
 Graph<T>::Graph(std::vector<std::vector<T>> &adjacency_matrix){
+    vertices = adjacency_matrix.size();
     conditional_inf = get_inf<T>();
     this->adjacency_matrix = adjacency_matrix;
 }
@@ -72,6 +75,123 @@ void Graph<T>::synchronize_data(DataType source_data, DataType target_data) { //
         default:
             break;
     }
+}
+
+template<typename T>
+void Graph<T>::bfs_search_to_find_min_path(int vertice_1, int vertice_2) 
+{
+    int* nodes = new int[vertices]; 
+    for (int i = 0; i < vertices; i++) {
+        nodes[i] = 0;
+    }
+
+    std::queue<int> Queue;
+    std::stack<int> Path;
+    struct Edge {
+        int begin;
+        int end;
+    };
+    std::stack<Edge> Edges;
+    Edge e;
+
+    Queue.push(vertice_1);
+    while (!Queue.empty())
+    {
+        int node = Queue.front();
+        Queue.pop();
+        nodes[node] = 2;
+        for (int j = 0; j < vertices; j++)
+        {
+            if (adjacency_matrix[node][j] == 1 && nodes[j] == 0)
+            {
+                Queue.push(j);
+                nodes[j] = 1;
+                e.begin = node; e.end = j;
+                Edges.push(e);
+                if (node == vertice_2) break;
+            }
+        }
+    }
+    while (!Edges.empty()) {
+        e = Edges.top();
+        Edges.pop();
+        if (e.end == vertice_2) {
+            vertice_2 = e.begin;
+            Path.push(e.end);
+        }
+    }
+    std::cout << vertice_2;
+    while (!Path.empty()) {
+        std::cout << "->" << Path.top();
+        Path.pop();
+    }
+    delete[] nodes;
+    nodes = nullptr;
+}
+
+template<typename T>
+void Graph<T>::dfs_search_for_topological_sort() 
+{
+    int* nodes = new int[vertices];
+    for (int i = 0; i < vertices; i++) {
+        nodes[i] = 0;
+    }
+
+    std::stack<int> Stack;
+    std::stack<int> Topological_Sorted;
+
+    for (int i = 0; i < vertices; i++)
+    {
+        if (nodes[i] == 0)
+        {
+            Stack.push(i);
+            while (!Stack.empty())
+            {
+                int node = Stack.top();
+                while (nodes[node] == 2)
+                {
+                    Stack.pop();
+                    node = Stack.top();
+                }
+
+                if (nodes[node] == 0)
+                {
+                    nodes[node] = 1;
+                    bool has_edge = false;
+                    int j = vertices - 1;
+                    for (; j >= 0; j--) {
+                        if (adjacency_matrix[node][j] and nodes[j] != 2)
+                        {
+                            Stack.push(j);
+                            has_edge = true;
+                        }
+                    }
+                    if (!has_edge and j < 0)
+                    {
+                        nodes[node] = 2;
+                        Stack.pop();
+                        Topological_Sorted.push(node);
+                    }
+                }
+                else
+                {
+                    nodes[node] = 2;
+                    Stack.pop();
+                    Topological_Sorted.push(node);
+                }
+            }
+        }
+    }
+
+    std::cout << std::endl;
+    while (!Topological_Sorted.empty())
+    {
+        std::cout << Topological_Sorted.top() << " ";
+        Topological_Sorted.pop();
+    }
+
+    delete[] nodes;
+    nodes = nullptr;
 }
 
 

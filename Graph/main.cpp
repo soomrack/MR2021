@@ -30,11 +30,33 @@ void test_floyd_warshall_ways() {
     fw.restore_path(2, 4);
 }
 
+void test_bfs_search_to_find_min_path() {
+    std::vector<std::vector<int>> grid = { {0,0,0,1,1},
+                                           {0,0,1,1,0},
+                                           {0,1,0,0,1},
+                                           {1,1,0,0,0},
+                                           {1,0,0,0,0} };
+    Graph<int> grid_1(grid);
+    grid_1.bfs_search_to_find_min_path(4, 1);
+}
+
+void test_dfs_search_for_topological_sort() {
+    std::vector<std::vector<int>> grid = { {0,0,0,0,0,0},
+                                           {0,0,0,0,0,0},
+                                           {0,0,0,1,0,0},
+                                           {0,1,0,0,0,0},
+                                           {1,1,0,0,0,0},
+                                           {1,0,1,0,0,0} };
+    Graph<int> grid_1(grid);
+    grid_1.dfs_search_for_topological_sort();
+}
+
 // Просьба организовывать свои тесты методов в функции, чтобы не сильно нагружать функцию main
 int main() {
 
     test_tarjan_s_find_bridges();
     test_floyd_warshall_ways();
-
+    test_bfs_search_to_find_min_path();
+    test_dfs_search_for_topological_sort();
     return 0;
 }
