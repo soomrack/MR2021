@@ -71,7 +71,7 @@ void BaseGraph<T>::synchronize_data(/*DataType source_data, DataType target_data
     adjacency_list.resize(adjacency_matrix.size());
     for (int orig = 0; orig < adjacency_matrix.size(); orig++) {
         for (int dest = 0; dest < adjacency_matrix[orig].size(); dest++) {
-            if (adjacency_matrix[orig][dest] != 0 && adjacency_matrix[orig][dest] != INF<T>) {
+            if (orig != dest && adjacency_matrix[orig][dest] != INF<T>) {
                 adjacency_list[orig].push_back(dest);
             }
         }
