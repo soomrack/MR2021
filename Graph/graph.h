@@ -16,11 +16,11 @@ typedef enum{
 
 template<typename T>
 T get_inf();            // Получить "бесконечность" для типа T
-                        // (целочисленный тип - максимальное значение, с плавающей запятой - inf)
+// (целочисленный тип - максимальное значение, с плавающей запятой - inf)
 
 template <typename T>
 T INF = get_inf<T>();   // переменная, содержащая "бесконечность", т.е. такой вес ребра,
-                        // который эквивалентен отсутствию этого ребра
+// который эквивалентен отсутствию этого ребра
 
 
 // Класс графа с базовой функциональностью
@@ -67,24 +67,23 @@ private:
 template<typename T>
 class GraphFloydWarshall : virtual public BaseGraph<T> {
 private:
-    int vertices = 0;
     std::vector<std::vector<int>> restore_matrix;   // Матрица для восстановления кратчайшего пути
     std::vector<int> restored_path;                 // Вектор, в котором хранится путь восстановленный методом restore_path
 public:
-    std::vector<std::vector<T>> floyd_warshall();
-    std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> floyd_warshall_ways();
+    std::vector<std::vector<T>> floyd_warshall();   // Базовая реализация алгоритма
+public:
+    // Дополнительный функционал на основе алгоритма
+    std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> floyd_warshall_ways(); // Дополнительно возвращает
+                                                                                                  // матрицу для восстановления
+                                                                                                  // пути между узлами
+    std::vector<int> restore_path(int from, int to); // Восстанавливает путь между указанными узлами
 private:
     T min(int, int, int);
-    bool check_adjacency_matrix();
-public:
-    std::vector<int> restore_path(int from, int to);
 };
 
 
 template<typename T>
 class GraphDijkstra : virtual public BaseGraph<T>{
-private:
-    int vertices = 0;
 public:
     std::vector<std::vector<T>> dijkstra();
 private:
@@ -119,4 +118,3 @@ public:
 };
 
 #endif
-
