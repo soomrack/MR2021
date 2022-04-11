@@ -40,7 +40,8 @@ public:
 // Методы для взаимодействия с графом (т.е. геттеры, сеттеры и т.д.)
 public:
     void add_edge(int v, int w, int weight = 0, EdgeType edge_type = UNDIRECTED);
-    void synchronize_data(DataType source_data, DataType target_data);
+    // Ранняя версия метода (будет еще дорабатываться)
+    void synchronize_data(/*DataType source_data, DataType target_data*/);
 };
 
 

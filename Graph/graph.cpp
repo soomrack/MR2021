@@ -67,15 +67,24 @@ void BaseGraph<T>::add_edge(int source, int target, int weight, EdgeType edge_ty
 }
 
 template<typename T>
-void BaseGraph<T>::synchronize_data(DataType source_data, DataType target_data) { // нужно позже реализовать
-    switch (source_data) {
+void BaseGraph<T>::synchronize_data(/*DataType source_data, DataType target_data*/) { // нужно позже реализовать
+    adjacency_list.resize(adjacency_matrix.size());
+    for (int orig = 0; orig < adjacency_matrix.size(); orig++) {
+        for (int dest = 0; dest < adjacency_matrix[orig].size(); dest++) {
+            if (adjacency_matrix[orig][dest] != 0 && adjacency_matrix[orig][dest] != INF<T>) {
+                adjacency_list[orig].push_back(dest);
+            }
+        }
+    }
+    //Alternative method of realization
+    /*switch (source_data) {
         case ADJACENCY_MATRIX:
             break;
         case ADJACENCY_LIST:
             break;
         default:
             break;
-    }
+    }*/
 }
 
 // DFS based function to find all bridges. It uses recursive function tarjan_s_bridge_finding_dfs
