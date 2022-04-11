@@ -50,7 +50,7 @@ public:
 // Все эти классы наследуются от базового графа как virtual public
 
 template<typename T>
-class GraphTarjansBridges : virtual public BaseGraph<T> {
+class GraphTarjansBridges: virtual public BaseGraph<T> {
 protected:
     int tarjan_s_time = 0;
 public:
@@ -66,7 +66,7 @@ private:
 
 
 template<typename T>
-class GraphFloydWarshall : virtual public BaseGraph<T> {
+class GraphFloydWarshall: virtual public BaseGraph<T> {
 private:
     std::vector<std::vector<int>> restore_matrix;   // Матрица для восстановления кратчайшего пути
     std::vector<int> restored_path;                 // Вектор, в котором хранится путь восстановленный методом restore_path
@@ -84,7 +84,7 @@ private:
 
 
 template<typename T>
-class GraphDijkstra : virtual public BaseGraph<T>{
+class GraphDijkstra: virtual public BaseGraph<T>{
 public:
     std::vector<std::vector<T>> dijkstra();
 private:
@@ -93,7 +93,7 @@ private:
 
 
 template<typename T>
-class GraphTraversal : virtual public BaseGraph<T> {
+class GraphTraversal: virtual public BaseGraph<T> {
 public:
     void bfs_search_to_find_min_path(int vertice_1, int vertice_2); //для невзвешенного графа
     void dfs_search_for_topological_sort();
@@ -104,7 +104,7 @@ public:
 // т.е. создающийся с помощью ромбовидного наследования
 
 template<typename T>
-class Graph :
+class Graph:
         virtual public GraphFloydWarshall<T>,
         virtual public GraphTarjansBridges<T>,
         virtual public GraphDijkstra<T>,
@@ -115,7 +115,7 @@ public:
     explicit Graph(std::vector<std::list<T>> &adjacency_list) : BaseGraph<T>(adjacency_list) {};
     Graph(const Graph &other) : BaseGraph<T>(other) {};
     Graph(Graph &&other) noexcept : BaseGraph<T>(other) {};
-    ~Graph() = default;
+    virtual ~Graph() = default;
 };
 
 #endif
