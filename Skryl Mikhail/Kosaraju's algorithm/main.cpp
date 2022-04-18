@@ -47,7 +47,12 @@ void Graph::DFS_recursive() {
         }
     }
     visited.assign(vertices, false);
-    DFS_reversed(max_tout());
+    for (auto const & i: visited) {
+        if (!i) {
+            DFS_reversed(max_tout());
+            cout << endl;
+        }
+    }
 }
 
 void Graph::DFS(int u) {
@@ -84,12 +89,6 @@ void Graph::DFS_reversed(int u) {
             tout.erase(tout.begin() + i);
             tout.insert(tout.begin() + i, 0);
             DFS_reversed(i);
-        }
-    }
-    for (auto const & i: visited) {
-        if (!i) {
-            cout << endl;
-            DFS_reversed(max_tout());
         }
     }
 }
