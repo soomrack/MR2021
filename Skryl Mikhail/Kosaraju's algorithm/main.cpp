@@ -46,6 +46,7 @@ void Graph::DFS_recursive() {
             DFS(i);
         }
     }
+    visited.assign(vertices, false);
     DFS_reversed(max_tout());
 }
 
@@ -76,17 +77,17 @@ int Graph::max_tout() {
 }
 
 void Graph::DFS_reversed(int u) {
-    visited[u] = false;
+    visited[u] = true;
     cout << u << "  ";
     for (auto &i: reversed[u]) {
-        if (visited[i]) {
+        if (!visited[i]) {
             tout.erase(tout.begin() + i);
             tout.insert(tout.begin() + i, 0);
             DFS_reversed(i);
         }
     }
     for (auto const & i: visited) {
-        if (i) {
+        if (!i) {
             cout << endl;
             DFS_reversed(max_tout());
         }
@@ -107,10 +108,10 @@ bool Graph::is_connected(int u, int v) {
 
 void rand_list() {
     srand(time(nullptr));
-    int vertices = rand() % 500;
+    int vertices = rand() % 20;
     Graph g(vertices);
-    int edges = rand() % ((vertices) * (vertices - 1));
-    //cout << endl << "V + E = " << edges + vertices << endl;
+    int edges = rand() % (vertices);
+    cout << endl << "V + E = " << edges + vertices << endl;
     for (int i = 0; i < edges; ++i) {
         int u = 0;
         int v = 0;
@@ -123,6 +124,7 @@ void rand_list() {
     g.print_list();
     //auto start = chrono::steady_clock::now();
     g.DFS_recursive();
+    //g.DFS_reversed(g.max_tout());
     /*auto end = chrono::steady_clock::now();
     auto ms = chrono::duration_cast<chrono::microseconds>(end - start);
     cout << endl << "Time: " << ms.count() << endl;
