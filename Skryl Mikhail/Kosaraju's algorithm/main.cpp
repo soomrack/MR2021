@@ -107,9 +107,9 @@ bool Graph::is_connected(int u, int v) {
 
 void rand_list() {
     srand(time(nullptr));
-    int vertices = rand() % 20;
+    int vertices = rand() % 500;
     Graph g(vertices);
-    int edges = rand() % (vertices);
+    int edges = rand() % ((vertices) * (vertices - 1));
     cout << endl << "V + E = " << edges + vertices << endl;
     for (int i = 0; i < edges; ++i) {
         int u = 0;
