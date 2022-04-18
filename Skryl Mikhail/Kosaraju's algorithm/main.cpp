@@ -123,7 +123,6 @@ void rand_list() {
     g.print_list();
     //auto start = chrono::steady_clock::now();
     g.DFS_recursive();
-    //g.DFS_reversed(g.max_tout());
     /*auto end = chrono::steady_clock::now();
     auto ms = chrono::duration_cast<chrono::microseconds>(end - start);
     cout << endl << "Time: " << ms.count() << endl;
