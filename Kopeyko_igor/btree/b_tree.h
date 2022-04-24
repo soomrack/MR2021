@@ -18,11 +18,16 @@ public:
         void root();
         void set(int keys[], Node* pointers[]);
         void print(unsigned int B_factor, Node* root, Node* parent);
+        void print_only_this(unsigned int B_factor, Node* root, Node* parent);
         void add(int key, unsigned int B_factor, Node * active_node, Node * root, Node * parent);
+
         void Node_segmentation_root (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent);
         void Node_segmentation_move (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent);
         void Node_segmentation_round (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent);
 
+        int search(int key, int level_down, int B_factor, Node * root, Node * active_node);
+
+        Node* find_this_parent (int B_factor, Node * active_node, Node * root);
         int count_free_key(int B_factor);
         int count_free_pointer(int B_factor);
         void refresh(unsigned int B_factor, BTree::Node * root, BTree::Node * parent);
@@ -40,6 +45,7 @@ public:
 //public:
     void add(int key);
     void print();
+    int search(int key);
     //void show_info();
     friend class Node;
 };
