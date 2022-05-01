@@ -864,7 +864,7 @@ void BTree::Node::delete_key(int key, int B_factor, Node * root, Node * parent, 
         if ((success) == 0){
             //объеденимся с братом, даже если у родителя всего один ключ
             if (parent->count_keys(B_factor) > 1) {
-                node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_MORE_KEYS); // У нас тут КЛЮЧ УДАЛИЛСЯ У РОДИТЕЛЯ
+                node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_MORE_KEYS);
             } else if (parent == root) {
                 node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_ROOT_HAS_ONE);
             }else if (parent->count_keys(B_factor) == 1) { //у родителей СЕЙЧАС КОНЧАТСЯ КЛЮЧИ
