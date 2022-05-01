@@ -3,8 +3,8 @@
 
 
 
-#define SIZE_ARRAY 30
-#define RAND_MAX 1000
+#define SIZE_ARRAY 85
+#define RAND_MAX 100
 
 
 
@@ -188,6 +188,7 @@ int main() {
     for (int i = 0; i < SIZE_ARRAY; i++){
         std::cout <<"Удаляем:  "<< massiv[i] << " #############################################################################################################################################\n";
         Derevo.print();
+        Derevo.print_keys_in_string();
         Derevo.delete_key(massiv[i]);
     }
 

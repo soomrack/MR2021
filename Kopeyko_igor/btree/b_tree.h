@@ -22,6 +22,7 @@ public:
         void print(unsigned int B_factor, Node* root, Node* parent);
         void print_only_this(unsigned int B_factor, Node* root, Node* parent);
         int count_tree(unsigned int B_factor, BTree::Node* root);
+        int print_keys_in_string(unsigned int B_factor);
 
 
 
@@ -73,6 +74,9 @@ public:
     BTree();
 //public:
     void count_tree();
+    void print_keys_in_string();
+
+
     void add(int key);
     void print();
     Node* search(int key);

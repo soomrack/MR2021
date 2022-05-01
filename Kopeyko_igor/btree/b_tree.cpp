@@ -1,6 +1,8 @@
 #include "b_tree.h"
 #include <iostream>
 
+int last_key = -1;
+
 
 
 #define DEBUG_TREE root->print(B_factor, nullptr, nullptr);
@@ -107,6 +109,44 @@ void BTree::Node::print(unsigned int B_factor, BTree::Node* root, BTree::Node* p
             this->pointers[i]->print(B_factor, nullptr, nullptr);
         }
     }
+}
+
+void BTree::print_keys_in_string(){
+    last_key = -1;
+    std::cout << " ============= Б-дерево ===============" << std::endl;
+    std::cout << "Печать по порядку всех ключей" << std::endl;
+    root->print_keys_in_string(B_factor);
+    std::cout << " \n============= Конец ===============" << std::endl;
+}
+
+
+int BTree::Node::print_keys_in_string(unsigned int B_factor){
+
+    for (int i = 0; i < B_factor - 1; i++) {
+        if(pointers[i] != nullptr) {
+            pointers[i]->print_keys_in_string(B_factor);
+        }
+        if(keys[i] != -1) {
+            std::cout << keys[i] << " ";
+            if(last_key >= keys[i]){
+                std::cout << "ERROR ";
+            }
+            last_key = keys[i];
+        }
+    }
+    if(pointers[B_factor-1] != nullptr) {
+        pointers[B_factor-1]->print_keys_in_string(B_factor);
+    }
+    //std::cout << "["<< pointers[B_factor - 1] << "] ";
+
+    //std::cout << "__"<< TEMP_KEY << "__";//DEBUG
+    //std::cout << "<"<< TEMP_POINTER << "> \n ";
+
+    //for (int i = 0; i < B_factor; i++){
+     //   if (pointers[i] != nullptr) {
+       //     this->pointers[i]->print(B_factor, nullptr, nullptr);
+      //  }
+    //}
 }
 
 
@@ -743,6 +783,7 @@ void BTree::Node::remove_free_place(int B_factor ){
 void BTree::Node::del_key_only_this(int key, int B_factor, Node * node_with_key){
     for(int i = 0; i < B_factor - 1; i++){
         if(node_with_key->keys[i] == key){
+            std::cout << "КЛЮЧ УДАЛЕН:  " << key << std::endl;
             node_with_key->keys[i] = -1;
             break;
         }
@@ -1197,6 +1238,7 @@ void BTree::Node::change_root(Node* new_root, Node* root, int B_factor){
 
 void BTree::Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status){
     std::cout << "Скрещиваем братьев c ключами!" << std::endl;
+    std::cout << "Статус"<< parent_status << std::endl;
     int node_with_key_index = -1;
 
     //узнаем каким по порядку идет наш узел
@@ -1245,10 +1287,15 @@ void BTree::Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node
         parent->remove_free_pointer(B_factor);
 
         //в конце
+
         key = parent->keys[0];
+        std::cout << "Новый ключ  " << key << std::endl;
+        std::cout << "Взяли из этого узла:  "  << std::endl;
+        parent->print_only_this(B_factor, nullptr, nullptr);
+
 
         if (parent_status == PARENT_HAS_ONE_KEY){
-            parent->delete_key(parent->keys[node_with_key_index],B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+            parent->delete_key(key/*parent->keys[node_with_key_index]*/,B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
         }
 
         else if (parent_status == PARENT_ROOT_HAS_ONE){
@@ -1257,7 +1304,9 @@ void BTree::Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node
             std::cout << "Меняем на ! " << parent->pointers[0] << std::endl;
             change_root(parent->pointers[0], root, B_factor);
             //root = parent->pointers[0];
-            std::cout << "КОрень после изменений " << parent->pointers[0] << std::endl;
+            std::cout << "КОрень после изменений " << std::endl;
+            root->print_only_this(B_factor, nullptr, nullptr);
+            //std::cout << "КОрень после изменений " << parent->pointers[0] << std::endl;
 
 
         }
@@ -1299,7 +1348,7 @@ void BTree::Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node
         key = parent->keys[0];
 
         if (parent_status == PARENT_HAS_ONE_KEY){
-            parent->delete_key(parent->keys[node_with_key_index],B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+            parent->delete_key(key/*parent->keys[node_with_key_index]*/,B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
         }
 
         else if (parent_status == PARENT_ROOT_HAS_ONE){
