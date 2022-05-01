@@ -1,8 +1,22 @@
 #include "b_tree.h"
 #include <iostream>
 
+
+
+#define DEBUG_TREE root->print(B_factor, nullptr, nullptr);
+
+
 #define TEMP_KEY keys[B_factor-1]
 #define TEMP_POINTER pointers[B_factor]
+
+#define USED 1
+#define NOT_USED 0
+
+#define PARENT_HAS_ONE_KEY 1
+#define PARENT_HAS_MORE_KEYS 2
+#define PARENT_ROOT_HAS_ONE 3
+
+
 
 //std::cout << "Hello, World!";
 //std::cout << "Hello, World!" << std::endl;
@@ -191,6 +205,9 @@ void BTree::Node::add_only_to_this (unsigned int B_factor, int key, int free_key
 
 BTree::Node * BTree::Node::find_this_parent(int B_factor, Node * active_node, Node * root){
 
+    std::cout << "ИЩЕМ РОДИТЕЛЯ ДЛЯ "<< this << std::endl;
+    this->print_only_this(B_factor,root, nullptr);
+
     if(this == root){
         return nullptr;
     }
@@ -218,7 +235,7 @@ BTree::Node * BTree::Node::find_this_parent(int B_factor, Node * active_node, No
 
     //выберем в какой указатель переходить
     for (int k = 0; k < B_factor; k++){
-        if (this->keys[0] < active_node->keys[k]) {
+        if (this->keys[0] <= active_node->keys[k]) {
             std::cout << "Переходим ниже на основе сравнения!" << std::endl;
             std::cout << this->keys[0] << " < " << active_node->keys[k] << std::endl;
 
@@ -598,38 +615,892 @@ void BTree::Node::add(int key, unsigned int B_factor, Node * active_node, Node *
 
 }
 
-int BTree::search(int key){
-      return root->search(key, -1, B_factor, root, root);
+BTree::Node* BTree::search(int key){
+      return root->search(key, 0, B_factor, root, root, nullptr);
 
 }
 
-int BTree::Node::search(int key, int level_down, int B_factor, Node * root, Node * active_node){
+//static BTree::Node::Node** pointers_array[] = {nullptr};
+
+BTree::Node* BTree::Node::search(int key, int level_down, int B_factor, Node * root, Node * active_node, Node* node_with_key){
     //переберем ключи в этом узле
+    //Node** Pointers_array[] = {nullptr, nullptr};
+    std::cout << "Hello, World!" << std::endl;
+    print_only_this(B_factor,root, nullptr);
+
+    //Node* node_with_key = nullptr;
+
     level_down++;
     //std::cout << "\n Прибавили! " << level_down << std::endl;
 
     for (int i = 0; i < B_factor; i++) {
         if (key == this->keys[i]) {
             //std::cout << "\n Найден ключ!" << std::endl;
-            return level_down;
+            node_with_key = this;
+            return node_with_key;//level_down;
         }
+    }
+    if (pointers[0] == nullptr) {
+        std::cout << "\n НЕ НАЙДЕН ключ!" << std::endl;
+        return nullptr;
     }
     for (int i = 0; i < B_factor; i++) {
         if (key < this->keys[i]){
-            level_down = pointers[i]->search(key, level_down,B_factor,root,active_node);
+            node_with_key = pointers[i]->search(key, level_down,B_factor,root,active_node, nullptr);
             //std::cout << "\n вернем!" << level_down << std::endl;
-            return level_down;
+            return node_with_key;//level_down;
         }
         if (-1 == this->keys[i]){
-            level_down = pointers[i]->search(key, level_down,B_factor,root,active_node);
+            node_with_key = pointers[i]->search(key, level_down,B_factor,root,active_node, nullptr);
             //std::cout << "\n вернем!" << level_down << std::endl;
-            return level_down;
+            return node_with_key;//level_down;
         }
     }
 
 
     //Выберем узел ребенок для перехода
-    return level_down;
+    return node_with_key;//level_down;
+}
+
+
+
+
+
+
+
+//УДАЛЕНИЕ УЗЛА
+
+int BTree::Node::count_keys(int B_factor) {
+    return ((B_factor-1) - this->count_free_key(B_factor));
+}
+
+int BTree::Node::count_pointers(int B_factor) {
+    return (B_factor - this->count_free_pointer(B_factor));
+}
+
+void BTree::Node::remove_free_pointer(int B_factor){
+    for (int i = 0; i < B_factor - 1; i++){
+        if(this->pointers[i] == nullptr){
+            for (int k = i; k < B_factor - 1; k++){
+                this->pointers[k] = this->pointers[k + 1];
+            }
+            this->pointers[B_factor-1] = nullptr;
+        }
+    }
+}
+
+
+void BTree::Node::remove_free_place(int B_factor ){
+    for (int i = 0; i < B_factor - 2; i++){
+        if(this->keys[i] == -1){
+            for (int k = i; k < B_factor - 2; k++){
+                this->keys[k] = this->keys[k + 1];
+            }
+            this->keys[B_factor-2] = -1;
+        }
+    }
+}
+
+
+void BTree::Node::del_key_only_this(int key, int B_factor, Node * node_with_key){
+    for(int i = 0; i < B_factor - 1; i++){
+        if(node_with_key->keys[i] == key){
+            node_with_key->keys[i] = -1;
+            break;
+        }
+    }
+    node_with_key->remove_free_place(B_factor);
+    //node_with_key->refresh(B_factor, nullptr, nullptr);
+}
+
+int BTree::Node::ask_brother_key(int key, int B_factor, Node * node_with_key, Node* parent, Node * root){
+    int parent_keys_amount = parent->count_keys(B_factor);
+    int node_with_key_index = -1;
+
+    //узнаем каким по порядку идет наш узел
+    for (int i = 0; i < B_factor; i++){
+        if(parent->pointers[i] == node_with_key){
+            node_with_key_index = i;
+        }
+    }
+    std::cout << "Правый брат вот " << parent->pointers[node_with_key_index + 1] << std::endl;
+
+
+    //обратимся к левому брату
+    if (node_with_key_index > 0){
+        int left_brother_key_amount = parent->pointers[node_with_key_index - 1]->count_keys(B_factor);
+        if (/*parent->pointers[node_with_key_index - 1]->count_keys(B_factor)*/left_brother_key_amount > 1){
+            std::cout << "Левый брат" << std::endl;
+            //возьмем отсюда крайний ключ правый и отправим родителю в резерв
+            parent->TEMP_KEY = parent->pointers[node_with_key_index - 1]->keys[left_brother_key_amount - 1];
+            std::cout << "Ключ отправили родителю"<< parent->pointers[node_with_key_index - 1]->keys[left_brother_key_amount - 1] << std::endl;
+            std::cout << "Число ключей левого братат "<< left_brother_key_amount << std::endl;
+            parent->pointers[node_with_key_index - 1]->keys[left_brother_key_amount - 1] = -1;
+
+            node_with_key->TEMP_KEY = parent->keys[node_with_key_index - 1];
+            parent->keys[node_with_key_index - 1] = -1;
+            parent->remove_free_place(B_factor);
+            parent->refresh(B_factor, root, nullptr);
+
+            node_with_key->refresh(B_factor,root,parent);
+            node_with_key->del_key_only_this(key,B_factor,node_with_key); //закоментим, потому что перекинем проблему
+            return 1;
+        }
+    }
+    //обратимся к правому брату
+
+    if (parent->pointers[node_with_key_index + 1] != nullptr){ //обратимся к правому брату
+        std::cout << "Правый брат??" << std::endl;
+        if (parent->pointers[node_with_key_index + 1]->count_keys(B_factor) > 1) {
+            std::cout << "Правый брат!" << std::endl;
+            int right_brother_key_amount = parent->pointers[node_with_key_index + 1]->count_keys(B_factor);
+
+            //возьмем отсюда крайний ключ левый и отправим к родителю в резерв
+            parent->TEMP_KEY = parent->pointers[node_with_key_index + 1]->keys[0];
+            parent->pointers[node_with_key_index + 1]->keys[0] = -1; //вместо него -1
+            parent->pointers[node_with_key_index + 1]->remove_free_place(B_factor); //уберем пробел
+            parent->refresh(B_factor,root, nullptr);
+
+
+            node_with_key->TEMP_KEY = parent->keys[node_with_key_index];
+            parent->keys[node_with_key_index] = -1;
+            parent->remove_free_place(B_factor);
+            parent->refresh(B_factor,root, nullptr);
+
+            node_with_key->refresh(B_factor,root,parent);
+            node_with_key->del_key_only_this(key,B_factor,node_with_key); //закоментим потому что перекинем проблему
+        } else {
+            //братья бомжи
+            std::cout << "Братья без ключей ( по одному)" << std::endl;
+            return 0;
+        }
+    } else {
+        //братья бомжи
+        std::cout << "Братья без ключей (по одному)" << std::endl;
+        return 0;
+    }
+
+}
+
+int BTree::Node::merge_nodes_brothers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status) {
+
+    if (1) {
+        //тут уже  мы знаем что братьев можно сливать
+        std::cout << "Скрещиваем братьев без ключей!" << std::endl;
+        std::cout << this << std::endl;
+        this->print_only_this(B_factor,root,parent);
+        int node_with_key_index = -1;
+
+        //узнаем каким по порядку идет наш узел
+        for (int i = 0; i < B_factor; i++) {
+            if (parent->pointers[i] == node_with_key) {
+                node_with_key_index = i;
+            }
+        }
+
+        //cначала проверям левого брата, потом правого
+        if (node_with_key_index > 0) {
+            std::cout << "Попытка с левым!" << std::endl;
+            int left_brother_key_amount = parent->pointers[node_with_key_index - 1]->count_keys(B_factor);
+            if (1) {
+                //будем скрещивать с левым
+                node_with_key->del_key_only_this(key, B_factor, node_with_key); //удалили ключ
+
+                parent->pointers[node_with_key_index] = nullptr; //удалили указатель
+
+                parent->pointers[node_with_key_index - 1]->TEMP_KEY = parent->keys[node_with_key_index -1]; //левому брату скидываем ключ от родител
+
+                if (parent_status == PARENT_HAS_MORE_KEYS) { //удаляем ключ если сверху много
+                    parent->keys[node_with_key_index - 1] = -1;
+                }
+
+                key = parent->keys[node_with_key_index - 1];
+                std::cout << "Отныне ключ равен " << key << std::endl;
+
+
+                parent->pointers[node_with_key_index - 1]->refresh(B_factor, root, parent);
+                parent->remove_free_place(B_factor);
+                parent->remove_free_pointer(B_factor);
+                std::cout << "????????!" << std::endl;
+                DEBUG_TREE
+
+                if (parent_status == PARENT_HAS_ONE_KEY){ //перекидываем проблему
+                    std::cout << "????????!" << std::endl;
+                    parent->delete_key(parent->keys[node_with_key_index - 1],B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+                }
+                else if (parent_status == PARENT_ROOT_HAS_ONE){
+                    change_root(parent->pointers[0], root, B_factor);
+                    //root = parent->pointers[0];
+                }
+                return key;
+
+            }
+        }
+        std::cout << "ПРодолжаем!" << std::endl;
+
+
+        if (parent->pointers[node_with_key_index + 1] != nullptr) { //обратимся к правому брату
+            std::cout << "Правый брат??" << std::endl;
+            if (1) {
+                std::cout << "Правый брат!" << std::endl;
+                node_with_key->del_key_only_this(key, B_factor, node_with_key); //удалили ключ
+
+                parent->pointers[node_with_key_index] = nullptr; //удалили указатель
+
+                parent->pointers[node_with_key_index + 1]->TEMP_KEY = parent->keys[node_with_key_index]; //правому брату скидываем ключ от родител
+
+                if (parent_status == PARENT_HAS_MORE_KEYS) {
+                    parent->keys[node_with_key_index] = -1;
+                }
+
+
+                parent->pointers[node_with_key_index + 1]->refresh(B_factor, root, parent);
+                parent->remove_free_place(B_factor);
+                parent->remove_free_pointer(B_factor);
+
+                if (parent_status == PARENT_HAS_ONE_KEY){
+                    std::cout << "Рекурсия" << std::endl;
+                    parent->delete_key(parent->keys[node_with_key_index],B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+                }
+
+                else if (parent_status == PARENT_ROOT_HAS_ONE){
+                    change_root(parent->pointers[0], root, B_factor);
+                    //root = parent->pointers[0];
+                }
+
+
+                return key;
+
+                //int right_brother_key_amount = parent->pointers[node_with_key_index + 1]->count_keys(B_factor);
+
+                //будем скрещивать с правым
+            }
+        }
+    }
+}
+
+
+
+
+
+int BTree::Node::lift_up_left (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index) {
+    std::cout << "мы в левом подьемем!"<< std::endl;
+
+    if (this == node_with_key){
+        std::cout << " Этот узел:  "<< this << "идем по индексу" << key_index << std::endl;
+        return this->pointers[key_index]->lift_up_left(key,B_factor,root,this,node_with_key,key_index);
+
+    } else if(this->pointers[0] != nullptr){ //отправляем вниз
+        std::cout << " Этот узел:  "<< this << std::endl;
+       return this->pointers[this->count_pointers(B_factor) - 1]->lift_up_left(key,B_factor,root,this,node_with_key,key_index);
+   } else {
+       std::cout << "дошли до нижнего, проверка!"<< std::endl;
+        std::cout << " Этот узел:  "<< this << std::endl;
+       if (this->count_keys(B_factor) > 1) {
+           std::cout << "передаем наверх!"<< this->keys[this->count_keys(B_factor) - 1] << "адрес узла" << this << std::endl;
+           node_with_key->TEMP_KEY = this->keys[this->count_keys(B_factor) - 1];
+           this->keys[this->count_keys(B_factor) - 1] = -1;
+           node_with_key->refresh(B_factor, root, nullptr);
+           return 1;
+       } else {
+           return 0;
+       }
+   }
+}
+
+int BTree::Node::lift_up_right (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index) {
+    if (this == node_with_key) {
+        std::cout << "это узел с ключем!"<< std::endl;
+        std::cout << " Этот узел:  "<< this << std::endl;
+        return this->pointers[key_index +1]->lift_up_right(key, B_factor, root, this, node_with_key, key_index);
+
+    } else if(this->pointers[0] != nullptr){ //отправляем вниз
+        std::cout << " Этот узел::  "<< this << std::endl;
+        return this->pointers[0]->lift_up_right(key,B_factor,root,this,node_with_key,key_index);
+    } else {
+        std::cout << " будет проверка  "<< this << std::endl;
+        if (this->count_keys(B_factor) > 1) {
+            node_with_key->TEMP_KEY = this->keys[0];
+            std::cout << "вверх отдаем этот!" << this->keys[0]<< std::endl;
+            this->keys[0] = -1;
+            this->remove_free_place(B_factor);
+            //this->refresh(B_factor,root, nullptr);
+            node_with_key->refresh(B_factor, root, nullptr);
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+void BTree::Node::steal_down_key(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int key_index){
+    /*
+    std::cout << " ТОЛЬКО ЗАШЛИ В ФУНКЦЮ" << key_index << std::endl;
+    std::cout << " Этот узел:  "<< this << "идем по индексу" << key_index << std::endl;
+    std::cout << " Узел с ключом:  "<< node_with_key << " ***" << key_index << std::endl;
+     */
+    //Node * safe_node_with_key = node_with_key;
+
+    if (this == node_with_key){
+        /*
+         * std::cout << " Этот узел:  "<< this << "идем по индексу" << key_index << std::endl;*/
+
+        std::cout << " Узел с ключом:  "<< node_with_key << " (тут нормальный адрес)" << std::endl;
+        std::cout << " Это че за адрес:  "<< this->pointers[key_index] << " ????" << std::endl;
+
+        //this->pointers[key_index]->steal_down_key(key,B_factor,root,this, node_with_key,key_index);
+        this->pointers[key_index]->steal_down_key(key,B_factor,node_with_key,this,root,key_index);
+
+    } else if(this->pointers[0] != nullptr){ //отправляем вниз
+        /*
+         std::cout << " Этот узел:  "<< this << std::endl;
+
+        std::cout << " Узел с ключом:  "<< node_with_key << " (уже другой мать его)" << std::endl;
+         */
+
+        this->pointers[this->count_pointers(B_factor) - 1]->steal_down_key(key,B_factor,node_with_key,this,root,key_index);
+    } else {
+        std::cout << "дошли до нижнего, проверка!"<< std::endl;
+        /*std::cout << " Этот узел:  "<< this << "(уже другой мать его) "<< std::endl;
+         */
+        std::cout << " Узел с ключом:  "<< node_with_key << " (уже другой мать его)" << key_index << std::endl;
+
+        if (1) {
+            //std::cout << "передаем наверх!"<< this->keys[this->count_keys(B_factor) - 1] << "адрес узла" << this << std::endl;
+            node_with_key->TEMP_KEY = this->keys[this->count_keys(B_factor) - 1];
+            //this->keys[this->count_keys(B_factor) - 1] = -1; //НЕ БУДЕМ ОБНУЛЯТЬ КЛЮЧ, ЧТОБЫ НАЙТИ РОДИТЕЛЯ
+            key = this->keys[this->count_keys(B_factor) - 1];
+            std::cout << "КЛЮЧ КЛЮЧ КЛЮЧ  !  "<< this->keys[this->count_keys(B_factor) - 1] << std::endl;
+
+            node_with_key->refresh(B_factor, root, nullptr);
+            std::cout << "ЭТОТ УЗЕЛ ПОСЛЕ ТОГО КАК МЫ ЗАБАРАЛИ КЛЮЧ СНИЗУ!"<< std::endl;
+            node_with_key->print_only_this(B_factor,root,parent);
+        }
+
+        //теперь перекидываем роблему ??? главное чтобы он не удалил ключ повторно
+        std::cout << "Перекидываем проблему! Наш узел с чужим ключом"<< std::endl;
+        node_with_key->print_only_this(B_factor,root,parent);
+
+        std::cout << "отсюда взяли ключ"<< std::endl;
+        this->print_only_this(B_factor,root,parent);
+
+
+
+        this->delete_key(key, B_factor, root, this->find_this_parent(B_factor,root,root), this, USED);
+
+
+
+
+
+    }
+    std::cout << " Конец функции" << key_index << std::endl;
+    //std::cout << " Этот узел:  "<< this << "идем по индексу" << key_index << std::endl;
+    //std::cout << " Узел с ключом:  "<< node_with_key << " ***" << key_index << std::endl;
+
+
+
+}
+
+
+
+int BTree::Node::ask_brother_key_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root){
+    //найдем индекс нашего узла сверху
+    std::cout << "Функция ask_brother_key_with_pointers" << std::endl;
+    std::cout << "Этот узел" << this << std::endl;
+    this->print_only_this(B_factor,root,parent);
+
+    std::cout << "Родитель нашаго узла" << this << std::endl;
+    parent->print_only_this(B_factor,root,parent);
+
+
+
+
+    int node_index = -1;
+    for (int i = 0; i < B_factor; i++){
+        if(parent->pointers[i] == this){
+            node_index = i;
+        }
+    }
+
+    std::cout << "Индекс узла у родителя" << node_index << std::endl;
+
+
+    if (node_index > 0) {//спрашиваем левого брата
+
+        std::cout << "Спросим у левого" << std::endl;
+
+        int left_brother_key_amount = parent->pointers[node_index - 1]->count_keys(B_factor);
+        Node* left_brother = parent->pointers[node_index - 1];
+        if (left_brother_key_amount > 1){
+
+            std::cout << "У левого Есть! берем" << std::endl;
+            //берем ключ у левого
+            //parent->pointers[node_index - 1]
+
+
+            //возьмем отсюда крайний ключ правый и отправим родителю в резерв
+            parent->TEMP_KEY = left_brother->keys[left_brother_key_amount - 1];
+            //std::cout << "Ключ отправили родителю"<< parent->pointers[node_with_key_index - 1]->keys[left_brother_key_amount - 1] << std::endl;
+            //std::cout << "Число ключей левого братат "<< left_brother_key_amount << std::endl;
+            left_brother->keys[left_brother_key_amount - 1] = -1;
+
+            this->TEMP_KEY = parent->keys[node_index - 1];
+            parent->keys[node_index - 1] = -1;
+            parent->remove_free_place(B_factor);
+            parent->refresh(B_factor, root, nullptr);
+
+            this->TEMP_POINTER = left_brother->pointers[left_brother_key_amount];
+            left_brother->pointers[left_brother_key_amount] = nullptr;
+
+
+            this->refresh(B_factor,root,parent);
+            this->del_key_only_this(key,B_factor,node_with_key); //даже если  ключа у нас нет, она все равно не должна удалять
+            return 1;
+
+
+
+
+
+        }
+
+    }
+
+    std::cout << "Продолжаем" << std::endl;
+
+    if (parent->pointers[node_index + 1] != nullptr) { //спрашиваем правого брата
+        std::cout << "Спросим у правого" << std::endl;
+        int right_brother_key_amount = parent->pointers[node_index + 1]->count_keys(B_factor);
+        Node* right_brother = parent->pointers[node_index + 1];
+        if (right_brother_key_amount > 1){
+
+            std::cout << "У правого есть! берем" << std::endl;
+            //берем ключ у правого
+
+            this->del_key_only_this(key,B_factor,node_with_key);
+            this->TEMP_KEY = parent->keys[0];
+
+            parent->keys[0] = -1;
+            parent->remove_free_place(B_factor);
+            parent->TEMP_KEY = right_brother->keys[0];
+            right_brother->keys[0] = -1;
+
+            parent->refresh(B_factor, root, nullptr);
+
+            this->TEMP_POINTER = right_brother->pointers[0];
+
+            right_brother->pointers[0] = nullptr;
+            right_brother->remove_free_place(B_factor);
+            right_brother->remove_free_pointer(B_factor);
+
+            this->refresh(B_factor,root,parent);          //ЭТОТ ОТСОРТИРОВАЛИ
+
+
+
+
+
+//??????
+
+            //parent->remove_free_place(key,B_factor,node_with_key);
+            //parent->refresh(B_factor, root, nullptr);
+
+            //this->TEMP_POINTER = right_brother->pointers[0];
+            //right_brother->pointers[0] = nullptr;
+            //right_brother->remove_free_place(key,B_factor,node_with_key);
+            //right_brother->remove_free_pointer(B_factor)
+
+
+            //this->refresh(B_factor,root,parent);
+            //this->del_key_only_this(key,B_factor,node_with_key); //даже если  ключа у нас нет, она все равно не должна удалять
+
+
+            //дальше ок
+            //right_brother->remove_free_place(key,B_factor,node_with_key);
+            //right_brother->remove_free_pointer(B_factor);
+
+            return 1;
+
+
+
+
+
+
+
+
+
+        }
+
+    }
+    return 0;
+
+}
+
+
+void BTree::Node::change_root(Node* new_root, Node* root, int B_factor){
+    //передаем ключи
+    for (int i = 0; i < B_factor -1; i++){
+        root->keys[i] = new_root->keys[i];
+    }
+
+    //передаем указатели
+    for (int i = 0; i < B_factor; i++){
+        root->pointers[i] = new_root->pointers[i];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+void BTree::Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status){
+    std::cout << "Скрещиваем братьев c ключами!" << std::endl;
+    int node_with_key_index = -1;
+
+    //узнаем каким по порядку идет наш узел
+    for (int i = 0; i < B_factor; i++) {
+        if (parent->pointers[i] == node_with_key) {
+            node_with_key_index = i;
+        }
+    }
+
+    std::cout << "Нашли индекс узла!  " << node_with_key_index << std::endl;
+
+
+    if (node_with_key_index > 0) { //работаем с левым
+        std::cout << "Работаем с левым братом!  " << std::endl;
+        Node* left_brother = parent->pointers[node_with_key_index -1];
+
+        this->del_key_only_this(key,B_factor,node_with_key);
+        this->TEMP_KEY = parent->keys[node_with_key_index - 1];
+        this->refresh(B_factor,root,parent);
+
+        //std::cout << "Живо1!  " << std::endl;
+
+        if (parent_status == PARENT_HAS_MORE_KEYS) {
+            parent->keys[node_with_key_index - 1] = -1;
+            parent->remove_free_place(B_factor);
+        }
+
+        //std::cout << "Живо2!  " << std::endl;
+
+        std::cout << left_brother << std::endl;
+
+        this->TEMP_KEY = left_brother->keys[0];
+        //std::cout << "чек1!  " << std::endl;
+        this->TEMP_POINTER = left_brother->pointers[0];
+        //std::cout << "чек 2!  " << std::endl;
+        this->refresh(B_factor,root,parent);
+        //std::cout << "чек 3!  " << std::endl;
+        this->TEMP_POINTER = left_brother->pointers[1];
+        //std::cout << "чек 4 3!  " << std::endl;
+        this->refresh(B_factor,root,parent);
+
+        //std::cout << "Живо 3!  " << std::endl;
+
+
+        parent->pointers[node_with_key_index - 1] = nullptr;
+        parent->remove_free_pointer(B_factor);
+
+        //в конце
+        key = parent->keys[0];
+
+        if (parent_status == PARENT_HAS_ONE_KEY){
+            parent->delete_key(parent->keys[node_with_key_index],B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+        }
+
+        else if (parent_status == PARENT_ROOT_HAS_ONE){
+            std::cout << "ИЗМЕНЯЕМ КОРЕНЬ!  " << std::endl;
+            std::cout << "КОрень до изменений ! " << root << std::endl;
+            std::cout << "Меняем на ! " << parent->pointers[0] << std::endl;
+            change_root(parent->pointers[0], root, B_factor);
+            //root = parent->pointers[0];
+            std::cout << "КОрень после изменений " << parent->pointers[0] << std::endl;
+
+
+        }
+
+        return;
+
+
+    }
+
+
+
+
+
+
+    if (parent->pointers[node_with_key_index + 1] != nullptr) { //обратимся к правому брату
+        std::cout << "Работаем с правым братом!  " << std::endl;
+        Node* right_brother = parent->pointers[node_with_key_index + 1];
+
+        this->del_key_only_this(key,B_factor,node_with_key);
+        this->TEMP_KEY = parent->keys[node_with_key_index];
+        this->refresh(B_factor,root,parent);
+
+        if (parent_status == PARENT_HAS_MORE_KEYS) {
+            parent->keys[node_with_key_index] = -1;
+            parent->remove_free_place(B_factor);
+        }
+
+
+        this->TEMP_KEY = right_brother->keys[0];
+        this->TEMP_POINTER = right_brother->pointers[0];
+        this->refresh(B_factor,root,parent);
+        this->TEMP_POINTER = right_brother->pointers[1];
+        this->refresh(B_factor,root,parent);
+
+        parent->pointers[node_with_key_index + 1] = nullptr;
+        parent->remove_free_pointer(B_factor);
+
+        //в конце
+        key = parent->keys[0];
+
+        if (parent_status == PARENT_HAS_ONE_KEY){
+            parent->delete_key(parent->keys[node_with_key_index],B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+        }
+
+        else if (parent_status == PARENT_ROOT_HAS_ONE){
+            //root = parent->pointers[0];
+            change_root(parent->pointers[0], root, B_factor);
+        }
+
+
+        return;
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+void BTree::delete_key(int key){
+    std::cout << "Функция: Удаление ключа (для дерева)!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=" << std::endl;
+    Node* node_with_key = root->search(key, 0, B_factor, root, root, nullptr);
+    if (node_with_key == nullptr){
+        std::cout << "НЕТ ТАКОГО КЛЮЧАААААААААА!" << std::endl;
+        return;
+    }
+    std::cout << "УЗЕЛ с ключом!!!"<< std::endl;
+    //node_with_key->print_only_this(B_factor,root, nullptr);
+    /*root было*/node_with_key->delete_key(key, B_factor, root, node_with_key->find_this_parent(B_factor,root,root), node_with_key, NOT_USED);
+}
+
+void BTree::Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int is_used){
+    std::cout << "Функция: Удаление ключа для node_with_key! ==========================================================================================" << std::endl;
+    std::cout << "ДЕРЕВО ПЕРЕД УДАЛЕНИЕМ КЛЮЧА"<< std::endl;
+    root->print(B_factor, nullptr, nullptr);
+    std::cout << "ЭТОТ УЗЕЛ в котором мы " << this << "  Удаляем ключ  "<< key << std::endl;
+
+    int success = 0;  // 1 означает что успешно
+    std::cout << "Удаление ключа"<< std::endl;
+    //найдем адрес узла с ключем, проверим есть ли такой ключ
+    if (node_with_key == nullptr){
+        std::cout << "НЕТ ТАКОГО КЛЮЧАААААААААА!" << std::endl;
+        return;
+    }
+    //работа в листьях
+    if (node_with_key->pointers[0] == nullptr) { // если нет детей
+        std::cout << "Мы в листьях!" << std::endl;
+
+        if (node_with_key->count_keys(B_factor) > 1) { //если больше 2 ключей и нет детей
+            node_with_key->del_key_only_this(key, B_factor, node_with_key);
+            return;
+        }
+
+        else if (node_with_key->count_keys(B_factor) == 1){ //остался один ключ, спросим у братьев соседей
+            std::cout << "Спросим ключ у брата!" << std::endl;
+            success = success + ask_brother_key(key,B_factor,node_with_key,parent,root);
+            if (/*is_used == NOT_USED*/1){ //если это первый заход, то надо удалить ключ. удаляем ключ в любом случае
+                //node_with_key->del_key_only_this(key,B_factor,node_with_key);
+            }
+        }
+
+        if ((success) == 0 /*&& (parent->count_keys(B_factor) > 1)*/){
+            std::cout << "Будем объединять братьев без детей!" << std::endl;
+            //объеденимся с братом, даже если у родителя всего один ключ
+
+
+            if (parent->count_keys(B_factor) > 1) {
+                node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_MORE_KEYS); // У нас тут КЛЮЧ УДАЛИЛСЯ У РОДИТЕЛЯ
+                std::cout << "Контроль!" << std::endl;
+
+                DEBUG_TREE
+                std::cout << "Контроль КЛЮЧ!" << key << std::endl;
+                //parent->delete_key(key, B_factor, root, parent->find_this_parent(B_factor, root, root), parent, USED);
+            } else if (parent == root) {
+                node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_ROOT_HAS_ONE);
+
+
+            }else if (parent->count_keys(B_factor) == 1) { //у родителей СЕЙЧАС КОНЧАТСЯ КЛЮЧИ
+                node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_ONE_KEY);
+
+            }
+
+
+
+            /*
+
+            if(parent->count_keys(B_factor) == 1){
+                //надо добыть родителю один ключ
+                std::cout << "АААААААААА!" << std::endl;
+                //merge_parents
+                //найдем ключ у братьев родителя
+                parent->take_key_brother_with_pointers(key,B_factor,node_with_key,parent->find_this_parent(B_factor,root,root),root);
+
+                //если не получится, то тогда сливаем родиетелй, но мы воруем ключ сверху, надо чтобы сверху было больше 1
+                //merge_nodes_brothers_with_pointers(key,B_factor,node_with_key,parent,root);
+            }
+
+             */
+
+
+            //объединение узла
+
+
+        }
+
+
+
+
+    } else {
+        std::cout << "Мы в ветке!" << std::endl;
+
+        int key_index = -1;
+        for(int i = 0; i < B_factor - 1; i++){
+            if(node_with_key->keys[i] == key){
+                key_index = i;
+            }
+        }
+
+
+
+        if (is_used == NOT_USED) { //идем вниз воровать ключи
+            std::cout << "Идем вниз брать лишний ключи!" << std::endl;
+            //идем в вниз до узлов без детей и если возможно берем крайние ключи
+
+
+
+            del_key_only_this(key,B_factor,node_with_key); //удалим ключ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            success = node_with_key->lift_up_left(key,B_factor,root,parent,node_with_key, key_index);
+            std::cout << "Резльтат взятия левого!" << success << std::endl;
+            if (success == 0){
+                std::cout << "идем брать правый!" << std::endl;
+                success = node_with_key->lift_up_right(key,B_factor,root,parent,node_with_key, key_index);
+            }
+            if (success == 1){
+                return;
+            }
+            std::cout << "Результат взятие правого!"<< success << std::endl;
+            //если success  будет равен 0, то нужно что-то другое делать
+
+            //node_with_key->lift_up(key,B_factor,root,parent,node_with_key);
+
+        }
+        if ((is_used == NOT_USED) && (success == 0)) { //если не удалось забрать ключи, забираем силой
+            //украсть ключ снизу
+            std::cout << "Будем просто отбирать ключи силой!"<< success << std::endl;
+
+
+            node_with_key->print_only_this(B_factor,root,parent);
+
+            node_with_key->steal_down_key(key,B_factor,node_with_key,parent,root,key_index);
+            return;
+
+
+            //после того как забрали силой нужно ДЕЛЕГИРОВАТЬ ОТСУТСТВИЕ КЛЮЧА В САМЫЙ НИЗ
+        }
+        if (1){ //будем брать ключ у братьев с детьми (если у них есть больше 1)
+            success = success + node_with_key->ask_brother_key_with_pointers(key,B_factor,node_with_key,parent,root);
+            std::cout << "Попытка взять у братьев ключей РЕЗУЛЬТАТ  " << success << std::endl;
+            if (success == 1) {
+                return;
+            }
+
+        }
+
+
+
+
+        //ВСЕ ЧТО НИЖЕ ЧЕРНОВИК
+
+        if (parent->count_keys(B_factor) > 1) {
+
+            node_with_key->merge_nodes_brothers_with_pointers(key,B_factor,node_with_key,parent,root,PARENT_HAS_MORE_KEYS);
+            //node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_MORE_KEYS); // У нас тут КЛЮЧ УДАЛИЛСЯ У РОДИТЕЛЯ
+            std::cout << "Контроль!" << std::endl;
+
+            DEBUG_TREE
+            std::cout << "Контроль КЛЮЧ!" << key << std::endl;
+            //parent->delete_key(key, B_factor, root, parent->find_this_parent(B_factor, root, root), parent, USED);
+        } else if (parent == root) {
+            node_with_key->merge_nodes_brothers_with_pointers(key,B_factor,node_with_key,parent,root,PARENT_ROOT_HAS_ONE);
+            //node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_ROOT_HAS_ONE);
+
+
+        }else if (parent->count_keys(B_factor) == 1) { //у родителей СЕЙЧАС КОНЧАТСЯ КЛЮЧИ
+            node_with_key->merge_nodes_brothers_with_pointers(key,B_factor,node_with_key,parent,root,PARENT_HAS_ONE_KEY);
+            //node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_ONE_KEY);
+
+        }
+
+
+
+
+
+        if (1){ //скреститься с братом
+
+            //ВАРИАНТЫ
+            //сверху больше 1
+            //сверху 1
+            //сверху 1 и это корень
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // если не удалось найти ключ снизу
+            //пытаемся слить детей данного узла (но для этого должно быть больше 1)
+
+         if (1/*?????*/){ //если не смогли, то берем один ключ и ссылку у брата (взять ключ с сосед ветки)
+
+
+        }else if (1) { //если не смогли, то сливаемся с веткой братом (это надо рекурсивно)
+
+
+        }
+
+
+
+
+
+    }
+    //std::cout << node_with_key->count_keys(B_factor) << std::endl;
+    //std::cout << node_with_key->count_pointers(B_factor) << std::endl;
+
+
 }
 
 

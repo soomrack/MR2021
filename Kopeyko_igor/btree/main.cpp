@@ -1,5 +1,8 @@
 #include <iostream>
 #include "b_tree.h"
+
+
+
 int massiv[35];
 
 
@@ -158,6 +161,7 @@ int main() {
         Derevo.print();
 
     }
+    Derevo.add(88);
     Derevo.print();
 
 
@@ -167,10 +171,95 @@ int main() {
     }
 
     std::cout << "Закончили++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ";
-int kaka = Derevo.search(72);
+//BTree::Node* kaka = Derevo.search(42);
 
-    std::cout <<  "\n Уровень  " << kaka << " ";
+    //std::cout <<  "\n Уровень  " << kaka << " \n";
+
+    //kaka->print_only_this(4, nullptr, nullptr);
     //Derevo.search(44);
+
+
+    Derevo.delete_key(88);
+    Derevo.delete_key(99);
+    //Derevo.delete_key(73);
+
+    Derevo.print();
+
+
+    BTree Kakashka;
+
+    Kakashka.add(1);
+    Kakashka.add(2);
+    Kakashka.add(3);
+    Kakashka.add(4);
+    Kakashka.add(5);
+    Kakashka.add(6);
+    Kakashka.add(7);
+    Kakashka.add(8);
+    Kakashka.add(9);
+    Kakashka.add(10);
+    Kakashka.add(11);
+    Kakashka.add(12);
+    Kakashka.add(13);
+    Kakashka.add(14);
+    Kakashka.add(15);
+    Kakashka.add(16);
+    Kakashka.add(17);
+    Kakashka.add(18);
+    Kakashka.add(19);
+    Kakashka.add(20);
+    Kakashka.add(21);
+    Kakashka.add(22);
+    Kakashka.add(23);
+    Kakashka.add(24);
+    Kakashka.add(25);
+    Kakashka.add(26);
+    Kakashka.add(27);
+
+    Kakashka.delete_key(15);
+    Kakashka.delete_key(14);
+    Kakashka.delete_key(9);
+    Kakashka.delete_key(13);
+    Kakashka.delete_key(12);
+    Kakashka.delete_key(19);
+    Kakashka.delete_key(18);
+    Kakashka.delete_key(17);
+    Kakashka.delete_key(16);
+    Kakashka.delete_key(21);
+    Kakashka.delete_key(20);
+    Kakashka.delete_key(23);
+    Kakashka.delete_key(3);
+    Kakashka.delete_key(7);
+    Kakashka.delete_key(6);
+    Kakashka.delete_key(22);
+    Kakashka.delete_key(5);
+    Kakashka.delete_key(24);
+    Kakashka.delete_key(11);
+    Kakashka.delete_key(2);
+    Kakashka.delete_key(27);
+    Kakashka.delete_key(1);
+    Kakashka.delete_key(8);
+    Kakashka.delete_key(26);
+    Kakashka.delete_key(25);
+    Kakashka.delete_key(4);
+    Kakashka.delete_key(10);
+    Kakashka.delete_key(0);
+
+    Kakashka.print();
+
+
+
+
+    //Kakashka.delete_key(15);
+    //Kakashka.delete_key(16);
+    //Kakashka.delete_key(14);
+    //Kakashka.delete_key(13);
+    //Kakashka.delete_key(1);
+
+    Kakashka.print();
+
+
+
 
 
     return 0;

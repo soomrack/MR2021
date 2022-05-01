@@ -1,6 +1,8 @@
 #ifndef BTREE_B_TREE_H
 #define BTREE_B_TREE_H
 
+
+
 class BTree {
 public:
     class Node {
@@ -25,7 +27,30 @@ public:
         void Node_segmentation_move (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent);
         void Node_segmentation_round (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent);
 
-        int search(int key, int level_down, int B_factor, Node * root, Node * active_node);
+        Node* search(int key, int level_down, int B_factor, Node * root, Node * active_node, Node* node_with_key);
+
+        int count_keys(int B_factor);
+        int count_pointers(int B_factor);
+        void remove_free_pointer(int B_factor);
+
+        int ask_brother_key(int key, int B_factor, Node * node_with_key, Node* parent, Node * root);
+
+        void remove_free_place( int B_factor);
+
+        int merge_nodes_brothers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status);
+
+        int ask_brother_key_with_pointers(int key, int B_factor, Node* node_with_key, Node*parent, Node* root);
+
+        int lift_up_left (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index);
+        int lift_up_right (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index);
+
+        void merge_nodes_brothers_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status);
+
+        void steal_down_key(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int key_index);
+        void change_root(Node* new_root, Node* root, int B_factor);
+
+        void del_key_only_this(int key, int B_factor, Node * node_with_key);
+        void delete_key(int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int is_used);
 
         Node* find_this_parent (int B_factor, Node * active_node, Node * root);
         int count_free_key(int B_factor);
@@ -45,10 +70,15 @@ public:
 //public:
     void add(int key);
     void print();
-    int search(int key);
+    Node* search(int key);
+    void delete_key(int key);
+
+
     //void show_info();
     friend class Node;
 };
+
+//BTree::Node::Node** pointers_array[] = {nullptr};
 
 
 
