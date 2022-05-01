@@ -47,29 +47,18 @@ void massiv_make(){
 
 
 
-
-
-
 int main() {
 
     BTree Derevo; //создали дерево
 
     massiv_make(); //массив с рандомными значениями 
-
+    //выведем массив
     for (int i = 0; i < SIZE_ARRAY; i++){
         std::cout << massiv[i] << " ";
     }
 
-    std::cout << " ";
-
-
-    std::cout << "Добавленные ключи" << std::endl;
     for (int i = 0; i < SIZE_ARRAY; i++){
-        std::cout << "Добавляем++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << massiv[i] << std::endl;
         Derevo.add(massiv[i]);
-        //std::cout << "Закончили++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << massiv[i] << std::endl;
-        Derevo.print();
-
     }
 
     Derevo.print();
@@ -79,19 +68,13 @@ int main() {
     }
 
     for (int i = 0; i < SIZE_ARRAY; i++){
-        std::cout <<"Удаляем:  "<< massiv[i] << " #############################################################################################################################################\n";
-        Derevo.print();
-        Derevo.print_keys_in_string();
+        //Derevo.print();
+        //Derevo.print_keys_in_string();
         Derevo.delete_key(massiv[i]);
     }
 
-    Derevo.count_tree();
-
-
+    Derevo.count_tree(); //подсчет числа ключей в дереве
     Derevo.print();
-
-
-
     return 0;
 }
 
