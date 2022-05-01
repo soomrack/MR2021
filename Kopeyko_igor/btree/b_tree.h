@@ -21,6 +21,10 @@ public:
         void set(int keys[], Node* pointers[]);
         void print(unsigned int B_factor, Node* root, Node* parent);
         void print_only_this(unsigned int B_factor, Node* root, Node* parent);
+        int count_tree(unsigned int B_factor, BTree::Node* root);
+
+
+
         void add(int key, unsigned int B_factor, Node * active_node, Node * root, Node * parent);
 
         void Node_segmentation_root (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent);
@@ -68,6 +72,7 @@ public:
 public:
     BTree();
 //public:
+    void count_tree();
     void add(int key);
     void print();
     Node* search(int key);

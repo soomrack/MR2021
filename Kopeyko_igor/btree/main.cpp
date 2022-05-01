@@ -3,29 +3,40 @@
 
 
 
-int massiv[35];
+#define SIZE_ARRAY 30
+#define RAND_MAX 1000
+
+
+
+int massiv[SIZE_ARRAY];
 
 
 void massiv_make(){
     //int * copy = mass;
-    for (int i = 0; i <30; i++){
+    for (int i = 0; i <SIZE_ARRAY; i++){
         massiv[i] = 0;
     }
 
     int a = 0;
-    int fatal = 0;
-    for (int i = 0; i < 30; i++) {
-        fatal = 0;
-        a = rand() % 100;
-        for (int k = 0; k < 30; k++) {
-            if (massiv[k] == a){
-                fatal++;
+    int fatal = -1;
+    for (int i = 0; i < SIZE_ARRAY; i++) {
+        fatal = -1;
+        while( fatal != 0 ) {
+            start:
+            fatal = 0;
+            a = rand() % RAND_MAX;
+
+            for (int k = 0; k < i; k++) {
+                if (massiv[k] == a) {
+                    fatal++;
+                }
+                if (massiv[k] == 0) {
+                    fatal++;
+                }
             }
-        }
-        if (fatal == 0){
-            massiv[i] = a;
-        } else {
-            massiv[i] = rand() % 100;
+            if (fatal == 0) {
+                massiv[i] = a;
+            }
         }
     }
 
@@ -132,9 +143,7 @@ int main() {
     BTree Derevo;
     //int a = 0;
     //int massiv[35];
-    for (int i = 0; i < 30; i++) {
-        massiv[i] = 0;
-    }
+
 
 /*
     for (int i = 0; i < 30; i++) {
@@ -151,41 +160,45 @@ int main() {
 
 
     massiv_make();
+    for (int i = 0; i < SIZE_ARRAY; i++){
+        std::cout << massiv[i] << " ";
+    }
+    std::cout << " ";
 
 
     std::cout << "Добавленные ключи" << std::endl;
-    for (int i = 0; i < 30; i++){
+    for (int i = 0; i < SIZE_ARRAY; i++){
         std::cout << "Добавляем++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << massiv[i] << std::endl;
         Derevo.add(massiv[i]);
         std::cout << "Закончили++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << massiv[i] << std::endl;
         Derevo.print();
 
     }
-    Derevo.add(88);
+    //Derevo.add(88);
     Derevo.print();
 
 
 
-    for (int i = 0; i < 30; i++){
+    for (int i = 0; i < SIZE_ARRAY; i++){
         std::cout << massiv[i] << " ";
     }
 
     std::cout << "Закончили++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ";
-//BTree::Node* kaka = Derevo.search(42);
 
-    //std::cout <<  "\n Уровень  " << kaka << " \n";
+    for (int i = 0; i < SIZE_ARRAY; i++){
+        std::cout <<"Удаляем:  "<< massiv[i] << " #############################################################################################################################################\n";
+        Derevo.print();
+        Derevo.delete_key(massiv[i]);
+    }
 
-    //kaka->print_only_this(4, nullptr, nullptr);
-    //Derevo.search(44);
+    Derevo.count_tree();
 
-
-    Derevo.delete_key(88);
-    Derevo.delete_key(99);
-    //Derevo.delete_key(73);
 
     Derevo.print();
 
 
+
+ /*
     BTree Kakashka;
 
     Kakashka.add(1);
@@ -258,7 +271,7 @@ int main() {
 
     Kakashka.print();
 
-
+*/
 
 
 

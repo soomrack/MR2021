@@ -62,6 +62,35 @@ void BTree::print(){
     std::cout << " ============= Конец ===============" << std::endl;
 }
 
+void BTree::count_tree(){
+    std::cout << " ============= Б-дерево ===============" << std::endl;
+    std::cout << " ЧИСЛО КЛЮЧЕЙ" << std::endl;
+    root->count_tree(B_factor, nullptr);
+    std::cout << root->count_tree(B_factor, nullptr) << std::endl;
+    std::cout << " ============= Конец ===============" << std::endl;
+}
+
+int BTree::Node::count_tree(unsigned int B_factor, BTree::Node* root){
+    int number = 0;
+    //std::cout << "{" << this << "}";
+    for (int i = 0; i < B_factor - 1; i++) {
+        if (keys[i] != -1){
+            number++;
+        }
+    }
+    //std::cout << "["<< pointers[B_factor - 1] << "] ";
+
+    //std::cout << "__"<< TEMP_KEY << "__";//DEBUG
+    //std::cout << "<"<< TEMP_POINTER << "> \n ";
+
+    for (int i = 0; i < B_factor; i++){
+        if (pointers[i] != nullptr) {
+            number = number + this->pointers[i]->count_tree(B_factor, nullptr);
+        }
+    }
+    return number;
+}
+
 void BTree::Node::print(unsigned int B_factor, BTree::Node* root, BTree::Node* parent){
     std::cout << "{" << this << "}";
     for (int i = 0; i < B_factor - 1; i++) {
@@ -79,6 +108,15 @@ void BTree::Node::print(unsigned int B_factor, BTree::Node* root, BTree::Node* p
         }
     }
 }
+
+
+
+
+
+
+
+
+
 
 void BTree::Node::print_only_this(unsigned int B_factor, BTree::Node* root, BTree::Node* parent) {
     std::cout << "{" << this << "}";
@@ -1077,9 +1115,9 @@ int BTree::Node::ask_brother_key_with_pointers(int key, int B_factor, Node* node
             //берем ключ у правого
 
             this->del_key_only_this(key,B_factor,node_with_key);
-            this->TEMP_KEY = parent->keys[0];
+            this->TEMP_KEY = parent->keys[node_index];
 
-            parent->keys[0] = -1;
+            parent->keys[node_index] = -1;
             parent->remove_free_place(B_factor);
             parent->TEMP_KEY = right_brother->keys[0];
             right_brother->keys[0] = -1;
@@ -1287,6 +1325,7 @@ void BTree::Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node
 
 void BTree::delete_key(int key){
     std::cout << "Функция: Удаление ключа (для дерева)!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=" << std::endl;
+    std::cout << "Ищем узел с ключом: " << key << std::endl;
     Node* node_with_key = root->search(key, 0, B_factor, root, root, nullptr);
     if (node_with_key == nullptr){
         std::cout << "НЕТ ТАКОГО КЛЮЧАААААААААА!" << std::endl;
