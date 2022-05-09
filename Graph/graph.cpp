@@ -102,7 +102,7 @@ void Graph<T>::print_adjacency_list() { //вывод списка смежнос
 }
 
 template<typename T>
-void Graph<T>::print_adjacency_matrix() { //вывод списка смежности на экран
+void Graph<T>::print_adjacency_matrix() { //вывод матрицы смежности на экран
     if (adjacency_matrix.size() == 0) {
         std::cout << "Print adjacency matrix error. Adjacency matrix size must be more zero"
                      "To fix this mistake input x.get_adjacency_matrix()";
@@ -163,7 +163,7 @@ void Graph<T>::dfs_search() {
 }
 
 template<typename T>
-std::vector<T> Graph<T>::find_path(const T from, const T to) {
+std::vector<T> Graph<T>::find_path(const T from, const T to) { // Find a path between two vertices
     if (from > vertices || to > vertices) {
         std::cout << "Find min path error. Index exceeds the number of vertices. Index must be not more " << vertices - 1 << "\n";
         return restored_path;
@@ -219,7 +219,7 @@ std::vector<T> Graph<T>::find_path(const T from, const T to) {
 }
 
 template<typename T>
-std::vector<T> Graph<T>::topological_sort() {
+std::vector<T> Graph<T>::topological_sort() { // Topological sorting of a graph
     std::vector<T> nodes(vertices, 0);
     std::stack<T> Stack;
     for (int i = 0; i < vertices; ++i) {
