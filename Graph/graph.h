@@ -4,70 +4,63 @@
 #include <vector>
 #include <list>
 
+typedef enum{
+    UNDIRECTED,
+    DIRECTED,
+} EdgeType;
+
+typedef enum{
+    ADJACENCY_MATRIX,
+    ADJACENCY_LIST,
+} DataType;
+
 template<typename T>
 T get_inf();            // Получить "бесконечность" для типа T
-                        // (целочисленный тип - максимальное значение, с плавающей запятой - inf)
+// (целочисленный тип - максимальное значение, с плавающей запятой - inf)
 
 template <typename T>
-class Graph {
-private:
-    typedef enum{
-        UNDIRECTED,
-        DIRECTED,
-    } EdgeType;
-    typedef enum{
-        ADJACENCY_MATRIX,
-        ADJACENCY_LIST,
-    } DataType;
-private:
+T INF = get_inf<T>();   // переменная, содержащая "бесконечность", т.е. такой вес ребра,
+// который эквивалентен отсутствию этого ребра
+
+
+// Класс графа с базовой функциональностью
+template <typename T>
+class BaseGraph{
+protected:
     std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности
     std::vector<std::list<T>> adjacency_list;       // Список смежности
-    T conditional_inf;                              // Условная бесконечность, которая означает отсутствие ребра
-                                                    // с таким весом в матрице смежности
-
-// Различные приватные переменные, которые могут использовать алгоритмы
-// (лучше не помещать в конструкторы их инициализацию)
-private:
-    int tarjan_s_time = 0;
-private:
-    int vertices = 0;
-    std::vector<std::vector<int>> restore_matrix;   // Матрица для восстановления кратчайшего пути
-    std::vector<T> restored_path;                 // Вектор, в котором хранится путь восстановленный методом restore_path
-    std::vector<T> topological_sorted_graph;      //топологически отсортированный граф
-
-// Конструкторы
 public:
-    explicit Graph(int vertices = 0);
-    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix);
-    explicit Graph(std::vector<std::list<T>> &adjacency_list);
-    Graph(const Graph &other);
-    Graph(Graph &&other) noexcept;
+    explicit BaseGraph(int num_of_vertices = 0);
+    explicit BaseGraph(std::vector<std::vector<T>> &adjacency_matrix);
+    explicit BaseGraph(std::vector<std::list<T>> &adjacency_list);
+    BaseGraph(const BaseGraph &other);
+    BaseGraph(BaseGraph &&other) noexcept;
+    virtual ~BaseGraph() = default;
 
 // Методы для взаимодействия с графом (т.е. геттеры, сеттеры и т.д.)
 public:
     void add_edge(int v, int w, int weight = 0, EdgeType edge_type = UNDIRECTED);
-    void synchronize_data(DataType source_data, DataType target_data);
-    void print_vector(std::vector<T> vector_to_print);
-    std::vector<std::vector<T>> get_adjacency_matrix();
-    void print_adjacency_list();
-    void print_adjacency_matrix();
-/* Далее следуют наши методы из курсовых работ */
+    void synchronize_data(/*DataType source_data, DataType target_data*/);  // Ранняя версия метода (будет еще дорабатываться)
+};
 
-// В качестве примера здесь уже вставлен алгоритм Тарьяна (для поиска мостов), Флойда и Дейкстры
 
-// *** Список публичных методов алгоритмов *** //
+
+// Далее идут классы, в которых реализуются алгоритмы
+// Все эти классы наследуются от базового графа как virtual public
+
+template<typename T>
+class GraphTarjansBridges: virtual public BaseGraph<T> {
+protected:
+    int tarjan_s_time = 0;
+public:
+    explicit GraphTarjansBridges(int num_of_vertices = 0) : BaseGraph<T>(num_of_vertices) {};
+    explicit GraphTarjansBridges(std::vector<std::vector<T>> &adjacency_matrix) : BaseGraph<T>(adjacency_matrix) {};
+    explicit GraphTarjansBridges(std::vector<std::list<T>> &adjacency_list) : BaseGraph<T>(adjacency_list) {};
+    GraphTarjansBridges(const GraphTarjansBridges &other) : BaseGraph<T>(other) {};
+    GraphTarjansBridges(GraphTarjansBridges &&other) noexcept : BaseGraph<T>(other) {};
+    virtual ~GraphTarjansBridges() = default;
 public:
     std::vector<std::pair<int, int>> tarjans_find_bridges();
-    std::vector<std::vector<T>> floyd_warshall();
-    std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> floyd_warshall_ways();
-    std::vector<std::vector<T>> dijkstra();
-    void bfs_search();
-    void dfs_search();
-    std::vector<T> find_path(T from, T to);
-    std::vector<T> topological_sort();
-
-// *** Место для вспомогательных приватных функций *** //
-// Вспомогательная приватная рекурсивная функция для алгоритма Тарьяна
 private:
     void tarjan_s_bridge_finding_dfs(int u,
                                      std::vector<bool> &visited,
@@ -75,20 +68,60 @@ private:
                                      std::vector<int> &low,
                                      std::vector<int> &parent,
                                      std::vector<std::pair<int, int>> &bridges);
+};
 
-// вспомогательные приватные функции для алгоритма Флойда
+
+template<typename T>
+class GraphFloydWarshall: virtual public BaseGraph<T> {
+private:
+    std::vector<std::vector<int>> restore_matrix;   // Матрица для восстановления кратчайшего пути
+    std::vector<int> restored_path;                 // Вектор, в котором хранится путь восстановленный методом restore_path
+public:
+    std::vector<std::vector<T>> floyd_warshall();   // Базовая реализация алгоритма
+public:
+    // Дополнительный функционал на основе алгоритма
+    std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> floyd_warshall_ways(); // Дополнительно возвращает
+                                                                                                  // матрицу для восстановления
+                                                                                                  // пути между узлами
+    std::vector<int> restore_path(int from, int to); // Восстанавливает путь между указанными узлами
 private:
     T min(int, int, int);
-    bool check_adjacency_matrix();
+};
 
-// вспомогательные public функции для алгоритма Флойда
+
+template<typename T>
+class GraphDijkstra: virtual public BaseGraph<T>{
 public:
-    std::vector<T> restore_path(int from, int to);
-
-// вспомогательные приватные функции для алгоритма Дейкстры
+    std::vector<std::vector<T>> dijkstra();
 private:
     std::vector<T> dijkstra_from_one_vertex(int origin);
 };
 
+
+template<typename T>
+class GraphTraversal: virtual public BaseGraph<T> {
+public:
+    void bfs_search_to_find_min_path(int vertice_1, int vertice_2); //для невзвешенного графа
+    void dfs_search_for_topological_sort();
+};
+
+
+// Итоговый класс графа, наследующийся как virtual public от всех классов, реализующих алгоритмы,
+// т.е. создающийся с помощью ромбовидного наследования
+
+template<typename T>
+class Graph:
+        virtual public GraphFloydWarshall<T>,
+        virtual public GraphTarjansBridges<T>,
+        virtual public GraphDijkstra<T>,
+        virtual public GraphTraversal<T> {
+public:
+    explicit Graph(int num_of_vertices = 0) : BaseGraph<T>(num_of_vertices) {};
+    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix) : BaseGraph<T>(adjacency_matrix) {};
+    explicit Graph(std::vector<std::list<T>> &adjacency_list) : BaseGraph<T>(adjacency_list) {};
+    Graph(const Graph &other) : BaseGraph<T>(other) {};
+    Graph(Graph &&other) noexcept : BaseGraph<T>(other) {};
+    virtual ~Graph() = default;
+};
 
 #endif
