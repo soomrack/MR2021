@@ -5,7 +5,7 @@
 
 Структура этой реализации выглядит следующим образом:
 <div align="center">
-<img src="docs/uml.png" height="300" width="400"/>
+<img src="docs/images/uml.png" height="300" width="400"/>
 </div>
 
 Базовый класс `BaseGraph` реализует поля для хранения информации о графе
