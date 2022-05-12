@@ -26,6 +26,36 @@ EXPLICIT_INSTANTIATION(Graph);
 
 
 template <typename T>
+Node<T>::Node(int id) {
+    this->id = id;
+}
+
+
+template <typename T>
+void Node<T>::add_neighbor(Node<T>* neighbor, T distance) {
+    Edge<T> edge(neighbor, distance);       //
+    neighbors.push_back(edge);
+}
+
+
+template <typename T>
+void Node<T>::remove_neighbor(Node<T>* neighbor) {
+    auto it = std::find(neighbors.begin(), neighbors.end(), neighbor);
+    if (it != neighbors.end()) {
+        neighbors.remove(it);
+    }
+}
+
+
+template <typename T>
+Edge<T>::Edge(Node<T>* neighbor, T distance) {
+    this->neighbor = neighbor;
+    this->distance = distance;
+}
+
+
+
+template <typename T>
 BaseGraph<T>::BaseGraph(int num_of_vertices){
     for (int i = 0; i < num_of_vertices; i++) {
         std::vector<T> row(num_of_vertices, INF<T>);

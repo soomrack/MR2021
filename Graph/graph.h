@@ -22,11 +22,42 @@ template <typename T>
 T INF = get_inf<T>();   // переменная, содержащая "бесконечность", т.е. такой вес ребра,
 // который эквивалентен отсутствию этого ребра
 
+template <typename T>
+class Edge;
+template <typename T>
+class Node;
+
+
+template <typename T>
+class Node{
+private:
+    int id;
+    std::list<Edge<T>> neighbors;
+public:
+    explicit Node(int id = 0);
+    ~Node() = default;
+public:
+    void add_neighbor(Node<T>* neighbor, T distance);
+    void remove_neighbor(Node<T>* neighbor);
+};
+
+
+template <typename T>
+class Edge{
+private:
+    Node<T>* neighbor;
+    T distance;
+public:
+    explicit Edge(Node<T>* neighbor = nullptr, T distance = 0);
+    ~Edge() = default;
+};
+
 
 // Класс графа с базовой функциональностью
 template <typename T>
 class BaseGraph{
 protected:
+    // std::list<Node<T>> nodes;
     std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности
     std::vector<std::list<T>> adjacency_list;       // Список смежности
 public:
