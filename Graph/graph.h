@@ -100,9 +100,15 @@ private:
 
 template<typename T>
 class GraphTraversal: virtual public BaseGraph<T> {
+private:
+    std::vector<T> restored_path;                   // Вектор для хранения пути между двумя вершинами
+    std::vector<T> topological_sorted_graph;        // Топологически отсортированный граф
 public:
-    void bfs_search_to_find_min_path(int vertice_1, int vertice_2); //для невзвешенного графа
-    void dfs_search_for_topological_sort();
+    void print_vector(std::vector<T> vector_to_print);
+    void bfs_search();
+    void dfs_search();
+    std::vector<T> find_path(T from, T to);
+    std::vector<T> topological_sort();
 };
 
 

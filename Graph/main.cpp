@@ -54,25 +54,60 @@ void test_floyd_warshall_ways() {
     std::cout << std::endl;
 }
 
-void test_bfs_search_to_find_min_path() {
-    std::vector<std::vector<int>> grid = { {0,0,0,1,1},
-                                           {0,0,1,1,0},
-                                           {0,1,0,0,1},
-                                           {1,1,0,0,0},
-                                           {1,0,0,0,0} };
+void test_bfs_search() {
+    std::vector<std::list<int>> grid = { {2},
+                                         {0,4,6},
+                                         {5,7},
+                                         {1,6},
+                                         {2},
+                                         {},
+                                         {4,8},
+                                         {5},
+                                         {4,7} };
     Graph<int> grid_1(grid);
-    grid_1.bfs_search_to_find_min_path(4, 1);
+    grid_1.bfs_search();
 }
 
-void test_dfs_search_for_topological_sort() {
-    std::vector<std::vector<int>> grid = { {0,0,0,0,0,0},
-                                           {0,0,0,0,0,0},
-                                           {0,0,0,1,0,0},
-                                           {0,1,0,0,0,0},
-                                           {1,1,0,0,0,0},
-                                           {1,0,1,0,0,0} };
+void test_dfs_search() {
+    std::vector<std::list<int>> grid = { {2},
+                                         {0,4,6},
+                                         {5,7},
+                                         {1,6},
+                                         {2},
+                                         {},
+                                         {4,8},
+                                         {5},
+                                         {4,7} };
     Graph<int> grid_1(grid);
-    grid_1.dfs_search_for_topological_sort();
+    grid_1.dfs_search();
+}
+
+void test_find_path() {
+    std::vector<std::list<int>> grid = { {2},
+                                         {0,4,6},
+                                         {5,7},
+                                         {1,6},
+                                         {2},
+                                         {},
+                                         {4,8},
+                                         {5},
+                                         {4,7} };
+    Graph<int> grid_1(grid);
+    grid_1.print_vector(grid_1.find_path(1, 5));
+}
+
+void test_topological_sort() {
+    std::vector<std::list<int>> grid = { {2},
+                                         {0,4,6},
+                                         {5,7},
+                                         {1,6},
+                                         {2},
+                                         {},
+                                         {4,8},
+                                         {5},
+                                         {4,7} };
+    Graph<int> grid_1(grid);
+    grid_1.print_vector(grid_1.topological_sort());
 }
 
 // Просьба организовывать свои тесты методов в функции, чтобы не сильно нагружать функцию main
@@ -80,7 +115,9 @@ int main() {
     test_tarjan_s_find_bridges();
     test_dijkstra();
     test_floyd_warshall_ways();
-    test_bfs_search_to_find_min_path();
-    test_dfs_search_for_topological_sort();
+    test_bfs_search();
+    test_dfs_search();
+    test_find_path();
+    test_topological_sort();
     return 0;
 }
