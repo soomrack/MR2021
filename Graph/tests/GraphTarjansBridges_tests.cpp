@@ -17,6 +17,8 @@ void graph_without_edges_test(int num_of_vertices) {
     Graph<int> graph(num_of_vertices);
     auto bridges = graph.tarjans_find_bridges();
 
+    graph.actualize_adjacency_matrix(); // change
+
     if (!bridges.empty()) {
         std::cout << "Graph with " << num_of_vertices << "vertices ";
         std::cout << "and without edges incorrectly has non-zero bridges" << std::endl;
@@ -32,7 +34,7 @@ void chain_graph_test(int num_of_vertices) {
     for (int i = 0; i < num_of_vertices - 1; i++) {
         graph.add_edge(i, i + 1);
     }
-
+    graph.actualize_adjacency_matrix(); // change
     auto bridges = graph.tarjans_find_bridges();
 
     if (bridges.size() == num_of_vertices - 1) {
@@ -52,7 +54,7 @@ void dense_graph_test(int num_of_vertices) {
             graph.add_edge(i, j);
         }
     }
-
+    graph.actualize_adjacency_matrix(); // change
     auto bridges = graph.tarjans_find_bridges();
 
     int correct_num_of_bridges = 0;
