@@ -46,9 +46,10 @@ Matrix::Matrix(int height, int width, double (&data)[S]) {
 Matrix::Matrix(Matrix &&m)  noexcept {
     height = m.height;
     width = m.width;
-    free(data);
     data = m.data;
     m.data = nullptr;
+    m.height = 0;
+    m.width = 0;
 }
 
 Matrix::Matrix(const Matrix &m) {
@@ -63,6 +64,7 @@ Matrix::Matrix(const Matrix &m) {
     memcpy(data,  m.data,height * width * (sizeof(double)));
 }
 
+
 Matrix & Matrix::operator= (const Matrix &m) {
     if (&m == this) { return *this; }
     height = m.height;
@@ -75,7 +77,7 @@ Matrix & Matrix::operator= (const Matrix &m) {
         return *this;
     }
     memcpy(data, m.data, height * width * (sizeof(double)));
-    return *this;
+    return * this;
 }
 
 Matrix Matrix::operator+ (const Matrix &m){
@@ -89,6 +91,7 @@ Matrix Matrix::operator+ (const Matrix &m){
     for (int i = 0; i < result.height * result.width; ++i) {
         result.data[i] = data[i] + m.data[i];
     }
+
     return result;
 }
 

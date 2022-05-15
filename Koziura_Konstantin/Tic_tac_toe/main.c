@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 char field[9];
 
 void init(){

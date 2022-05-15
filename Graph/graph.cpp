@@ -522,6 +522,7 @@ std::vector<std::vector<T>> GraphDijkstra<T>::dijkstra() {
     return BaseGraph<T>::adjacency_matrix;
 }
 
+
 template<typename T>
 void GraphTraversal<T>::print_vector(std::vector<T> vector_to_print) {
     std::cout << std::endl;
@@ -541,8 +542,8 @@ void GraphTraversal<T>::bfs_search() {
         T node = Queue.front();
         Queue.pop();
         nodes[node] = 1;
-        for (auto iter = BaseGraph<T>::adjacency_list[node].begin();
-             iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
+        for (auto iter = BaseGraph<T>::adjacency_list[node].begin(); 
+            iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
             if (nodes[*iter] == 0) {
                 Queue.push(*iter);
             }
@@ -599,6 +600,7 @@ std::vector<T> GraphTraversal<T>::find_path(const T from, const T to) { // Find 
         T node = Queue.front();
         Queue.pop();
         nodes[node] = 1;
+
         for (auto iter = BaseGraph<T>::adjacency_list[node].begin();
              iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
             if (nodes[*iter] == 0) {
@@ -649,8 +651,10 @@ std::vector<T> GraphTraversal<T>::topological_sort() { // Topological sorting of
                 }
                 nodes[node] = 1;
                 bool has_edge = false;
+
                 for (auto iter = BaseGraph<T>::adjacency_list[node].rbegin();
                      iter != BaseGraph<T>::adjacency_list[node].rend(); ++iter) {
+
                     if (nodes[*iter] != 1) {
                         Stack.push(*iter);
                         has_edge = true;
