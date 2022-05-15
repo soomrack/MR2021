@@ -2,7 +2,7 @@
 #include "GL/freeglut.h"    //Graphic
 #include <iostream>         //IO
 #include <stdio.h>          //IO
-#include <time.h>           //Rand seed
+#include <time.h>           //Rand seed, time
 #include <unistd.h>         //POSIX API (Sleep)
 #include <thread>           //Multithreading
 
@@ -19,6 +19,10 @@ int swapCounter = 0;
 int sortIndex = 0;
 char sortName[5][15] = {"QuickSort", "Bubble Sort", "BogoSort", "Insertion Sort", "Heap Sort"};
 int typeSort = 0;
+int startTime;
+int endTime;
+int sortTime = 0;
+
 
 int main(int argc, char *argv[]);
 
@@ -111,8 +115,8 @@ void isItRunning() {
 void fillArray() {
     free(arr);
     arr = (int *) malloc(sizeof(int) * length);
-        for (int i = 0; i < length; ++i)
-            arr[i] = i;
+    for (int i = 0; i < length; ++i)
+        arr[i] = i;
 }
 
 void randomizeArray(int *arr, int length) {
@@ -128,7 +132,7 @@ void swap(int index1, int index2) {
     usleep(delay);
 }
 
-void arrayColor(int i, float l){
+void arrayColor(int i, float l) {
     if (arr[i] < (l / 6)) glColor3f(1, 6 * arr[i] / l, 0);
     else if (arr[i] < (l / 3)) glColor3f(1 - ((arr[i] - (l / 6)) * (6 / l)), 1, 0);
     else if (arr[i] < (l / 2)) glColor3f(0, 1, (arr[i] - (l / 3)) * (6 / l));
@@ -217,6 +221,12 @@ void render() {
     displayText(-0.98, 0.74, 1, 1, 1, "Delay (us):");
     displayText(-0.72, 0.74, 1, 1, 1, charDelay);
     glFlush();
+
+    char charTime[10] = "";
+    std::sprintf(charDelay, "%d", sortTime);
+    displayText(-0.98, 0.67, 1, 1, 1, "Time (us):");
+    displayText(-0.72, 0.67, 1, 1, 1, charDelay);
+    glFlush();
 }
 
 
@@ -254,7 +264,10 @@ void keyboardEvent(unsigned char key, int x, int y) {
         case 's':
             //std::thread sortThread(sort, arr, length);
             //sortThread.join();
+            startTime = clock();
             sort(arr, length);
+            endTime = clock();
+            sortTime = endTime - startTime;
             break;
         case 'r':
             randomizeArray(arr, length);

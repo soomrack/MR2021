@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cygdrive/c/Users/Master/CLionProjects/Graph/Graph.h
+iostream
+-
+vector
+-
+
+/cygdrive/c/Users/Master/CLionProjects/Graph/main.cpp
+iostream
+-
+Graph.h
+/cygdrive/c/Users/Master/CLionProjects/Graph/Graph.h
+

@@ -9,13 +9,14 @@ private:
     int num_of_vertices;
     std::vector<std::list<int>> adj; // adjacency vector
 private:
-    int time;
+    int time;   // special variable for counting of vertices in algorithm find bridges
 public:
     Graph();
     explicit Graph(int num_of_vertices);
     explicit Graph(std::vector<std::list<int>> &adj);
     Graph(const Graph &other);
     Graph(Graph &&other) noexcept;
+    virtual ~Graph() = default;
 public:
     void add_edge(int v, int w);
     int get_number_of_edges();

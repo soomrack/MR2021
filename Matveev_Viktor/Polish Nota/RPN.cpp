@@ -7,6 +7,7 @@ Interpretation::Interpretation(const Interpretation & other)
 	expression = other.expression;
 	prepared = other.prepared;
 	rp_string = other.rp_string;
+	next_symbol = other.next_symbol;
 
 	input_id = other.input_id;
 	actual_symbol = other.actual_symbol;
@@ -22,6 +23,7 @@ Interpretation::Interpretation(Interpretation && other) noexcept
 	input_id = other.input_id;
 	actual_symbol = other.actual_symbol;
 	prev_symbol = other.prev_symbol;
+	next_symbol = other.next_symbol;
 
 	other.input_id = 0;
 	other.actual_symbol = '\0';
@@ -29,6 +31,7 @@ Interpretation::Interpretation(Interpretation && other) noexcept
 	other.expression = "\0";
 	other.prepared = "\0";
 	other.rp_string = "\0";
+	other.next_symbol = '\0';
 }
 
 Interpretation::~Interpretation() = default;
@@ -67,6 +70,15 @@ char Interpretation::get_next_char(std::string go_throw_str)
     {
         return (actual_symbol = '\0');
     }
+}
+
+char Interpretation::reflect_next_smb(std::string go_throw_str)
+{
+	if(input_id < go_throw_str.size())
+	{
+		int index = input_id;
+		return (next_symbol = go_throw_str[index++]);
+	}
 }
 
 char Interpretation::get_prev_char(std::string go_throw_str)
@@ -128,6 +140,32 @@ std::string Interpretation::prepare(std::string expression)
 	}
 
 	return prepared;
+}
+
+std::string Interpretation::multiple_degrees(std::string expression)
+{
+	int num_of_degrees = 0;
+	input_id = 0;
+	while(get_next_char(expression) != '\0')
+	{
+		int index = input_id;
+		if(actual_symbol == '^')
+		{
+			ready4convertion += '^';
+			ready4convertion += '(';
+			num_of_degrees++;
+			continue;
+		}
+		ready4convertion += actual_symbol;
+		if(reflect_next_smb(expression) != '^')
+		{
+			for(int i = 0; i<num_of_degrees; i++)
+			{
+				ready4convertion += ')';
+			}
+		}
+	}
+	return ready4convertion;
 }
 
 std::string Interpretation::convert(std::string middle_str)
@@ -346,10 +384,10 @@ int main()
 
 	clock_t t1 = clock();
 
-	for(int i = 0; i <= 12500; i++)
+	for(int i = 0; i <= 0; i++)
 	{
 		Interpretation Test;
-		test_prep = Test.prepare("1/(7-(1+1))*3-(2+(1+1))*1/(7-(2+1))*3-(2+(1+1))*(1/(7-(1+1)))^-3-((2+(1+1)))+1/(7-((1+1)))*3-((2+(1+1)))");
+		test_prep = Test.multiple_degrees("(3+1)^4^2");
 		//std::string test_prep = Test.prepare("(8+2*5)/(1+3*2-4)");
 		//std::cout << "Prepared string > "<< test_prep << "\n";
 		test_str = Test.convert(test_prep);
@@ -362,6 +400,6 @@ int main()
 	std::cout << "Prepared string > "<< test_prep << "\n";
 	std::cout << "String in RPN > " << test_str << "\n";
 	std::cout << "Your answer > "<< test_answ << "\n";
-	std::cout << "Runtime > " << runtime << "\n";
+	//std::cout << "Runtime > " << runtime << "\n";
 	return 0;
 }

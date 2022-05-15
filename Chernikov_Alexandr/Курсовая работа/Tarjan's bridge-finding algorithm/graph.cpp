@@ -1,7 +1,6 @@
 #include<iostream>
 #include <list>
 #include <vector>
-#include <ctime>
 #include <algorithm>
 #include <cmath>
 #include "graph.h"
@@ -156,3 +155,4 @@ Graph create_random_graph(int sum_of_edges_and_vertices){
     }
     return graph;
 }
+
