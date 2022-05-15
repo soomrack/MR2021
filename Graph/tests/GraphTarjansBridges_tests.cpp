@@ -1,6 +1,41 @@
 #include "../graph.h"
 #include <iostream>
 
+
+void empty_graph_test();
+void graph_without_edges_test(int num_of_vertices);
+void chain_graph_test(int num_of_vertices);
+void dense_graph_test(int num_of_vertices);
+
+
+int main() {
+
+    std::cout << "====== Empty graph test ======" << std::endl;
+    empty_graph_test();
+
+
+    std::cout << "====== Graph without edges test ======" << std::endl;
+    graph_without_edges_test(1);
+    graph_without_edges_test(2);
+    graph_without_edges_test(3);
+    graph_without_edges_test(4);
+
+
+    std::cout << "====== Chain graph test ======" << std::endl;
+    chain_graph_test(3);
+    chain_graph_test(5);
+    chain_graph_test(10);
+
+
+    std::cout << "====== Dense graph test ======" << std::endl;
+    dense_graph_test(3);
+    dense_graph_test(10);
+    dense_graph_test(20);
+
+    return 0;
+}
+
+
 void empty_graph_test() {
     Graph<int> graph;
     auto bridges = graph.tarjans_find_bridges();
@@ -67,33 +102,4 @@ void dense_graph_test(int num_of_vertices) {
     std::cout << "Correct: " << correct_num_of_bridges << std::endl;
     std::cout << "Got: " << bridges.size() << std::endl;
     exit(1);
-}
-
-
-int main() {
-
-    std::cout << "====== Empty graph test ======" << std::endl;
-    empty_graph_test();
-
-
-    std::cout << "====== Graph without edges test ======" << std::endl;
-    graph_without_edges_test(1);
-    graph_without_edges_test(2);
-    graph_without_edges_test(3);
-    graph_without_edges_test(4);
-
-
-    std::cout << "====== Chain graph test ======" << std::endl;
-    chain_graph_test(3);
-    chain_graph_test(5);
-    chain_graph_test(10);
-
-
-    std::cout << "====== Dense graph test ======" << std::endl;
-    dense_graph_test(3);
-    dense_graph_test(10);
-    dense_graph_test(20);
-
-
-    return 0;
 }
