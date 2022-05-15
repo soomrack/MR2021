@@ -523,122 +523,148 @@ std::vector<std::vector<T>> GraphDijkstra<T>::dijkstra() {
 }
 
 template<typename T>
-void GraphTraversal<T>::bfs_search_to_find_min_path(int vertice_1, int vertice_2)
-{
-    int vertices = BaseGraph<T>::adjacency_matrix.size();
-    int* nodes = new int[vertices];
-    for (int i = 0; i < vertices; i++) {
-        nodes[i] = 0;
+void GraphTraversal<T>::print_vector(std::vector<T> vector_to_print) {
+    std::cout << std::endl;
+    for (int i = 0; i < vector_to_print.size(); i++) {
+        std::cout << vector_to_print[i] << " ";
     }
-
-    std::queue<int> Queue;
-    std::stack<int> Path;
-    struct Edge {
-        int begin;
-        int end;
-    };
-    std::stack<Edge> Edges;
-    Edge e;
-
-    Queue.push(vertice_1);
-    while (!Queue.empty())
-    {
-        int node = Queue.front();
-        Queue.pop();
-        nodes[node] = 2;
-        for (int j = 0; j < vertices; j++)
-        {
-            if (BaseGraph<T>::adjacency_matrix[node][j] == 1 && nodes[j] == 0)
-            {
-                Queue.push(j);
-                nodes[j] = 1;
-                e.begin = node; e.end = j;
-                Edges.push(e);
-                if (node == vertice_2) break;
-            }
-        }
-    }
-    while (!Edges.empty()) {
-        e = Edges.top();
-        Edges.pop();
-        if (e.end == vertice_2) {
-            vertice_2 = e.begin;
-            Path.push(e.end);
-        }
-    }
-    std::cout << vertice_2;
-    while (!Path.empty()) {
-        std::cout << "->" << Path.top();
-        Path.pop();
-    }
-    delete[] nodes;
-    nodes = nullptr;
 }
 
 template<typename T>
-void GraphTraversal<T>::dfs_search_for_topological_sort()
-{
-    int vertices = BaseGraph<T>::adjacency_matrix.size();
-    int* nodes = new int[vertices];
-    for (int i = 0; i < vertices; i++) {
-        nodes[i] = 0;
+void GraphTraversal<T>::bfs_search() {
+    int vertices = BaseGraph<T>::adjacency_list.size();
+    std::cout << std::endl << "BFS search: ";
+    std::vector<T> nodes(vertices, 0);
+    std::queue<T> Queue;
+    Queue.push(0);
+    while (!Queue.empty()) {
+        T node = Queue.front();
+        Queue.pop();
+        nodes[node] = 1;
+        for (auto iter = BaseGraph<T>::adjacency_list[node].begin();
+             iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
+            if (nodes[*iter] == 0) {
+                Queue.push(*iter);
+            }
+        }
+        std::cout << node << " ";
     }
+}
 
-    std::stack<int> Stack;
-    std::stack<int> Topological_Sorted;
+template<typename T>
+void GraphTraversal<T>::dfs_search() {
+    int vertices = BaseGraph<T>::adjacency_list.size();
+    std::cout << std::endl << "DFS search: ";
+    std::vector<T> nodes(vertices, 0);
+    std::stack<T> Stack;
+    Stack.push(0);
+    while (!Stack.empty()) {
+        T node = Stack.top();
+        Stack.pop();
+        if (nodes[node] == 1) continue;
+        nodes[node] = 1;
+        for (auto iter = BaseGraph<T>::adjacency_list[node].rbegin();
+             iter != BaseGraph<T>::adjacency_list[node].rend(); ++iter) {
+            if (nodes[*iter] != 1) {
+                Stack.push(*iter);
+            }
+        }
+        std::cout << node << " ";
+    }
+}
 
-    for (int i = 0; i < vertices; i++)
-    {
-        if (nodes[i] == 0)
-        {
-            Stack.push(i);
-            while (!Stack.empty())
-            {
-                int node = Stack.top();
-                while (nodes[node] == 2)
-                {
-                    Stack.pop();
-                    node = Stack.top();
-                }
-
-                if (nodes[node] == 0)
-                {
-                    nodes[node] = 1;
-                    bool has_edge = false;
-                    int j = vertices - 1;
-                    for (; j >= 0; j--) {
-                        if (BaseGraph<T>::adjacency_matrix[node][j] and nodes[j] != 2)
-                        {
-                            Stack.push(j);
-                            has_edge = true;
-                        }
-                    }
-                    if (!has_edge and j < 0)
-                    {
-                        nodes[node] = 2;
-                        Stack.pop();
-                        Topological_Sorted.push(node);
-                    }
-                }
-                else
-                {
-                    nodes[node] = 2;
-                    Stack.pop();
-                    Topological_Sorted.push(node);
+template<typename T>
+std::vector<T> GraphTraversal<T>::find_path(const T from, const T to) { // Find a path between two vertices
+    int vertices = BaseGraph<T>::adjacency_list.size();
+    if (from > vertices || to > vertices) {
+        std::cout << "Find min path error. Index exceeds the number of vertices."
+                     "Index must be not more " << vertices - 1 << "\n";
+        return restored_path;
+    }
+    if (from == to) {
+        std::cout << "Find min path error. Check entrance and exit.";
+        return restored_path;
+    }
+    std::vector<T> nodes(vertices, 0);
+    std::queue<T> Queue;
+    struct Edge {
+        T begin;
+        T end;
+    };
+    Edge Edge_beetween_two_vertices;
+    std::stack<Edge> Edges;
+    Queue.push(from);
+    bool find = false;
+    while (!Queue.empty() && !find) {
+        T node = Queue.front();
+        Queue.pop();
+        nodes[node] = 1;
+        for (auto iter = BaseGraph<T>::adjacency_list[node].begin();
+             iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
+            if (nodes[*iter] == 0) {
+                Queue.push(*iter);
+                Edge_beetween_two_vertices.begin = node;
+                Edge_beetween_two_vertices.end = *iter;
+                Edges.push(Edge_beetween_two_vertices);
+                if (*iter == to) {
+                    find = true;
+                    break;
                 }
             }
         }
     }
-
-    std::cout << std::endl;
-    while (!Topological_Sorted.empty())
-    {
-        std::cout << Topological_Sorted.top() << " ";
-        Topological_Sorted.pop();
+    if (find) {
+        T update_to = to;
+        while (update_to != from && !Edges.empty()) {
+            Edge_beetween_two_vertices = Edges.top();
+            Edges.pop();
+            if (Edge_beetween_two_vertices.end == update_to) {
+                update_to = Edge_beetween_two_vertices.begin;
+                restored_path.push_back(Edge_beetween_two_vertices.end);
+            }
+        }
+        restored_path.push_back(from);
+        std::reverse(restored_path.begin(), restored_path.end());
     }
+    else {
+        std::cout << "No path from " << from << " to " << to << ".";
+    }
+    return restored_path;
+}
 
-    delete[] nodes;
-    nodes = nullptr;
+template<typename T>
+std::vector<T> GraphTraversal<T>::topological_sort() { // Topological sorting of a graph
+    int vertices = BaseGraph<T>::adjacency_list.size();
+    std::vector<T> nodes(vertices, 0);
+    std::stack<T> Stack;
+    for (int i = 0; i < vertices; ++i) {
+        if (nodes[i] == 0) {
+            Stack.push(i);
+            while (!Stack.empty()) {
+                T node = Stack.top();
+                if (nodes[node] == 1) {
+                    topological_sorted_graph.push_back(node);
+                    Stack.pop();
+                    continue;
+                }
+                nodes[node] = 1;
+                bool has_edge = false;
+                for (auto iter = BaseGraph<T>::adjacency_list[node].rbegin();
+                     iter != BaseGraph<T>::adjacency_list[node].rend(); ++iter) {
+                    if (nodes[*iter] != 1) {
+                        Stack.push(*iter);
+                        has_edge = true;
+                    }
+                }
+                if (!has_edge) {
+                    topological_sorted_graph.push_back(node);
+                    Stack.pop();
+                }
+            }
+        }
+    }
+    std::reverse(topological_sorted_graph.begin(), topological_sorted_graph.end());
+    return topological_sorted_graph;
 }
 
 template<typename T>
