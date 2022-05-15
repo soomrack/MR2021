@@ -93,6 +93,7 @@ BaseGraph<T>::BaseGraph(std::list<Vertex<T>*> &vertices) {
 template <typename T>
 BaseGraph<T>::BaseGraph(std::vector<std::vector<T>> &adjacency_matrix){
     this->adjacency_matrix = adjacency_matrix;
+    this->id_counter = adjacency_matrix.size();
 
     for (int i = 0; i < adjacency_matrix.size(); i++) {
         auto v = new Vertex<T>(i);
@@ -112,6 +113,7 @@ BaseGraph<T>::BaseGraph(std::vector<std::vector<T>> &adjacency_matrix){
 template <typename T>
 BaseGraph<T>::BaseGraph(std::vector<std::list<int>> &adjacency_list){
     this->adjacency_list = adjacency_list;
+    this->id_counter = adjacency_list.size();
 
     for (int i = 0; i < adjacency_list.size(); i++) {
         auto v = new Vertex<T>(i);
@@ -259,7 +261,6 @@ template <typename T>
 void BaseGraph<T>::actualize_adjacency_list() {
     adjacency_list = std::vector<std::list<int>>(id_counter, std::list<int>());
 
-    auto it = adjacency_list.begin();
     for (int id = 0; id < id_counter; id++) {
         Vertex<T>* vtx = find_vertex(id);
 
@@ -269,8 +270,7 @@ void BaseGraph<T>::actualize_adjacency_list() {
         std::list<Edge<T>> edges = vtx->get_edges();
         for (Edge<T> edge : edges) {
             Vertex<T>* neighbor = edge.get_neighbor();
-            it->push_back(neighbor->get_id());
-            it++;
+            adjacency_list[id].push_back(neighbor->get_id());
         }
     }
 }

@@ -14,6 +14,16 @@
 }                                                                   \
 
 
+# define CHECK_EQUAL_SILENTLY(expected, got, test_name) {           \
+    if ((got) == (expected)) {                                      \
+        std::cout << test_name << ":\tpass" << std::endl;           \
+    } else {                                                        \
+        std::cout << test_name << ":\tfailed" << std::endl;         \
+        exit(1);                                                    \
+    }                                                               \
+}
+
+
 # define CHECK_NOT_EQUAL(expected, got, test_name) {                \
     if ((got) != (expected)) {                                      \
         std::cout << test_name << ":\tpass" << std::endl;           \
@@ -38,10 +48,15 @@ void actualize_adjacency_matrix();
 int main() {
 
     find_vertex_test();
+
     add_edge_test();
     remove_edge_test();
+
     add_vertex_test();
-    add_vertex_test();
+    remove_vertex_test();
+
+    actualize_adjacency_list_test();
+    actualize_adjacency_matrix();
 
     return 0;
 }
@@ -186,6 +201,127 @@ void add_vertex_test() {
 }
 
 
+void remove_vertex_test() {
+    std::cout << std::endl << "====== Remove vertex test ======" << std::endl;
+
+    Graph<int> graph(3);
+    Vertex<int>* v1 = graph.find_vertex(1);
+    Vertex<int>* v2 = graph.find_vertex(2);
+
+    graph.add_edge(0, 1);
+    graph.add_edge(0, 2);
+
+    graph.remove_vertex(0);
+    CHECK_EQUAL(0, graph.find_vertex(0), "Successfully delete vertex 0");
+    CHECK_EQUAL(0, v1->get_edges().size(), "After remove vertex 1 doesnt have neighbors");
+    CHECK_EQUAL(0, v2->get_edges().size(), "After remove vertex 2 doesnt have neighbors");
+}
+
+
+void actualize_adjacency_list_test() {
+
+    std::cout << std::endl << "====== actualize_adjacency_list_test ======" << std::endl;
+
+    /*    `init_adj_list` represents this graph:
+     *
+     *                0 -- 3 -- 4
+     *              /  \
+     *             1 -- 2
+     * */
+
+    std::vector<std::list<int>> init_adj_list = {
+            {1, 2, 3},
+            {0, 2},
+            {0, 1},
+            {0},
+            {3},
+    };
+
+
+
+    // Change graph somehow
+
+    Graph<int> graph(init_adj_list);
+    graph.add_vertex();
+    graph.add_edge(5, 1);
+    graph.add_edge(5, 3);
+    graph.remove_edge(0, 1);
+
+    /*    final graph must be like this:
+     *
+     *                0 -- 3 -- 4
+     *                 \   \
+     *             1 -- 2   \
+     *              \       |
+     *               \------5
+     * */
+
+    std::vector<std::list<int>> final_adj_list = {
+            {2, 3},
+            {2, 5},
+            {0, 1},
+            {0, 5},
+            {3},
+            {1, 3},
+    };
+
+    graph.actualize_adjacency_list();
+    std::vector<std::list<int>> got_adj_list = graph.get_adjacency_list();
+    CHECK_EQUAL_SILENTLY(final_adj_list, got_adj_list, "Checking adjlist");
+}
+
+
+void actualize_adjacency_matrix() {
+
+    std::cout << std::endl << "====== actualize_adjacency_matrix ======" << std::endl;
+
+    /*    `init_adj_matrix` represents this graph:
+     *
+     *                0 -- 3 -- 4
+     *              /  \
+     *             1 -- 2
+     * */
+
+    std::vector<std::vector<int>> init_adj_matrix = {
+            {INF<int>, 0, 0, 0, INF<int>},
+            {0, INF<int>, 0, INF<int>, INF<int>},
+            {0, 0, INF<int>, INF<int>, INF<int>},
+            {0, INF<int>, INF<int>, INF<int>, 0},
+            {INF<int>, INF<int>, INF<int>, 0, INF<int>},
+    };
+
+
+    // Change graph somehow
+
+    Graph<int> graph(init_adj_matrix);
+    graph.add_vertex();
+    graph.add_edge(5, 1);
+    graph.add_edge(5, 3);
+    graph.remove_edge(0, 1);
+
+    /*    final graph must be like this:
+     *
+     *                0 -- 3 -- 4
+     *                 \   \
+     *             1 -- 2   \
+     *              \       |
+     *               \------5
+     * */
+
+    std::vector<std::vector<int>> final_adj_matrix = {
+            {INF<int>, INF<int>, 0, 0, INF<int>, INF<int>},
+            {INF<int>, INF<int>, 0, INF<int>, INF<int>, 0},
+            {0, 0, INF<int>, INF<int>, INF<int>, INF<int>},
+            {0, INF<int>, INF<int>, INF<int>, 0, 0},
+            {INF<int>, INF<int>, INF<int>, 0, INF<int>, INF<int>},
+            {INF<int>, 0, INF<int>, 0, INF<int>, INF<int>},
+    };
+
+
+    graph.actualize_adjacency_matrix();
+    std::vector<std::vector<int>> got_adj_matrix = graph.get_adjacency_matrix();
+    CHECK_EQUAL_SILENTLY(final_adj_matrix, got_adj_matrix, "Checking adjmatrix");
+}
 
 
 

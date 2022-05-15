@@ -9,18 +9,15 @@ typedef enum{
     DIRECTED,
 } EdgeType;
 
-typedef enum{
-    ADJACENCY_MATRIX,
-    ADJACENCY_LIST,
-} DataType;
-
-template<typename T>
-T get_inf();            // Получить "бесконечность" для типа T
+// Получить "бесконечность" для типа T
 // (целочисленный тип - максимальное значение, с плавающей запятой - inf)
+template<typename T>
+T get_inf();
 
-template <typename T>
-T INF = get_inf<T>();   // переменная, содержащая "бесконечность", т.е. такой вес ребра,
+// переменная, содержащая "бесконечность", т.е. такой вес ребра,
 // который эквивалентен отсутствию этого ребра
+template <typename T>
+T INF = get_inf<T>();
 
 template <typename T> class Edge;
 template <typename T> class Vertex;
