@@ -2,6 +2,31 @@
 #include <iostream>
 
 
+# define CHECK_EQUAL(expected, got, test_name) {                    \
+    if ((got) == (expected)) {                                      \
+        std::cout << test_name << ":\tpass" << std::endl;           \
+    } else {                                                        \
+        std::cout << test_name << ":\tfailed" << std::endl;         \
+        std::cout << "Expected: " << expected << std::endl;         \
+        std::cout << "Got: " << got << std::endl;                   \
+        exit(1);                                                    \
+    }                                                               \
+}                                                                   \
+
+
+# define CHECK_NOT_EQUAL(expected, got, test_name) {                \
+    if ((got) != (expected)) {                                      \
+        std::cout << test_name << ":\tpass" << std::endl;           \
+    } else {                                                        \
+        std::cout << test_name << ":\tfailed" << std::endl;         \
+        std::cout << "Expected: " << expected << std::endl;         \
+        std::cout << "Got: " << got << std::endl;                   \
+        exit(1);                                                    \
+    }                                                               \
+}                                                                   \
+
+
+
 void empty_graph_test();
 void graph_without_edges_test(int num_of_vertices);
 void chain_graph_test(int num_of_vertices);
@@ -40,11 +65,7 @@ void empty_graph_test() {
     Graph<int> graph;
     auto bridges = graph.tarjans_find_bridges();
 
-    if (!bridges.empty()) {
-        std::cout << "Error with empty graph" << std::endl;
-        exit(1);
-    }
-    std::cout << "Empty graph correctly has zero bridges" << std::endl;
+    CHECK_EQUAL(true, bridges.empty(), "Test empty graph")
 }
 
 
@@ -52,15 +73,9 @@ void graph_without_edges_test(int num_of_vertices) {
     Graph<int> graph(num_of_vertices);
     auto bridges = graph.tarjans_find_bridges();
 
-    graph.actualize_adjacency_matrix(); // change
-
-    if (!bridges.empty()) {
-        std::cout << "Graph with " << num_of_vertices << "vertices ";
-        std::cout << "and without edges incorrectly has non-zero bridges" << std::endl;
-        exit(1);
-    }
-
-    std::cout << "Graph correctly has " << num_of_vertices - 1 << " bridges" << std::endl;
+    graph.actualize_adjacency_matrix(); //
+    std::string message = "Graph with " + std::to_string(num_of_vertices) + " vertices and without edges test";
+    CHECK_EQUAL(true, bridges.empty(), message)
 }
 
 
@@ -69,16 +84,11 @@ void chain_graph_test(int num_of_vertices) {
     for (int i = 0; i < num_of_vertices - 1; i++) {
         graph.add_edge(i, i + 1);
     }
-    graph.actualize_adjacency_matrix(); // change
+    graph.actualize_adjacency_matrix(); //
     auto bridges = graph.tarjans_find_bridges();
 
-    if (bridges.size() == num_of_vertices - 1) {
-        std::cout << "Graph correctly has " << num_of_vertices - 1 << " bridges" << std::endl;
-        return;
-    }
-
-    std::cout << "Error with chain graph with " << num_of_vertices << "vertices" << std::endl;
-    exit(1);
+    std::string message = "Chain graph with " + std::to_string(num_of_vertices) + " vertices test";
+    CHECK_EQUAL(num_of_vertices - 1, bridges.size(), message);
 }
 
 
@@ -92,14 +102,6 @@ void dense_graph_test(int num_of_vertices) {
     graph.actualize_adjacency_matrix(); // change
     auto bridges = graph.tarjans_find_bridges();
 
-    int correct_num_of_bridges = 0;
-    if (bridges.size() == correct_num_of_bridges) {
-        std::cout << "Graph correctly has " << correct_num_of_bridges << " bridges" << std::endl;
-        return;
-    }
-
-    std::cout << "Error with dense graph with " << num_of_vertices << " vertices" << std::endl;
-    std::cout << "Correct: " << correct_num_of_bridges << std::endl;
-    std::cout << "Got: " << bridges.size() << std::endl;
-    exit(1);
+    std::string message = "Dense graph with " + std::to_string(num_of_vertices) + " vertices test";
+    CHECK_EQUAL(0, bridges.size(), message);
 }
