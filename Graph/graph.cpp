@@ -250,7 +250,7 @@ int BaseGraph<T>::remove_vertex(int id) {
 template <typename T>
 Vertex<T>* BaseGraph<T>::find_vertex(int id) {
     for (auto v = vertices.begin(); v != vertices.end(); v++) {
-        if ((*v)->id == id) {
+        if ((*v)->get_id() == id) {
             return *v;
         }
     }
