@@ -3,7 +3,6 @@
 
 #define DEBUG_TREE root->print(B_factor, nullptr, nullptr);
 
-
 #define TEMP_KEY keys[B_factor-1]
 #define TEMP_POINTER pointers[B_factor]
 
@@ -14,17 +13,14 @@
 #define PARENT_HAS_MORE_KEYS 2
 #define PARENT_ROOT_HAS_ONE 3
 
-int last_key = -1; //используется в функции print_keys_in_string
+static int last_key = -1; //используется в функции print_keys_in_string
 
 //std::cout << "Hello, World!";
 //std::cout << "Hello, World!" << std::endl;
 
 
-BTree::Node::Node(){
-
-}
-
-BTree::Node::Node(unsigned int factor) {
+Node::Node(){
+    int factor = 4;
 
     //создать массив ключей
     keys = new int [factor]; //имеется по одному резервному месту под ключ, под дату, под указатель
@@ -47,7 +43,30 @@ BTree::Node::Node(unsigned int factor) {
     }
 }
 
-void BTree::Node::root() {
+Node::Node(unsigned int factor) {
+
+    //создать массив ключей
+    keys = new int [factor]; //имеется по одному резервному месту под ключ, под дату, под указатель
+    //создать массив из даты
+    data = new int [factor];
+    //создать массив из указателей
+    pointers = new Node* [factor + 1];
+
+    keys[factor] = -1;
+
+    pointers[factor+1] = nullptr;
+
+    //каждому ключу дать номер -1
+    for(int i = 0; i < factor; i++) {
+        keys[i] = -1;
+    }
+    //каждому указателю дать nullptr
+    for(int i = 0; i <= factor; i++) {
+        pointers[i] = nullptr;
+    }
+}
+
+void Node::root() {
     //заполняем узел с ключом "0"
     keys[0] = 0;
 }
@@ -67,7 +86,7 @@ void BTree::count_tree(){
     std::cout << " ============= Конец ===============" << std::endl;
 }
 
-int BTree::Node::count_tree(unsigned int B_factor, BTree::Node* root){
+int Node::count_tree(unsigned int B_factor, Node* root){
     int number = 0;
     //std::cout << "{" << this << "}";
     for (int i = 0; i < B_factor - 1; i++) {
@@ -84,7 +103,7 @@ int BTree::Node::count_tree(unsigned int B_factor, BTree::Node* root){
     return number;
 }
 
-void BTree::Node::print(unsigned int B_factor, BTree::Node* root, BTree::Node* parent){
+void Node::print(unsigned int B_factor, Node* root, Node* parent){
     std::cout << "{" << this << "}";
     for (int i = 0; i < B_factor - 1; i++) {
         std::cout << "[" << pointers [i] << "]";
@@ -110,7 +129,7 @@ void BTree::print_keys_in_string(){
     std::cout << " \n============= Конец ===============" << std::endl;
 }
 
-int BTree::Node::print_keys_in_string(unsigned int B_factor){
+int Node::print_keys_in_string(unsigned int B_factor){
 
     for (int i = 0; i < B_factor - 1; i++) {
         if(pointers[i] != nullptr) {
@@ -129,7 +148,7 @@ int BTree::Node::print_keys_in_string(unsigned int B_factor){
     }
 }
 
-void BTree::Node::print_only_this(unsigned int B_factor, BTree::Node* root, BTree::Node* parent) {
+void Node::print_only_this(unsigned int B_factor, Node* root, Node* parent) {
     std::cout << "{" << this << "}";
     for (int i = 0; i < B_factor - 1; i++) {
         std::cout << "[" << pointers [i] << "]";
@@ -141,7 +160,7 @@ void BTree::Node::print_only_this(unsigned int B_factor, BTree::Node* root, BTre
     std::cout << "<"<< TEMP_POINTER << "> \n ";
 }
 
-int BTree::Node::count_free_key(int B_factor) { //возвращает количество пустых ключей (-1)
+int Node::count_free_key(int B_factor) { //возвращает количество пустых ключей (-1)
     int free_key_count = 0;
     for (int i = 0; i < B_factor - 1; i++ ) {
         free_key_count = free_key_count + (keys[i] == -1);
@@ -149,7 +168,7 @@ int BTree::Node::count_free_key(int B_factor) { //возвращает коли�
     return free_key_count;
 }
 
-int BTree::Node::count_free_pointer(int B_factor) { //возвращает количество пустых указателей (nullptr)
+int Node::count_free_pointer(int B_factor) { //возвращает количество пустых указателей (nullptr)
     int free_pointer_count = 0;
     for (int i = 0; i < B_factor; i++){
         free_pointer_count = free_pointer_count + (pointers[i] == nullptr);
@@ -157,7 +176,7 @@ int BTree::Node::count_free_pointer(int B_factor) { //возвращает ко�
     return free_pointer_count;
 }
 
-void BTree::Node::refresh(unsigned int B_factor, BTree::Node * root, BTree::Node * parent) {
+void Node::refresh(unsigned int B_factor, Node * root, Node * parent) {
     //функция установит ключ и указатель из резервной позиции в основную для соблюдения порядка
     //устанавливаем ключи
 
@@ -212,7 +231,7 @@ void BTree::Node::refresh(unsigned int B_factor, BTree::Node * root, BTree::Node
     }
 }
 
-void BTree::Node::add_to_any_child (unsigned int B_factor, int key, int free_key_count, BTree::Node * root) {
+void Node::add_to_any_child (unsigned int B_factor, int key, int free_key_count, Node * root) {
     //переходим по указателю
     for (int k = 0; k < (B_factor -1) - free_key_count; k++){
         if (key < keys[k]) {
@@ -227,7 +246,7 @@ void BTree::Node::add_to_any_child (unsigned int B_factor, int key, int free_key
     }
 }
 
-void BTree::Node::add_only_to_this (unsigned int B_factor, int key, int free_key_count, BTree::Node * root, BTree::Node * parent) {
+void Node::add_only_to_this (unsigned int B_factor, int key, int free_key_count, Node * root, Node * parent) {
     int a = 0;
     for(int i = 0; i < B_factor - 1; i++){
         if (key < keys[i]){
@@ -246,7 +265,7 @@ void BTree::Node::add_only_to_this (unsigned int B_factor, int key, int free_key
     }
 }
 
-BTree::Node * BTree::Node::find_this_parent(int B_factor, Node * active_node, Node * root){
+Node * Node::find_this_parent(int B_factor, Node * active_node, Node * root){
 
     if(this == root){
         return nullptr;
@@ -273,7 +292,7 @@ BTree::Node * BTree::Node::find_this_parent(int B_factor, Node * active_node, No
     return needed_parent;
 }
 
-void BTree::Node::Node_segmentation_root (unsigned int B_factor, BTree::Node* active_node, int key, BTree::Node * root, BTree::Node * parent){
+void Node::Node_segmentation_root (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent){
 //пока опишем создания узла в случае если у родительского узла есть свободные места
     int free_pointer_count = count_free_pointer(B_factor);
     this->refresh(B_factor,root, nullptr); //new
@@ -282,8 +301,8 @@ void BTree::Node::Node_segmentation_root (unsigned int B_factor, BTree::Node* ac
     Node* a = active_node->pointers[0];
     Node* b = active_node->pointers[1];
 
-    active_node->pointers[0] = new BTree::Node (B_factor);
-    active_node->pointers[1] = new BTree::Node (B_factor);
+    active_node->pointers[0] = new Node (B_factor);
+    active_node->pointers[1] = new Node (B_factor);
 
      //если мы делим узел коренной и ничего не переносим наверх
         //определяем центр
@@ -306,10 +325,6 @@ void BTree::Node::Node_segmentation_root (unsigned int B_factor, BTree::Node* ac
             active_node->pointers[0]->pointers[0] = a; //было active_node->pointers[0]->pointers[0] = a;
             active_node->pointers[0]->pointers[1] = b; //было active_node->pointers[0]->pointers[1] = a;
 
-            std::cout << active_node->pointers[0] << std::endl;
-            std::cout << active_node->pointers[0]->pointers[1] << std::endl;
-            std::cout << active_node->pointers[1] << std::endl;
-
             //заполняем первый до центра
             for (int i = 2; i <= center; i++) {
                 active_node->pointers[0]->pointers[i] = active_node->pointers[i];
@@ -322,13 +337,10 @@ void BTree::Node::Node_segmentation_root (unsigned int B_factor, BTree::Node* ac
             }
 
         }
-
-    active_node->pointers[0]->print_only_this(B_factor,root,parent);
-    active_node->pointers[1]->print_only_this(B_factor,root,parent);
 }
 
 
-void BTree::Node::Node_segmentation_round (unsigned int B_factor, BTree::Node* active_node, int key, BTree::Node * root, BTree::Node * parent) {
+void Node::Node_segmentation_round (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent) {
 
     if (root->TEMP_POINTER != nullptr) {
         root->TEMP_POINTER->print(B_factor, root, nullptr);
@@ -355,7 +367,7 @@ void BTree::Node::Node_segmentation_round (unsigned int B_factor, BTree::Node* a
         //сначала добавляем резервные места в основу
         this->refresh(B_factor,root,parent);
 
-        parent->TEMP_POINTER = new BTree::Node (B_factor); //вставляем в верхний узел ссылку на новый
+        parent->TEMP_POINTER = new Node (B_factor); //вставляем в верхний узел ссылку на новый
 
         parent->TEMP_KEY = this->keys[center]; //средний увели к родителям
         keys[center] = -1;
@@ -378,7 +390,7 @@ void BTree::Node::Node_segmentation_round (unsigned int B_factor, BTree::Node* a
         }
         this->refresh(B_factor,root,parent);
 
-        parent->TEMP_POINTER = new BTree::Node (B_factor); //новый узел во временный адрес наверх
+        parent->TEMP_POINTER = new Node (B_factor); //новый узел во временный адрес наверх
         parent->TEMP_KEY = this->keys[center];//центральный ключ во временный наверх
         this->keys[center] = -1;
 
@@ -399,7 +411,7 @@ void BTree::Node::Node_segmentation_round (unsigned int B_factor, BTree::Node* a
 }
 
 
-void BTree::Node::set(int keys_in[], Node **pointers_in) {
+void Node::set(int keys_in[], Node **pointers_in) {
     keys = keys_in;
     pointers = pointers_in;
 }
@@ -410,11 +422,17 @@ BTree::BTree() {
     root->root();
 }
 
+BTree::BTree(int B_factor) {
+    this->B_factor = B_factor;
+    root = new Node (B_factor);
+    root->root();
+}
+
 void BTree::add(int key) {
     root->add(key, B_factor, root, root, nullptr);
 }
 
-void BTree::Node::add(int key, unsigned int B_factor, Node * active_node, Node * root, Node * parent) {
+void Node::add(int key, unsigned int B_factor, Node * active_node, Node * root, Node * parent) {
     int free_pointer_count = count_free_pointer(B_factor);
     int free_key_count = count_free_key(B_factor);
 
@@ -448,11 +466,11 @@ void BTree::Node::add(int key, unsigned int B_factor, Node * active_node, Node *
     }
 }
 
-BTree::Node* BTree::search(int key){
+Node* BTree::search(int key){
       return root->search(key, 0, B_factor, root, root, nullptr);
 }
 
-BTree::Node* BTree::Node::search(int key, int level_down, int B_factor, Node * root, Node * active_node, Node* node_with_key){
+Node* Node::search(int key, int level_down, int B_factor, Node * root, Node * active_node, Node* node_with_key){
     //переберем ключи в этом узле
     level_down++;
     for (int i = 0; i < B_factor; i++) {
@@ -479,15 +497,15 @@ BTree::Node* BTree::Node::search(int key, int level_down, int B_factor, Node * r
 
 //УДАЛЕНИЕ УЗЛА
 
-int BTree::Node::count_keys(int B_factor) {
+int Node::count_keys(int B_factor) {
     return ((B_factor-1) - this->count_free_key(B_factor));
 }
 
-int BTree::Node::count_pointers(int B_factor) {
+int Node::count_pointers(int B_factor) {
     return (B_factor - this->count_free_pointer(B_factor));
 }
 
-void BTree::Node::remove_free_pointer(int B_factor){
+void Node::remove_free_pointer(int B_factor){
     for (int i = 0; i < B_factor - 1; i++){
         if(this->pointers[i] == nullptr){
             for (int k = i; k < B_factor - 1; k++){
@@ -499,7 +517,7 @@ void BTree::Node::remove_free_pointer(int B_factor){
 }
 
 
-void BTree::Node::remove_free_place(int B_factor ){
+void Node::remove_free_place(int B_factor ){
     for (int i = 0; i < B_factor - 2; i++){
         if(this->keys[i] == -1){
             for (int k = i; k < B_factor - 2; k++){
@@ -511,7 +529,7 @@ void BTree::Node::remove_free_place(int B_factor ){
 }
 
 
-void BTree::Node::del_key_only_this(int key, int B_factor, Node * node_with_key){
+void Node::del_key_only_this(int key, int B_factor, Node * node_with_key){
     for(int i = 0; i < B_factor - 1; i++){
         if(node_with_key->keys[i] == key){
             node_with_key->keys[i] = -1;
@@ -521,7 +539,7 @@ void BTree::Node::del_key_only_this(int key, int B_factor, Node * node_with_key)
     node_with_key->remove_free_place(B_factor);
 }
 
-int BTree::Node::ask_brother_key(int key, int B_factor, Node * node_with_key, Node* parent, Node * root){
+int Node::ask_brother_key(int key, int B_factor, Node * node_with_key, Node* parent, Node * root){
     int parent_keys_amount = parent->count_keys(B_factor);
     int node_with_key_index = -1;
 
@@ -577,7 +595,7 @@ int BTree::Node::ask_brother_key(int key, int B_factor, Node * node_with_key, No
     }
 }
 
-int BTree::Node::merge_nodes_brothers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status) {
+int Node::merge_nodes_brothers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status) {
     if (1) {
         //тут уже  мы знаем что братьев можно сливать
         int node_with_key_index = -1;
@@ -646,7 +664,7 @@ int BTree::Node::merge_nodes_brothers(int key, int B_factor, Node* node_with_key
     }
 }
 
-int BTree::Node::lift_up_left (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index) {
+int Node::lift_up_left (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index) {
     if (this == node_with_key){
         return this->pointers[key_index]->lift_up_left(key,B_factor,root,this,node_with_key,key_index);
     } else if(this->pointers[0] != nullptr){ //отправляем вниз
@@ -663,7 +681,7 @@ int BTree::Node::lift_up_left (int key, int B_factor, Node * root, Node * parent
    }
 }
 
-int BTree::Node::lift_up_right (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index) {
+int Node::lift_up_right (int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int key_index) {
     if (this == node_with_key) {
         return this->pointers[key_index +1]->lift_up_right(key, B_factor, root, this, node_with_key, key_index);
     } else if(this->pointers[0] != nullptr){ //отправляем вниз
@@ -681,7 +699,7 @@ int BTree::Node::lift_up_right (int key, int B_factor, Node * root, Node * paren
     }
 }
 
-void BTree::Node::steal_down_key(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int key_index){
+void Node::steal_down_key(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int key_index){
     if (this == node_with_key){
         this->pointers[key_index]->steal_down_key(key,B_factor,node_with_key,this,root,key_index);
     } else if(this->pointers[0] != nullptr){ //отправляем вниз
@@ -697,7 +715,7 @@ void BTree::Node::steal_down_key(int key, int B_factor, Node* node_with_key, Nod
     }
 }
 
-int BTree::Node::ask_brother_key_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root){
+int Node::ask_brother_key_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root){
     //найдем индекс нашего узла сверху
     int node_index = -1;
     for (int i = 0; i < B_factor; i++){
@@ -754,7 +772,7 @@ int BTree::Node::ask_brother_key_with_pointers(int key, int B_factor, Node* node
     return 0;
 }
 
-void BTree::Node::change_root(Node* new_root, Node* root, int B_factor){
+void Node::change_root(Node* new_root, Node* root, int B_factor){
     //передаем ключи
     for (int i = 0; i < B_factor -1; i++){
         root->keys[i] = new_root->keys[i];
@@ -765,7 +783,7 @@ void BTree::Node::change_root(Node* new_root, Node* root, int B_factor){
     }
 }
 
-void BTree::Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status){
+void Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node* node_with_key, Node* parent, Node* root, int parent_status){
     int node_with_key_index = -1;
 
     //узнаем каким по порядку идет наш узел
@@ -845,7 +863,7 @@ void BTree::delete_key(int key){
     node_with_key->delete_key(key, B_factor, root, node_with_key->find_this_parent(B_factor,root,root), node_with_key, NOT_USED);
 }
 
-void BTree::Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int is_used){
+void Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * node_with_key, int is_used){
     int success = 0;  // 1 означает что успешно
     //найдем адрес узла с ключем, проверим есть ли такой ключ
     if (node_with_key == nullptr){
@@ -892,7 +910,6 @@ void BTree::Node::delete_key(int key, int B_factor, Node * root, Node * parent, 
         }
         if ((is_used == NOT_USED) && (success == 0)) { //если не удалось забрать ключи, забираем силой
             //украсть ключ снизу
-            node_with_key->print_only_this(B_factor,root,parent);
             node_with_key->steal_down_key(key,B_factor,node_with_key,parent,root,key_index);
             return;
             //после того как забрали силой нужно ДЕЛЕГИРОВАТЬ ОТСУТСТВИЕ КЛЮЧА В САМЫЙ НИЗ
