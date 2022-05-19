@@ -1,9 +1,16 @@
 #include <iostream>
 #include "b_tree.h"
 
+#include <ctime>
+
+unsigned int start_time = 0; // начальное время
+// здесь должен быть фрагмент кода, время выполнения которого нужно измерить
+unsigned int end_time = 0; // конечное время
+unsigned int search_time = 0;
 
 
-#define SIZE_ARRAY 1000
+
+#define SIZE_ARRAY 10000
 #define RAND_MAX 100000
 
 
@@ -12,7 +19,6 @@ int massiv[SIZE_ARRAY];
 
 
 void massiv_make(){
-    //int * copy = mass;
     for (int i = 0; i <SIZE_ARRAY; i++){
         massiv[i] = 0;
     }
@@ -57,9 +63,24 @@ int main() {
         std::cout << massiv[i] << " ";
     }
 
+
+
+
     for (int i = 0; i < SIZE_ARRAY; i++){
         Derevo.add(massiv[i]);
     }
+    //Derevo.count_tree();
+
+
+
+    start_time = clock();
+
+    for (int i = 0; i < SIZE_ARRAY; i++){
+        Derevo.search(massiv[i]);
+    }
+    end_time = clock();
+
+
 
     Derevo.print();
 
@@ -67,14 +88,26 @@ int main() {
         std::cout << massiv[i] << " ";
     }
 
+
+
     for (int i = 0; i < SIZE_ARRAY; i++){
         //Derevo.print();
         //Derevo.print_keys_in_string();
         Derevo.delete_key(massiv[i]);
     }
 
+
+
     Derevo.count_tree(); //подсчет числа ключей в дереве
     Derevo.print();
+
+
+    //подсет времени
+    search_time = (end_time - start_time)/CLK_TCK;
+    unsigned int search_time_orig = (end_time - start_time);
+    std::cout << "Время выполенения программы (в милисекундах) = " << search_time <<std::endl;
+    std::cout << "Время выполенения программы (в единицах) = " << search_time_orig <<std::endl;
+
     return 0;
 }
 
