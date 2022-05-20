@@ -78,7 +78,7 @@ int Prefix_tree::get_suff_link_comp(int v) {
 void Prefix_tree::check(int v, int i) {
     for (int u = v; u != 0; u = get_suff_link_comp(u)) {
         if (tree[u].flag) {
-            //cout << i - pattern[tree[u].pat_num].length() + 1 << " " << pattern[tree[u].pat_num] << endl;
+            cout << i - pattern[tree[u].pat_num].length() + 1 << " " << pattern[tree[u].pat_num] << endl;
         }
     }
 }
