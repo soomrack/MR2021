@@ -4,7 +4,6 @@
 #include <ctime>
 
 unsigned int start_time = 0; // начальное время
-// здесь должен быть фрагмент кода, время выполнения которого нужно измерить
 unsigned int end_time = 0; // конечное время
 unsigned int search_time = 0;
 
@@ -60,7 +59,7 @@ int main() {
     massiv_make(); //массив с рандомными значениями 
     //выведем массив
     for (int i = 0; i < SIZE_ARRAY; i++){
-        std::cout << massiv[i] << " ";
+        //std::cout << massiv[i] << " ";
     }
 
 
@@ -69,9 +68,7 @@ int main() {
     for (int i = 0; i < SIZE_ARRAY; i++){
         Derevo.add(massiv[i]);
     }
-    //Derevo.count_tree();
-
-
+    Derevo.count_tree();
 
     start_time = clock();
 
@@ -79,7 +76,6 @@ int main() {
         Derevo.search(massiv[i]);
     }
     end_time = clock();
-
 
 
     Derevo.print();
@@ -91,8 +87,6 @@ int main() {
 
 
     for (int i = 0; i < SIZE_ARRAY; i++){
-        //Derevo.print();
-        //Derevo.print_keys_in_string();
         Derevo.delete_key(massiv[i]);
     }
 

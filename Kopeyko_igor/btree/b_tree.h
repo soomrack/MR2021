@@ -17,9 +17,8 @@ public:
     void print_keys_in_string();
     void add(int key);
     void print();
-    Node* search(int key);
+    int search(int key);
     void delete_key(int key);
-
     friend class Node;
 };
 

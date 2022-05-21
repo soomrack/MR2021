@@ -342,14 +342,6 @@ void Node::Node_segmentation_root (unsigned int B_factor, Node* active_node, int
 
 void Node::Node_segmentation_round (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent) {
 
-    if (root->TEMP_POINTER != nullptr) {
-        root->TEMP_POINTER->print(B_factor, root, nullptr);
-    }
-
-    if (this->TEMP_POINTER != nullptr) {
-        this->TEMP_POINTER->print(B_factor, root, nullptr);
-    }
-
     int free_pointer_count = count_free_pointer(B_factor);
     int free_key_count = count_free_key(B_factor);
     int center = (B_factor - 1) / 2;
@@ -466,8 +458,17 @@ void Node::add(int key, unsigned int B_factor, Node * active_node, Node * root, 
     }
 }
 
+/*
 Node* BTree::search(int key){
       return root->search(key, 0, B_factor, root, root, nullptr);
+}
+*/
+int BTree::search(int key){
+    Node* node_with_key = root->search(key, 0, B_factor, root, root, nullptr);
+    if(node_with_key != nullptr){
+        return key;
+    }
+    return -1;
 }
 
 Node* Node::search(int key, int level_down, int B_factor, Node * root, Node * active_node, Node* node_with_key){
