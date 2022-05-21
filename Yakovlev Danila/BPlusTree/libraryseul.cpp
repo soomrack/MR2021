@@ -63,7 +63,6 @@ Node::Node(Node &&node) noexcept {
     }
 }
 Node::~Node() {
-    ///____когда-то все в этом деструкторе было закоменченым и все работало. будет ли работать иначе____///
     if (leaf) {
         key_data = 0;
         neighbour = nullptr;
@@ -84,7 +83,7 @@ BPTree::BPTree(int t) {
 }
 BPTree::~BPTree() {//вообще тут надо виртуальный деструктор.хммм
     int ooo = 0;
-    //удаление всех листьев и узлов рекурсией... я забываю тебя создать...
+    //удаление всех листьев и узлов... я забываю тебя создать...
 }
 
 ///готово
@@ -270,7 +269,6 @@ Node* BPTree::search_neighbour_right(int leaf, Node* &ref_node, int floor, Node*
     if (floor < H-1){//до предлистового узла
         int i = 0;
         while ((i < ref_node->max_ref_child_id) and (leaf > ref_node->key_copy[i+1])) i++;
-        //cout << "Переходим в узел " << ref_node->key_copy[i] << endl;
         floor++;
         if (i < ref_node->max_ref_child_id) {minimally_larger_node = ref_node->child_array[i+1]; mln_floor = floor;}//если это был не максимальный номер, записываем следующий узел ,чтобы потом если че на него перейти
         return search_neighbour_right(leaf, ref_node->child_array[i], floor, minimally_larger_node, mln_floor);
@@ -278,19 +276,13 @@ Node* BPTree::search_neighbour_right(int leaf, Node* &ref_node, int floor, Node*
     else if (floor == H-1) {//мы на предлистовом узле
         int i = 0;
         while ((i < ref_node->max_ref_child_id) and (leaf >= ref_node->key_copy[i])) i++;
-        //cout << "Переходим в лист " << ref_node->key_copy[i] << endl;
         floor++;
         return search_neighbour_right(leaf, ref_node->child_array[i], floor, minimally_larger_node, mln_floor);
     }
-    //cout <<"Вот такой вот лист мог быть соседом справа = "<<ref_node->key_data <<endl;
     if (leaf == ref_node->key_data){//если текущий лист меньше нашего
-        //cout <<"Но он равен текущему, поэтому ";
         if (minimally_larger_node != nullptr){//но в соседних узлах есть еще листы
-            //cout <<" у нас есть альтернатива" <<endl;
-            //cout <<"На этаже = "<< mln_floor <<endl;
             return search_leaf_neighbour(minimally_larger_node, mln_floor);
         }
-        //cout <<"возвращаем пустоту" <<endl;
         return nullptr;
     }
     return ref_node;
@@ -303,9 +295,8 @@ Node* BPTree::search_leaf_neighbour(Node* ref_node, int floor){//дохожу д
     return ref_node;
 }
 
-///в процессе
+///подредактировал. пока ошибок не всплывало
 void* BPTree::del(int leaf) {
-    cout <<"DELETE "<< leaf << endl;
     Hplus = false;
 /// 1. поиск последнего узла, в котором удалим лист
     ptr_path_array = new Node*[H];
@@ -314,64 +305,49 @@ void* BPTree::del(int leaf) {
     Node *here = ptr_path_array[H-1];//предлистовой узел
     int i = 0;
     while ((i < here->max_ref_child_id) and (leaf > here->child_array[i]->key_data)){
-        cout << " " << here->child_array[i]->key_data;
         i++;
     }
     if (here->child_array[i]->key_data != leaf){
-        cout << "Листа " << leaf << " и не было вовсе" << endl;//******************************************************
         delete ptr_path_array;
         return nullptr;
     }
 ///2. поправка соседей
     Node* left_node = search_neighbour_left(leaf, root, 0);
     Node* right_node = search_neighbour_right(leaf, root, 0, nullptr, 0);
-    cout << "\n Узел справа " << right_node-> key_data<< endl;
+
     if ((left_node != here->child_array[i])and(right_node != nullptr)){//если они существуют оба
         left_node -> neighbour = right_node;
-
     }
 ///3. удаление и наведение порядка в текущем узле предлистовом
-    while (i < here->max_ref_child_id-1) {// тут смещение ссылок и копий на 1 влево с места удаления листа (и так как раз его и удалим случайно). поэтому соседи раньше
+    here -> max_ref_child_id--;
+    delete here->child_array[i];    //удаление листа поэтому соседи и были раньше
+    while (i <= here->max_ref_child_id) {   // тут смещение ссылок и копий на 1 влево с места удаления листа
         here->key_copy[i] = here->key_copy[i+1];
         here->child_array[i] = here->child_array[i+1];
         i++;
     }
-    here->key_copy[i] = MAX;
-    here->child_array[i] = nullptr;
-    here -> max_ref_child_id--;
-///4. А теперь настройка дерева. Объединение узлов / одалживание у соседей........................рекурсией по дереву вверх.
+    if (i<=b_factor){// на всякий случай. потом проверю надо ли *********************************************************** * * *
+        here->key_copy[i] = MAX;
+        here->child_array[i] = nullptr;
+    }
+
+///4. А теперь настройка дерева. Объединение узлов / одалживание у соседей........................рекурсия по дереву к корню
     if (change_node){
-        cout <<"А теперь самое сложное"<< endl;
         tree_edits_after_deletion(ptr_path_array[H-1],  ptr_path_array[H-2], H-1);
     }
-    cout <<"DELETE " << leaf <<  " COMPLETED" << endl;//***********************************
     delete ptr_path_array;
     return nullptr;
-}
-bool BPTree::search_place_for_del(int leaf, Node* &ref_node, int floor){
-    if (floor < H-1){
-        int i = 1;
-        while ((i <= ref_node->max_ref_child_id) and (leaf > ref_node->key_copy[i])) i++;
-        ptr_path_array[floor+1] = ref_node->child_array[i-1];
-        return search_place_for_del(leaf, ref_node->child_array[i-1], floor+1);
-    }
-    bool combining = false;
-    if (ref_node->max_ref_child_id == t - 1) combining = true; //будет ли нехватка узлов после удаления в предлистовом узле
-    return combining;
 }
 void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, int floor){//перестройка этажей, бабочки летают ,переворачивая все верх вверх ногами...
     int i = 0;
     bool node_neighbour_left = false;
     ///1. Проходим по листу родителя пока не дойдем до узла просящего добавки узлов.
     while (ref_parent_node -> child_array[i] != ref_node) i++;
-    int memory_we = i;
     ///1.2. если он последний - обратимся к соседу слева, иначе к соседу справа
-    if (i== ref_parent_node ->max_ref_child_id) {i--; node_neighbour_left= true;}
-    else i++;
-    int memory_neighbour = i;
-    ///2. проверка колва детей. если их больше половина минус 1, то просто возьмем крайний узел и подвинем остальных
+    if (i== ref_parent_node ->max_ref_child_id) {i--; node_neighbour_left= true;}else i++;
+    ///2. проверка колва детей. если их больше половина минус 1, то просто возьмем крайний узел и подвинем остальных - проверено
     if (ref_parent_node -> child_array[i] -> max_ref_child_id > t-2){
-        if (node_neighbour_left){//взаимствование у соседа слева
+        if (node_neighbour_left){   //взаимствование у соседа слева
             ///двигаем узлы вправо для освобождения первого места добавления
             int n = ref_node -> max_ref_child_id+1;
             while (n > 1) {
@@ -380,7 +356,7 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
                 n--;
             }
             ref_node->key_copy[1]=search_for_the_first_leaf_of_this_branch(ref_node->child_array[0], floor+1);
-            /// берем у соседа лист и очищаем у соседа информвцию о нем
+            /// берем у соседа лист и очищаем у соседа информацию о нем
             ref_node->child_array[0] = ref_parent_node -> child_array[i]->child_array[ref_parent_node -> child_array[i] -> max_ref_child_id];
             ref_parent_node -> child_array[i]->child_array[ref_parent_node -> child_array[i] -> max_ref_child_id] = nullptr;
             ref_parent_node -> child_array[i]->key_copy[ref_parent_node -> child_array[i] -> max_ref_child_id] = MAX;
@@ -389,9 +365,8 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
         }
         else{//взаимствование у соседа справа
             ///собстна само взаимствование нулевого элемента
-            ref_node->child_array[ref_node->max_ref_child_id] = ref_parent_node -> child_array[i]->child_array[0];
-            ref_node->key_copy[ref_node->max_ref_child_id] = search_for_the_first_leaf_of_this_branch(ref_node->child_array[ref_node->max_ref_child_id], floor+1);
-
+            ref_node->child_array[ref_node->max_ref_child_id+1] = ref_parent_node -> child_array[i]->child_array[0];
+            ref_node->key_copy[ref_node->max_ref_child_id+1] = search_for_the_first_leaf_of_this_branch(ref_node->child_array[ref_node->max_ref_child_id+1], floor+1);
             ref_parent_node -> child_array[i]->child_array[0] = ref_parent_node -> child_array[i]->child_array[1];
             int n = 1;
             while (n <= ref_parent_node -> child_array[i] -> max_ref_child_id) {// тут смещение ссылок и копий на 1 влево у соседа
@@ -406,7 +381,7 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
         ref_node->max_ref_child_id++;
     }
     ///2.2 если их меньше или равно половина минус 1, то объединим узлы
-    else{
+    else{//хехе
         Node* left_node;
         Node* right_node;
         if (node_neighbour_left) {left_node = ref_parent_node -> child_array[i]; right_node = ref_node; }
@@ -432,45 +407,31 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
         ref_parent_node->key_copy[i] = MAX;
         ref_parent_node -> max_ref_child_id--;
     }
-    ///END. Просмотр результата:
-    cout << "Этаж " << floor <<" из " << H << endl;
-    cout << "Заполненность родителя " << ref_parent_node -> max_ref_child_id <<" из " << b_factor << endl;
-    int www = 0;
-    cout << "Копии узла родителя:  " << endl;
-    while (www <= ref_parent_node -> max_ref_child_id){
-        cout << ref_parent_node -> key_copy[www] << " ";
-        www++;
-    } cout << endl;
-    www=0;
-    cout << "Копии узла соседа после удаления: " << endl;
-    www=0;
-    while (www <= ref_parent_node ->child_array[memory_neighbour]->max_ref_child_id){
-        cout << ref_parent_node ->child_array[memory_neighbour]-> key_copy[www] << " ";
-        www++;
-    } cout << endl;
-    cout << "Копии узла текущего после удаления: " << endl;
-    www=0;
-    while (www <= ref_parent_node ->child_array[memory_we]->max_ref_child_id){
-        cout << ref_parent_node ->child_array[memory_we]-> key_copy[www] << " ";
-        www++;
-    } cout << endl;
-    ///3. идем в следующий узел
+    ///3. идем в следующий узел, если требуется
     floor--;
     if (floor==0){// если мы в корне можем оказаться
         if ((ref_parent_node -> max_ref_child_id==0)and(H>1)){ //если у него только 1 ссылка и он не предлистовой узел
-            //следующий узел новый корень
             root = ref_parent_node ->child_array[0];
-            //удаление корня
             delete ref_parent_node;//сработает ?
         }
         return nullptr;
     }
-    if (ref_parent_node -> max_ref_child_id < (b_factor+1)/2-1){
+    if (ref_parent_node -> max_ref_child_id == t-3){
         return tree_edits_after_deletion(ptr_path_array[floor-1],  ptr_path_array[floor], floor);
     }
     return nullptr;
-}///просит проверки
-
+}
+bool BPTree::search_place_for_del(int leaf, Node* &ref_node, int floor){
+    if (floor < H-1){
+        int i = 1;
+        while ((i <= ref_node->max_ref_child_id) and (leaf > ref_node->key_copy[i])) i++;
+        ptr_path_array[floor+1] = ref_node->child_array[i-1];
+        return search_place_for_del(leaf, ref_node->child_array[i-1], floor+1);
+    }
+    bool combining = false;
+    if (ref_node->max_ref_child_id == t - 2) combining = true;
+    return combining;
+}///требуется улучшение как у "соседа справа"
 ///готово
 void BPTree::print(){
     cout << "B+ - tree:"<< endl;
