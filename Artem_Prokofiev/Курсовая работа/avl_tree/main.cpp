@@ -1,44 +1,43 @@
 #include "avl_tree.h"
-#include<bits/stdc++.h>
 
 int main() {
-    Node New_Node;
-    Node *root = NULL;
+    Tree New_Tree;
+    New_Tree.root = New_Tree.remove(New_Tree.root,0);
+    node *info = 0;
+    ///* Building tree by adding values *///
+    New_Tree.root = New_Tree.insert(New_Tree.root, 10, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 20, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 30, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 40, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 50, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 25, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 60, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 70, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 45, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 75, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 55, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 90, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 15, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 80, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 5, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 65, info);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 56, info);
 
-    /* Building tree by adding values */
-
-    root = New_Node.insert(root, 10);
-    root = New_Node.insert(root, 20);
-    root = New_Node.insert(root, 30);
-    root = New_Node.insert(root, 40);
-    root = New_Node.insert(root, 50);
-    root = New_Node.insert(root, 25);
-    root = New_Node.insert(root, 60);
-    root = New_Node.insert(root, 70);
-    root = New_Node.insert(root, 70);
-    root = New_Node.insert(root, 45);
-    root = New_Node.insert(root, 75);
-    root = New_Node.insert(root, 55);
-    root = New_Node.insert(root, 90);
-    root = New_Node.insert(root, 15);
-    root = New_Node.insert(root, 80);
-    root = New_Node.insert(root, 5);
-    root = New_Node.insert(root, 65);
+    New_Tree.root = New_Tree.insert(New_Tree.root, 54, info);
+    New_Tree.root = New_Tree.remove(New_Tree.root,54);
     /* The AVL Tree structure will be look like:
-              _____50_____
-             /            \
-            30            70
-          /    \        /    \
-         20     40     60     80
-       /   \      \   /  \   /  \
-      10  25     45  55  65 75  90
-     /  \
-    5   15
-    */
+                 _____55_____
+                /            \
+               40            70
+             /    \        /    \
+            20     50     60     80
+          /    \   /     /  \     \
+         10    30 45   56   65     90
+        /  \   /              \
+       5   15 25              75
+       */
     std::cout << "The preliminary traversal of the "
                  "constructed AVL tree looks like: \n";
-    New_Node.preOrder(root);
-
+    New_Tree.preOrder(New_Tree.root);
     return 0;
 }
- 

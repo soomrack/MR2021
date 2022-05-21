@@ -1,113 +1,127 @@
 #include "avl_tree.h"
-#include<bits/stdc++.h>
+#include <iostream>
 
-int Node:: get_height(Node *N) {
-    if (N == NULL) {
-        return 0;
+unsigned short Tree::height(node* p) {
+    return p?p -> height:0;
+}
+
+int16_t Tree::balance_factor(node* p) {
+    return (int8_t)(height(p -> right) - height(p -> left));
+}
+
+void Tree::real_height(node* p) {
+    unsigned short h_left = height(p->left);
+    unsigned short h_right = height(p->right);
+    p->height = (h_left > h_right?h_left:h_right) + 1;
+}
+
+node* Tree::rotate_right(node* p) {
+    node* q = p -> left;
+    p -> left = q -> right;
+    q -> right = p;
+    real_height(p);
+    real_height(q);
+    return q;
+}
+
+node* Tree::rotate_left(node* q) {
+    node* p = q -> right;
+    q -> right = p -> left;
+    p -> left = q;
+    real_height(p);
+    return p;
+}
+
+node* Tree::balance(node* p) {
+    real_height(p);
+    if(balance_factor(p) == 2) {
+        if(balance_factor(p -> right) < 0)
+            p -> right = rotate_right(p -> right);
+        return rotate_left(p);
     }
-    return N->height;
-}
-
-int Node::max(int a, int b) {
-    return (a > b)? a : b;
-}
-
-Node* Node::newNode(int key) {
-    Node* node = new Node();
-    node->key = key;
-    node->left = NULL;
-    node->right = NULL;
-    node->height = 1; // The new node is initially added at the end (at leaf)
-    return(node);
-}
-
-Node *Node::rightRotate(Node *y) {
-    Node *x = y->left;
-    Node *T2 = x->right;
-
-    // Rotation
-    x->right = y;
-    y->left = T2;
-
-    // Update heights
-    y->height = max(get_height(y->left),
-                    get_height(y->right)) + 1;
-    x->height = max(get_height(x->left),
-                    get_height(x->right)) + 1;
-
-    // Return new root
-    return x;
-}
-
-Node *Node::leftRotate(Node *x) {
-    Node *y = x->right;
-    Node *T2 = y->left;
-
-    // Rotation
-    y->left = x;
-    x->right = T2;
-
-    // Update heights
-    x->height = max(get_height(x->left),
-                    get_height(x->right)) + 1;
-    y->height = max(get_height(y->left),
-                    get_height(y->right)) + 1;
-
-    // Return new root
-    return y;
-}
-
-int Node::getBalance(Node *N) {
-    if (N == NULL)
-        return 0;
-    return get_height(N->left) - get_height(N->right);
-}
-
-Node* Node::insert(Node* node, int key) {
-    /* 1. Insertion */
-    if (node == NULL) {
-        return (newNode(key));
+    if(balance_factor(p) == -2) {
+        if(balance_factor(p -> left) > 0)
+            p -> left = rotate_left(p -> left);
+        return rotate_right(p);
     }
-    if (key < node->key) {
-        node->left = insert(node->left, key);
-    } else if (key > node->key) {
-        node->right = insert(node->right, key);
+    return p; // do not need balance
+}
+
+node* Tree::insert(node* p, int k, node* information) {
+    if(!p) {
+        node* A = new node;
+        A -> height = 1;
+        A -> key = k;
+        A -> left = 0;
+        A -> right = 0;
+        A -> info = 0;
+        return A;
+    }
+
+    if(k < p -> key) {
+        p -> left = insert(p -> left, k, information);
+    } else if (k > p -> key) {
+        p -> right = insert(p -> right, k, information);
     } else {    // Equal keys are not allowed in binary search trees
-        return node;
+        return p;
     }
-    /* 2. Update height of this previous node */
-    node->height = 1 + max(get_height(node->left),
-                           get_height(node->right));
-
-    /* 3. Get the balance factor of this previous
-        node to check whether this node became unbalanced */
-    int balance = getBalance(node);
-
-    /* If this node becomes unbalanced, then there are 4 cases:
-       1. Left Left Case*/
-    if (balance > 1 && key < node->left->key) {
-        return rightRotate(node);
-    }
-    // 2. Right Right Case
-    if (balance < -1 && key > node->right->key) {
-        return leftRotate(node);
-    }
-    // 3. Left Right Case
-    if (balance > 1 && key > node->left->key) {
-        node->left = leftRotate(node->left);
-        return rightRotate(node);
-    }
-    // 4. Right Left Case
-    if (balance < -1 && key < node->right->key) {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
-    }
-
-    /* If node is balanced return the (unchanged) node pointer */
-    return node;
+    return balance(p); // balance after insertion
 }
 
-void Node::preOrder(Node *root) {
+
+node* Tree::search(node* p, int k) {
+    while(1) {
+        if (k < p -> key) {
+            p = p -> left;
+        }
+        if (k > p -> key) {
+            p = p -> right;
+        }
+        if (k == p -> key) {
+            std::cout << k <<std::endl;
+            return p;
+        }
+        if ((p -> left == 0) && (p -> right == 0)) {
+            std::cout << "can't find the key\n"<<"return zero pointer"<<std::endl;
+            return p;
+        }
+    }
+}
+
+node* Tree::find_min(node* p) {
+    return p -> left?find_min(p -> left):p;
+}
+
+node* Tree::remove_min(node* p) {
+    if(p -> left == 0) {
+        return p->right;
+    }
+    p -> left = remove_min(p -> left);
+    return balance(p);
+}
+
+node* Tree::remove(node* p, int k) {
+    if(!p) {
+        return 0;
+    }
+    if( k < p->key ) {
+        p->left = remove(p->left, k);
+    } else if( k > p->key ) {
+        p->right = remove(p->right, k);
+    } else {  // k == p -> key
+        node* q = p->left;
+        node* r = p->right;
+        delete p;
+        if( !r ) return q;
+        node* min = find_min(r);
+        min->right = remove_min(r);
+        min->left = q;
+        return balance(min);
+    }
+    return balance(p); // balance after delete node
+}
+
+void Tree::preOrder(node *root) {
     if(root != NULL) {
         std::cout << root->key << " ";
         preOrder(root->left);
