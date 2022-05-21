@@ -3,9 +3,6 @@
 //
 #ifndef TOKIO3_LIBRARYSEUL_H
 #define TOKIO3_LIBRARYSEUL_H
-//б+ дерево в отличие от б дерева
-//значения только в листьях, а в узлах копии
-//листья содержат ссылки дна соседа побольше (не помню есть ли в простом б)
 
 #include <iostream>
 #include <cstring>
@@ -21,20 +18,20 @@ class Node;
 
 class Node{
     friend class BPTree;
-private:                                //для узла
-    int max_ref_child_id;                  //заполненность
-    vector <Node*> child_array;              // массив со ссылками на детей
+private:                   //для узла
+    int max_ref_child_id;                //заполненность
+    vector <Node*> child_array;          // массив со ссылками на детей
     int *key_copy;                       //массив копий ключей
-    int size_array;                     //размер массивов, равный бфактору
-private:                                //для листа
+    int size_array;                      //размер массивов, равный бфактору
+private:                   //для листа
     bool leaf;                     //лист если тру
     Node* neighbour;               //ссылка на соседа
     int key_data;                  //значение в листе
 private:
     Node(int data_leaf_or_bfactor,bool leaf_or_node);
-    Node(const Node &node); //конструктор копирования
-    Node(Node &&node) noexcept;//конструктор перемещений
-    ~Node();//деструктор
+    Node(const Node &node);      //конструктор копирования
+    Node(Node &&node) noexcept;  //конструктор перемещений
+    ~Node();                     //деструктор
 };
 
 class BPTree{
@@ -54,21 +51,22 @@ public:
 public:
     bool search(int leaf); //работает
     void* add(int leaf); //работает
-    void* del(int leaf); //пока концепция
+    void* del(int leaf); //работает
     void print(); // работает
-private://search
+private://for search
     bool search(int leaf, Node* ref_node, int floor);
-private://add
+private://for add
     int search_place_for_add(int leaf, Node* &ref_node, int floor, int floors_for_separation);
-    void* node_separation(Node* &ref_node,Node* &ref_parent_node, int floor, int leaf);
+    void* node_separation(Node* &ref_node,Node* &ref_parent_node, int floor, int leaf); //узел для разделения, родительский узел, этаж детей (на котором будем разедлять), лист
+private://for add and dell
     int search_for_the_first_leaf_of_this_branch(Node* ref_node, int floor);
-private://add and dell
     Node* search_neighbour_left(int leaf, Node* &ref_node, int floor);
-    Node* search_neighbour_right(int leaf, Node* &ref_node, int floor);
-private://dell
+    Node* search_neighbour_right(int leaf, Node* &ref_node, int floor,Node* minimally_larger_node, int mln_floor); //пока неполноценен. в 1 из 2t он не работает.
+    Node* search_leaf_neighbour(Node* ref_node, int floor);
+private://for dell
     bool search_place_for_del(int leaf, Node* &ref_node, int floor);
     void* tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, int floor);
-private://print
+private://for print
     Node* search_once_leaf(Node* ref_node, int floor);
     Node* print_leaf(Node* ref_leaf);
 };
