@@ -110,6 +110,18 @@ void test_topological_sort() {
     grid_1.print_vector(grid_1.topological_sort());
 }
 
+void test_Tarjans_SCC_algorithm(){
+    std::vector<std::vector<int>> grid = {{0,1,0,0,0,0,0},
+                                          {0,0,1,1,0,0,0},
+                                          {0,0,0,0,0,0,0},
+                                          {0,0,0,0,1,0,0},
+                                          {1,0,0,0,0,1,1},
+                                          {0,0,1,0,0,0,1},
+                                          {0,0,0,0,0,1,0}};
+    Graph<int> grid_1( grid);
+    grid_1.Tarjan_SCC_algorithm();
+}
+
 // Просьба организовывать свои тесты методов в функции, чтобы не сильно нагружать функцию main
 int main() {
     test_tarjan_s_find_bridges();
@@ -119,5 +131,6 @@ int main() {
     test_dfs_search();
     test_find_path();
     test_topological_sort();
+    test_Tarjans_SCC_algorithm();
     return 0;
 }

@@ -3,9 +3,8 @@
 
 #include <vector>
 #include <list>
+#include <stack>
 
-// Тип ребра (ориентированное или неориентированное)
-// Нужен для функций вставки или удаления ребер
 typedef enum{
     UNDIRECTED,
     DIRECTED,
@@ -16,7 +15,7 @@ typedef enum{
 template<typename T>
 T get_inf();
 
-// Переменная, содержащая "бесконечность", т.е. такой вес ребра,
+// переменная, содержащая "бесконечность", т.е. такой вес ребра,
 // который эквивалентен отсутствию этого ребра
 template <typename T>
 T INF = get_inf<T>();
@@ -26,25 +25,25 @@ template <typename T> class Vertex;
 template <typename T> class BaseGraph;
 
 
-// Класс вершины
 template <typename T>
 class Vertex {
-    int id;                     // Уникальный id
-    std::list<Edge<T>> edges;   // Список инстанцированных с этой вершиной ребер
+    friend BaseGraph<T>;
+private:
+    int id;
+    std::list<Edge<T>> edges;
 public:
     explicit Vertex(int id = 0);
     Vertex(const Vertex &other);
     ~Vertex() = default;
 public:
-    void add_edge(Vertex<T>* neighbor, T distance);     // Добавить ребро с полями neighbor и distance в список ребер
-    void remove_edge(Vertex<T>* neighbor);              // Удалить ребро, которое соединяется с neighbor, из списка ребер
+    void add_edge(Vertex<T>* neighbor, T distance);
+    void remove_edge(Vertex<T>* neighbor);
 public:
     int get_id() {return id;}
     std::list<Edge<T>> get_edges() {return edges;}
 };
 
 
-// Класс ребра
 template <typename T>
 class Edge{
 private:
@@ -65,10 +64,10 @@ public:
 template <typename T>
 class BaseGraph{
 protected:
-    int id_counter = 0;                                 // Счетчик для присвоения id новым вершинам
-    std::list<Vertex<T>*> vertices;                     // Список вершин
-    std::vector<std::vector<T>> adjacency_matrix;       // Матрица смежности
-    std::vector<std::list<int>> adjacency_list;         // Список смежности
+    int id_counter = 0;
+    std::list<Vertex<T>*> vertices;
+    std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности
+    std::vector<std::list<int>> adjacency_list;       // Список смежности
 public:
     explicit BaseGraph(int num_of_vertices = 0);
     explicit BaseGraph(std::list<Vertex<T>*> &vertices);
@@ -78,20 +77,18 @@ public:
     BaseGraph(BaseGraph &&other) noexcept;
     virtual ~BaseGraph();
 
-// Методы для взаимодействия с графом (а именно, со списком вершин vertices)
+// Методы для взаимодействия с графом (т.е. геттеры, сеттеры и т.д.)
 public:
-    Vertex<T>* find_vertex(int id);     // return ptr - success, return nullptr - failure
-    int add_edge(int source_id, int target_id, int weight = 0, EdgeType edge_type = UNDIRECTED);    // return 0 - success, return 1 - failure
-    int remove_edge(int source_id, int target_id, EdgeType edge_type = UNDIRECTED);                 // return 0 - success, return 1 - failure
-    int add_vertex();               // Добавляет новую вершину с id равным id_counter и увеличивает на 1 id_counter
-    int remove_vertex(int id);      // Удаляет вершину по id и удаляет все ребра, связанные с этой вершиной, id_counter не меняется
+    Vertex<T>* find_vertex(int id);
+    int add_edge(int source_id, int target_id, int weight = 0, EdgeType edge_type = UNDIRECTED);
+    int remove_edge(int source_id, int target_id, EdgeType edge_type = UNDIRECTED);
+    int add_vertex();
+    int remove_vertex(int id);
 public:
     int get_id_counter() {return id_counter;}
     std::list<Vertex<T>*> get_vertices() {return vertices;}
     std::vector<std::vector<T>> get_adjacency_matrix() {return adjacency_matrix;}
     std::vector<std::list<int>> get_adjacency_list() {return adjacency_list;}
-
-// Методы для актуализации других структур данных (т.к. они не меняются при использовании методов выше)
 public:
     void actualize_adjacency_list();
     void actualize_adjacency_matrix();
@@ -99,9 +96,8 @@ public:
 
 
 
-/* Далее идут классы, в которых реализуются алгоритмы
- * Все эти классы наследуются от базового графа как virtual public
- * */
+// Далее идут классы, в которых реализуются алгоритмы
+// Все эти классы наследуются от базового графа как virtual public
 
 template<typename T>
 class GraphTarjansBridges: virtual public BaseGraph<T> {
@@ -159,6 +155,16 @@ public:
     std::vector<T> topological_sort();
 };
 
+template<typename T>
+class GraphTarjansSCCalgorithm: virtual public BaseGraph<T> {
+private:
+    void Tarjan_DFS( int current_node, std::vector<int>& queue_num, std::vector<int>& low_link, std::vector<bool>& presents_in_stack,
+                     std::stack<int>& stack_of_relatives);
+    void Print_SCC(int head_of_SCC, std::stack<int>& stack_of_relatives, std::vector<bool>& presents_in_stack);
+public:
+    void Tarjan_SCC_algorithm();
+};
+
 
 // Итоговый класс графа, наследующийся как virtual public от всех классов, реализующих алгоритмы,
 // т.е. создающийся с помощью ромбовидного наследования
@@ -168,7 +174,8 @@ class Graph:
         virtual public GraphFloydWarshall<T>,
         virtual public GraphTarjansBridges<T>,
         virtual public GraphDijkstra<T>,
-        virtual public GraphTraversal<T> {
+        virtual public GraphTraversal<T>,
+        virtual public GraphTarjansSCCalgorithm<T> {
 public:
     explicit Graph(int num_of_vertices = 0) : BaseGraph<T>(num_of_vertices) {};
     explicit Graph(std::vector<std::vector<T>> &adjacency_matrix) : BaseGraph<T>(adjacency_matrix) {};
