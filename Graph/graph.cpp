@@ -511,6 +511,39 @@ std::vector<T> GraphDijkstra<T>::dijkstra_from_one_vertex(int origin) {
     return shortest_distances;
 }
 
+template<typename T>
+int GraphDijkstra<T>::dijkstra_log(int top_from, int top_to)
+{
+    //number of tops of the graph
+    int tops = BaseGraph<T>::adjacency_matrix.size();
+    top_from--;
+    top_to--;
+    // vector of infs
+    std::vector <int> distances(tops, INF<T>);
+    distances[top_from] = 0;
+    std::priority_queue <std::pair <int, int > > q;
+    q.push(std::make_pair(0, top_from));
+    while (!q.empty())
+        {
+        int first_length = -q.top().first;
+        int first_top = q.top().second;
+        q.pop();
+        if (first_length > distances[first_top]) continue;
+        for (int i = 0; i < tops; i++)
+            {
+            int to = i;
+            int length = BaseGraph<T>::adjacency_matrix[first_top][i];
+            if (distances[to] > distances[first_top] + length)
+            {
+                distances[to] = distances[first_top] + length;
+                q.push(std::make_pair(-distances[to], to));
+            }
+            }
+        }
+    if (distances[top_to] == INF<T>) return -1;
+    else return distances[top_to];
+}
+
 //Applies Dijkstra algorithm for every node to make paths matrix
 template<typename T>
 std::vector<std::vector<T>> GraphDijkstra<T>::dijkstra() {

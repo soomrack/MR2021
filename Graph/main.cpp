@@ -34,6 +34,17 @@ void test_dijkstra() {
     std::cout << std::endl;
 }
 
+void test_dijkstra_log()
+{
+    std::vector<std::vector<int>> grid = {{0, 3,  88, 7},
+                                          {8, 0,  2,  22},
+                                          {5, 99, 0,  1},
+                                          {2, 49, 54, 0}};
+    Graph<int> ways(grid);
+    int answer = ways.dijkstra_log(1,4);
+    std:: cout << answer << std::endl;
+}
+
 void test_floyd_warshall_ways() {
     std::vector<std::vector<int>> grid = {{0, 3,  88, 7},
                                           {8, 0,  2,  22},
@@ -124,13 +135,14 @@ void test_Tarjans_SCC_algorithm(){
 
 // Просьба организовывать свои тесты методов в функции, чтобы не сильно нагружать функцию main
 int main() {
-    test_tarjan_s_find_bridges();
-    test_dijkstra();
-    test_floyd_warshall_ways();
-    test_bfs_search();
-    test_dfs_search();
-    test_find_path();
-    test_topological_sort();
-    test_Tarjans_SCC_algorithm();
+   // test_tarjan_s_find_bridges();
+   // test_dijkstra();
+    //test_floyd_warshall_ways();
+   // test_bfs_search();
+    //test_dfs_search();
+    //test_find_path();
+    //test_topological_sort();
+    //test_Tarjans_SCC_algorithm();
+    test_dijkstra_log();
     return 0;
 }
