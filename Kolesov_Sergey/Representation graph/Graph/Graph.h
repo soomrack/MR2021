@@ -17,11 +17,6 @@ typedef enum{
 
 class Graph {
 private:
-    struct edge{
-        unsigned int begin;
-        unsigned int end;
-        double weigth;
-    };
 
     struct property{
         bool directed = false;

@@ -197,6 +197,10 @@ void Graph::add_node()
 
 void Graph::delete_edge(unsigned int begin, unsigned int end, unsigned int weight, bool direct){
     num_edges--;
+    if ((begin >= num_nodes)|(end >= num_nodes)){
+        return;
+    }
+
     switch (type) {
         case ADJACENCY:
             if (graph[begin][end] != 0) {
@@ -269,7 +273,7 @@ void Graph::delete_edge(unsigned int begin, unsigned int end, unsigned int weigh
 void Graph::delete_node(unsigned int n)
 {
     num_nodes--;
-    if (n > num_nodes){
+    if (n >= num_nodes){
         return;
     }
     switch (type) {
@@ -295,7 +299,7 @@ void Graph::delete_node(unsigned int n)
 
         case ADJACLIST:
             graph.erase(graph.begin() + n);
-            for (int i = 0; i < num_nodes; i++) {
+            for (int i = 0; i < graph.size(); i++) {
                 if (properties.weighted){
                     for (int j = 0; j < graph[i].size(); j+=2) {
                         if (graph[i][j] == n){
