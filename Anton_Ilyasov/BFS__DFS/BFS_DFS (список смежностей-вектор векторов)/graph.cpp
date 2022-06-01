@@ -105,10 +105,8 @@ void Graph::add_edge(int from, int to) { //добавление однонапр
 }
 
 void Graph::remove_edge(int from, int to) { //удаление однонаправленного ребра
-    for (auto it = adjacency_list[from].begin(); it != adjacency_list[from].end(); )
-    {
-        if (*it == to)
-        {
+    for (auto it = adjacency_list[from].begin(); it != adjacency_list[from].end(); ) {
+        if (*it == to) {
             it = adjacency_list[from].erase(it);
             break;
         }
