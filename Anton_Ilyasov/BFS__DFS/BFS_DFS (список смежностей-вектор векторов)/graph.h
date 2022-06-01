@@ -1,4 +1,4 @@
-#ifndef BFS_AND_DFS_H
+п»ї#ifndef BFS_AND_DFS_H
 #define BFS_AND_DFS_H
 #include <vector>
 
@@ -8,12 +8,12 @@ typedef enum {
 
 class Graph {
 private:
-    int num_of_vertices; //количество вершин
-    int num_of_edges; //количество ребер
-    std::vector<std::vector<int>> adjacency_list; //Список смежности
-    std::vector<std::vector<int>> adjacency_matrix;//Матрица смежности
-    std::vector<int> restored_path; //путь между двумя вершинами
-    std::vector<int> topological_sorted_graph; //топологически отсортированный граф
+    int num_of_vertices; //РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ
+    int num_of_edges; //РєРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР±РµСЂ
+    std::vector<std::vector<int>> adjacency_list; //РЎРїРёСЃРѕРє СЃРјРµР¶РЅРѕСЃС‚Рё
+    std::vector<std::vector<int>> adjacency_matrix;//РњР°С‚СЂРёС†Р° СЃРјРµР¶РЅРѕСЃС‚Рё
+    std::vector<int> restored_path; //РїСѓС‚СЊ РјРµР¶РґСѓ РґРІСѓРјСЏ РІРµСЂС€РёРЅР°РјРё
+    std::vector<int> topological_sorted_graph; //С‚РѕРїРѕР»РѕРіРёС‡РµСЃРєРё РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РіСЂР°С„
 public:
     Graph();
     Graph(int num_of_vertices);
