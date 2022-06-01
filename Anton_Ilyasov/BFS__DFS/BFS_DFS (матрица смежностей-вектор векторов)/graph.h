@@ -3,39 +3,31 @@
 #include <vector>
 
 typedef enum {
-    RANDOM
+    ZERO, RANDOM
 } GraphType;
 
-class Graph {
+class Graph { //граф, представленный матрицей смежности
 private:
-    std::vector<std::vector<int>> adjacency_matrix;//Матрица смежности
-    std::vector<std::vector<int>> adjacency_list; //Список смежности
-    int num_of_vertices; //количество вершин
-    int num_of_edges; //количество ребер
-    std::vector<int> restored_path; //путь между двумя вершинами
-    std::vector<int> topological_sorted_graph; //топологически отсортированный граф
+    std::vector<std::vector<int>> adjacency_matrix;
+    int num_of_vertices;
+    int num_of_edges;
 public:
     Graph();
     Graph(int num_of_vertices);
-    Graph(std::vector<std::vector<int>>& other_list);
+    Graph(std::vector<std::vector<int>>& other_matrix);
     Graph(int sum_of_edges_and_vertices, GraphType type);
-    Graph(const Graph& other_list);
-    Graph(Graph&& other_list);
+    Graph(const Graph& other_matrix);
+    Graph(Graph&& other_matrix);
 public:
-    void add_edge(int from, int to);
-    void remove_edge(int from, int to);
-    void print_adjacency_list();
-    void print_adjacency_matrix();
-    void print_vector(std::vector<int> vector_to_print);
-    bool is_edge(int from, int to);
+    void addEdge(int from, int to);
+    void removeEdge(int from, int to);
+    bool isEdge(int from, int to);
     int get_number_of_vertices();
     int get_number_of_edges();
-    std::vector<std::vector<int>> get_adjacency_matrix();
+    void print();
 public:
     void bfs_search();
     void dfs_search();
-    std::vector<int> find_path(int from, int to);
-    std::vector<int> topological_sort();
 };
 
 #endif
