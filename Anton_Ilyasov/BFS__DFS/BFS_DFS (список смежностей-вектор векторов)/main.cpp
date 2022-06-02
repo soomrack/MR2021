@@ -10,7 +10,8 @@ void bfs_search_time(int sum_of_edges_and_vertices) {
     int start = clock();
     a.print_vector(a.bfs_search());
     int end = clock();
-    std::cout << "sum of edges and vertices: " << a.get_number_of_edges() + a.get_number_of_vertices() << ", milliseconds: ";
+    std::cout << "sum of edges and vertices: " << a.get_number_of_edges() + a.get_number_of_vertices()
+              << ", milliseconds: ";
     std::cout << (end - start) * 1000 / CLOCKS_PER_SEC << std::endl;
 }
 
@@ -21,7 +22,8 @@ void dfs_search_time(int sum_of_edges_and_vertices) {
     int start = clock();
     a.print_vector(a.dfs_search());
     int end = clock();
-    std::cout << "sum of edges and vertices: " << a.get_number_of_edges() + a.get_number_of_vertices() << ", milliseconds: ";
+    std::cout << "sum of edges and vertices: " << a.get_number_of_edges() + a.get_number_of_vertices()
+              << ", milliseconds: ";
     std::cout << (end - start) * 1000 / CLOCKS_PER_SEC << std::endl;
 }
 
@@ -30,7 +32,8 @@ void topological_sort_search_time(int sum_of_edges_and_vertices) {
     int start = clock();
     a.topological_sort();
     int end = clock();
-    std::cout << "sum of edges and vertices: " << a.get_number_of_edges() + a.get_number_of_vertices() << ", milliseconds: ";
+    std::cout << "sum of edges and vertices: " << a.get_number_of_edges() + a.get_number_of_vertices()
+              << ", milliseconds: ";
     std::cout << (end - start) * 1000 / CLOCKS_PER_SEC << std::endl;
 }
 
@@ -77,31 +80,47 @@ int main() {
 
     //тест отдельных графов
 
-    std::vector<std::vector<int>> a_list_1 = { {1,2,3},
-                                             {6},
-                                             {9,14},
-                                             {14,17},
-                                             {11,16,19},
-                                             {0,3},
-                                             {14},
-                                             {2,8},
-                                             {},
-                                             {},
-                                             {7},
-                                             {12,16,19},
-                                             {9},
-                                             {2,11},
-                                             {4},
-                                             {19},
-                                             {},
-                                             {18},
-                                             {4,14,15},
-                                             {12} };
+    //std::vector<std::vector<int>> a_list_1 = { {1,2,3},
+    //                                         {6},
+    //                                         {9,14},
+    //                                         {14,17},
+    //                                         {11,16,19},
+    //                                         {0,3},
+    //                                         {14},
+    //                                         {2,8},
+    //                                         {},
+    //                                         {},
+    //                                         {7},
+    //                                         {12,16,19},
+    //                                         {9},
+    //                                         {2,11},
+    //                                         {4},
+    //                                         {19},
+    //                                         {},
+    //                                         {18},
+    //                                         {4,14,15},
+    //                                         {12} };
+
+    std::vector<std::vector<int>> a_list_1 = {{2},
+                                              {0, 4, 6},
+                                              {5, 7},
+                                              {1, 6},
+                                              {},
+                                              {6},
+                                              {4, 8},
+                                              {},
+                                              {4, 7}};
 
     Graph aa(a_list_1);
-    aa.print_adjacency_list();
     aa.get_adjacency_matrix();
     aa.print_adjacency_matrix();
+    std::cout << "BFS:\n";
+    aa.print_vector(aa.bfs_search());
+    std::cout << "\nDFS:\n";
+    aa.print_vector(aa.dfs_search());
+    std::cout << "\nFind path:\n";
+    aa.print_vector(aa.find_path(0, 4));
+    std::cout << "\nTopological sort:\n";
     aa.print_vector(aa.topological_sort());
     //aa.print_vector(aa.kahn_topological_sort());
 

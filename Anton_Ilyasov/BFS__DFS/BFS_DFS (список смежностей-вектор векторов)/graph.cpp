@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+﻿//#include "pch.h"
 #include <iostream>
 #include "graph.h"
 #include <queue>
@@ -16,7 +16,7 @@ Graph::Graph(int num_of_vertices) { //пустой лист смежностей
     adjacency_list = std::vector<std::vector<int>>(num_of_vertices);
 }
 
-Graph::Graph(const std::vector<std::vector<int>>& other_list) { //список смежности на основе исходного листа смежности
+Graph::Graph(const std::vector<std::vector<int>> &other_list) { //список смежности на основе исходного листа смежности
     num_of_vertices = other_list.size();
     adjacency_list = other_list;
 }
@@ -26,68 +26,67 @@ Graph::Graph(int sum_of_edges_and_vertices, GraphType type) { //список с�
         num_of_edges = 0;
         num_of_vertices = 0;
         adjacency_list = std::vector<std::vector<int>>(0);
-    }
-    else if (sum_of_edges_and_vertices == 1) {
+    } else if (sum_of_edges_and_vertices == 1) {
         num_of_edges = 0;
         num_of_vertices = 1;
         adjacency_list = std::vector<std::vector<int>>(1);
-    }
-    else if (sum_of_edges_and_vertices == 2) {
+    } else if (sum_of_edges_and_vertices == 2) {
         num_of_edges = 0;
         num_of_vertices = 2;
         adjacency_list = std::vector<std::vector<int>>(2);
-    }
-    else {
+    } else {
         switch (type) {
-        case RANDOM: //случайный список смежностей
-            //srand(time(NULL));
-            srand(1);
-            //будем рассматривать плотный граф
-            num_of_vertices = (-1 + (int)ceil(sqrt(1 + 8.0 * sum_of_edges_and_vertices))) / 2;
-            num_of_edges = sum_of_edges_and_vertices - num_of_vertices;
+            case RANDOM: //случайный список смежностей
+                //srand(time(NULL));
+                srand(1);
+                //будем рассматривать плотный граф
+                num_of_vertices = (-1 + (int) ceil(sqrt(1 + 8.0 * sum_of_edges_and_vertices))) / 2;
+                num_of_edges = sum_of_edges_and_vertices - num_of_vertices;
 
-            int add_edge = 0; //всего ребер добавлено 
+                int add_edge = 0; //всего ребер добавлено
 
-            adjacency_list = std::vector<std::vector<int>>(num_of_vertices);
+                adjacency_list = std::vector<std::vector<int>>(num_of_vertices);
 
-            //равномерное заполнение списка смежностей
-            int vertice_edge = num_of_edges / num_of_vertices + 1;
-            bool add_edge_less_num_edge = true;
+                //равномерное заполнение списка смежностей
+                int vertice_edge = num_of_edges / num_of_vertices + 1;
+                bool add_edge_less_num_edge = true;
 
-            for (int v = 0; v < num_of_vertices && add_edge_less_num_edge; v++) {
-                int add_vertice_edge = 0; //добавлено ребер для вершины
-                bool add_vertice_edge_less_vertice_edge = true;
-                for (int w = (rand() % num_of_vertices); add_vertice_edge_less_vertice_edge && add_edge_less_num_edge;) {
-                    if (v != w && !(std::find(adjacency_list[v].begin(), adjacency_list[v].end(), w) != adjacency_list[v].end())) {
-                        adjacency_list[v].push_back(w);
-                        add_edge++;
-                        add_vertice_edge++;
-                        add_edge_less_num_edge = add_edge < num_of_edges;
-                        add_vertice_edge_less_vertice_edge = add_vertice_edge < vertice_edge;
+                for (int v = 0; v < num_of_vertices && add_edge_less_num_edge; v++) {
+                    int add_vertice_edge = 0; //добавлено ребер для вершины
+                    bool add_vertice_edge_less_vertice_edge = true;
+                    for (int w = (rand() % num_of_vertices);
+                         add_vertice_edge_less_vertice_edge && add_edge_less_num_edge;) {
+                        if (v != w && !(std::find(adjacency_list[v].begin(), adjacency_list[v].end(), w) !=
+                                        adjacency_list[v].end())) {
+                            adjacency_list[v].push_back(w);
+                            add_edge++;
+                            add_vertice_edge++;
+                            add_edge_less_num_edge = add_edge < num_of_edges;
+                            add_vertice_edge_less_vertice_edge = add_vertice_edge < vertice_edge;
+                        }
+                        w = (rand() % num_of_vertices);
                     }
-                    w = (rand() % num_of_vertices);
+                    sort(adjacency_list[v].begin(), adjacency_list[v].end());
                 }
-                sort(adjacency_list[v].begin(), adjacency_list[v].end());
-            }
         }
     }
 }
 
-Graph::Graph(const Graph& other_list) { //конструктор копирования
+Graph::Graph(const Graph &other_list) { //конструктор копирования
     num_of_vertices = other_list.num_of_vertices;
     num_of_edges = other_list.num_of_edges;
     adjacency_list = other_list.adjacency_list;
     adjacency_matrix = other_list.adjacency_matrix;
 }
 
-Graph::Graph(Graph&& other_list) { //конструктор перемещения
+Graph::Graph(Graph &&other_list) { //конструктор перемещения
     num_of_vertices = other_list.num_of_vertices;
     num_of_edges = other_list.num_of_edges;
     adjacency_list = other_list.adjacency_list;
     adjacency_matrix = other_list.adjacency_matrix;
 }
 
-Graph& Graph::operator =(const Graph& other_list) { //перегрузка оператора присваивания 
+Graph &Graph::operator=(const Graph &other_list) { //перегрузка оператора присваивания
     if (&other_list == this) {
         return *this;
     }
@@ -105,12 +104,11 @@ void Graph::add_edge(int from, int to) { //добавление однонапр
 }
 
 void Graph::remove_edge(int from, int to) { //удаление однонаправленного ребра
-    for (auto it = adjacency_list[from].begin(); it != adjacency_list[from].end(); ) {
+    for (auto it = adjacency_list[from].begin(); it != adjacency_list[from].end();) {
         if (*it == to) {
             it = adjacency_list[from].erase(it);
             break;
-        }
-        else
+        } else
             ++it;
     }
     num_of_edges--;
@@ -140,10 +138,10 @@ int Graph::get_number_of_edges() { //количество ребер
 std::vector<std::vector<int>> Graph::get_adjacency_matrix() { //получить матрицу смежжности по списку смежности
     for (int v = 0; v < num_of_vertices; v++) {
         std::vector<int> row(num_of_vertices, 0);
-        adjacency_matrix.push_back(row);
         for (int i = 0; i < adjacency_list[v].size(); ++i) {
-            adjacency_matrix[v][adjacency_list[v][i]] = 1;
+            row[adjacency_list[v][i]] = 1;
         }
+        adjacency_matrix.push_back(row);
     }
     return adjacency_matrix;
 }
@@ -164,8 +162,8 @@ void Graph::print_adjacency_list() { //вывод списка смежност�
 
 void Graph::print_adjacency_matrix() { //вывод матрицы смежности на экран
     if (adjacency_matrix.size() == 0) {
-        std::cout << "Print adjacency matrix error. Adjacency matrix size must be more zero"
-            "To fix this mistake input x.get_adjacency_matrix()";
+        std::cout << "Print adjacency matrix error. Adjacency matrix size must be more zero. "
+                     "To fix this mistake input x.get_adjacency_matrix(). ";
         return;
     }
     for (int i = 0; i < num_of_vertices; i++) {
@@ -175,7 +173,7 @@ void Graph::print_adjacency_matrix() { //вывод матрицы смежно�
     }
 }
 
-void Graph::print_vector(std::vector<int> vector_to_print) { //вывод вектора
+void Graph::print_vector(const std::vector<int> vector_to_print) { //вывод вектора
     for (int i = 0; i < vector_to_print.size(); i++) {
         std::cout << vector_to_print[i] << " ";
     }
@@ -222,9 +220,10 @@ std::vector<int> Graph::dfs_search() {
     return dfs_search;
 }
 
-std::vector<int> Graph::find_path(const int from, const int to) {
+std::vector<int> Graph::find_path(int from, int to) {
     if (from >= num_of_vertices || to >= num_of_vertices) { //ошибка, если такой вершины нет
-        std::cout << "Find min path error. Index exceeds the number of vertices. Index must be not more " << num_of_vertices - 1 << "\n";
+        std::cout << "Find min path error. Index exceeds the number of vertices. Index must be not more "
+                  << num_of_vertices - 1 << "\n";
         return restored_path;
     }
     if (from == to) { //ошибка, если вход = выход
@@ -240,40 +239,40 @@ std::vector<int> Graph::find_path(const int from, const int to) {
     Edge Edge_beetween_two_vertices; //ребро с двумя параметрами
     std::stack<Edge> Edges; //список ребер
     Queue.push(from); //заносим исходную вершину
-    bool find = false; //изначально путь не найден
-    while (!Queue.empty() && !find) { //пока есть смежные вершины и путь не найден
+    bool path_found = false; //изначально путь не найден
+    //здесь путь ищется
+    while (!Queue.empty() && !path_found) { //пока есть вершины и путь не найден
         int node = Queue.front();
         Queue.pop();
         nodes[node] = 2; //отмечаем вершину как посещенную
         for (int i = 0; i < adjacency_list[node].size(); ++i) { //перебираем смежные вершины для текущей
-            if (nodes[adjacency_list[node][i]] == 0) { //если вершина не была посещена
+            if (nodes[adjacency_list[node][i]] == 0) { // если вершина смежная и не обнаружена
                 nodes[adjacency_list[node][i]] = 1; // отмечаем вершину как обнаруженную
                 Queue.push(adjacency_list[node][i]); //заносим вершину в очередь
                 Edge_beetween_two_vertices.begin = node; //заносим начало ребра
                 Edge_beetween_two_vertices.end = adjacency_list[node][i]; //заносим конец ребра
                 Edges.push(Edge_beetween_two_vertices); //заносим ребро в стек ребер
                 if (adjacency_list[node][i] == to) { //если добрались до нужной вершины, останавливаем перебор вершин
-                    find = true; //нашли требуемую вершину
+                    path_found = true; //нашли требуемую вершину
                     break; //выходим из цикла
                 }
             }
         }
     }
     //здесь путь собирается
-    if (find) {
-        int update_to = to;
-        while (update_to != from && !Edges.empty()) { //перебираем все имеющиеся ребра
+    if (path_found) {
+        while (to != from) { //перебираем все имеющиеся ребра
             Edge_beetween_two_vertices = Edges.top(); //извлекаем крайнее ребро
             Edges.pop(); //удаляем крайнее ребро
-            if (Edge_beetween_two_vertices.end == update_to) { //если конец ребра ведет в искомую вершину
-                update_to = Edge_beetween_two_vertices.begin; //теперь искомая вершина - начало этого ребра
+            if (Edge_beetween_two_vertices.end == to) { //если конец ребра ведет в искомую вершину
+                to = Edge_beetween_two_vertices.begin; //теперь искомая вершина - начало этого ребра
                 restored_path.push_back(Edge_beetween_two_vertices.end); //заносим конец ребра в вектор ответа
             }
         }
         restored_path.push_back(from); //заносим начало пути в вектор ребра
         std::reverse(restored_path.begin(), restored_path.end()); //реверс, чтобы путь шел от from к to
     }
-    //вывод сообщения, если пути нет
+        //вывод сообщения, если пути нет
     else {
         std::cout << "No path from " << from << " to " << to << ".";
     }

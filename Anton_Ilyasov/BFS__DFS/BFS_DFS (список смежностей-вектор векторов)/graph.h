@@ -27,7 +27,7 @@ public:
     void remove_edge(int from, int to);
     void print_adjacency_list();
     void print_adjacency_matrix();
-    void print_vector(std::vector<int> vector_to_print);
+    void print_vector(const std::vector<int> vector_to_print);
     bool is_edge(int from, int to);
     int get_number_of_vertices();
     int get_number_of_edges();
