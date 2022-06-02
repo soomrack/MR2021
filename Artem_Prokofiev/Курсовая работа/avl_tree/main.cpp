@@ -26,15 +26,15 @@ int main() {
     New_Tree.root = New_Tree.insert(New_Tree.root, 54, info);
     New_Tree.root = New_Tree.remove(New_Tree.root,54);
     /* The AVL Tree structure will be look like:
-                 _____55_____
+                 _____50_____
                 /            \
-               40            70
-             /    \        /    \
-            20     50     60     80
-          /    \   /     /  \     \
-         10    30 45   56   65     90
-        /  \   /              \
-       5   15 25              75
+               30             70
+             /    \         /    \
+            20     40     60      80
+          /    \    \    /  \    /  \
+         10    25   45  55  65  75   90
+        /  \              \
+       5   15             56
        */
     std::cout << "The preliminary traversal of the "
                  "constructed AVL tree looks like: \n";

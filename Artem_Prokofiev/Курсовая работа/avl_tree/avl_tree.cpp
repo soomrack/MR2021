@@ -36,6 +36,7 @@ node* Tree::rotate_left(node* q) {
     node* p = q -> right;
     q -> right = p -> left;
     p -> left = q;
+    real_height(q);
     real_height(p);
     return p;
 }
@@ -127,7 +128,9 @@ node* Tree::pre_remove(node* p, int k) {
         node* q = p->left;
         node* r = p->right;
         delete p;
-        if( !r ) return q;
+        if( !r ) {
+            return q;
+        }
         node* min = find_min(r);
         min->right = remove_min(r);
         min->left = q;
