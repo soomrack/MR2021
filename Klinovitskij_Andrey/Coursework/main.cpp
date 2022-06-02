@@ -5,12 +5,19 @@
 #include <time.h>           //Rand seed, time
 #include <unistd.h>         //POSIX API (Sleep)
 #include <thread>           //Multithreading
+#include <stdlib.h>         //Standart lib
+
+//WIP B-tree
+//#define MAX 3
+//#define MIN 2
+//#define MAX_RAND 100
+//#define AMOUNT 100
 
 //WIP
 //#include "GL/gl.h"
 //#include "GL/glut.h"
 //#include "GL/glext.h"
-//#include <stdlib.h>
+
 
 int length = 10;
 int delay = 10000;
@@ -31,7 +38,7 @@ void counterMessage(std::string message);
 //--------------------Array--------------------
 void fillArray();
 
-void randomizeArray(int *arr, int length);
+void randomizeArray(int *a, int length);
 
 void swap(int index1, int index2);
 
@@ -82,6 +89,30 @@ void isItRunning();
 
 void (*sort)(int *, int);
 
+/*
+//WIP
+//--------------------B-tree--------------------
+void renderBTree(int *pos, struct BTreeNode *myNode);
+
+int bTree();
+
+void insertNode(int val, int pos, struct BTreeNode *node, struct BTreeNode *child);
+
+void splitNode(int val, int *pval, int pos, struct BTreeNode *node,
+               struct BTreeNode *child, struct BTreeNode **newNode);
+
+int setValue(int val, int *pval,
+             struct BTreeNode *node, struct BTreeNode **child);
+
+void insert(int val);
+
+void insert(int val);
+
+void search(int val, int *pos, struct BTreeNode *myNode);
+
+void traversal(struct BTreeNode *myNode);
+//^^^^^^^^^^^^^^^^^^^^B-tree^^^^^^^^^^^^^^^^^^^^
+*/
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));
@@ -119,9 +150,9 @@ void fillArray() {
         arr[i] = i;
 }
 
-void randomizeArray(int *arr, int length) {
+void randomizeArray(int *a, int length) {
     for (int i = length - 1; i > 0; --i) {
-        std::swap(arr[i], arr[rand() % (i + 1)]);
+        std::swap(a[i], a[rand() % (i + 1)]);
     }
 }
 
@@ -160,6 +191,15 @@ int setUp(int argc, char **argv) {
     glutMainLoop();
 }
 
+/*
+//WIP
+void renderBTree(int *pos, struct BTreeNode *myNode) {
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 1.0, 1.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+}
+*/
 
 void render() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -287,14 +327,14 @@ void keyboardEvent(unsigned char key, int x, int y) {
             if (length == 10)
                 length = 5;
             else if (length > 10 && length != 26)
-                length /= 10;
+                length -= 100;
             fillArray();
             break;
         case 54: //RIGHT - NumPad 6
             if (length == 5)
                 length = 10;
             else if (length < 1000 && length != 26)
-                length *= 10;
+                length += 100;
             fillArray();
             break;
         case ']':
@@ -309,6 +349,17 @@ void keyboardEvent(unsigned char key, int x, int y) {
             if (typeSort % 2 == 1) length = 26;
             fillArray();
             break;
+
+        /*
+        //WIP
+        case '=':
+            startTime = clock();
+            bTree();
+            endTime = clock();
+            sortTime = endTime - startTime;
+            printf("%d", sortTime);
+            break;
+        */
 
             //Sort
         case 'q':
@@ -410,13 +461,13 @@ void visualizeInsertionSort(int *a, int length) {
     int key, j;
     for (int i = 1; i < length; i++) {
         isItRunning();
-        key = arr[i];
+        key = a[i];
         j = i - 1;
-        while (j >= 0 && arr[j] > key) {
+        while (j >= 0 && a[j] > key) {
             swap(j + 1, j);
             j = j - 1;
         }
-        arr[j + 1] = key;
+        a[j + 1] = key;
     }
     counterMessage("Insertion Sort");
 }
@@ -425,10 +476,12 @@ void visualizeInsertionSort(int *a, int length) {
 
 //--------------------Heap Sort--------------------
 void visualizeHeapSort(int *a, int length) {
-    for (int i = length / 2 - 1; i >= 0; i--)
+    for (int i = length / 2 - 1; i >= 0; i--) {
+        isItRunning();
         heapify(a, length, i);
-
+    }
     for (int i = length - 1; i > 0; i--) {
+        isItRunning();
         swap(0, i);
 
         heapify(a, i, 0);
@@ -457,21 +510,163 @@ void heapify(int *a, int length, int i) {
 
 
 
-
-//TEXT. Doesn't work. WIP
 /*
-void renderBitmapString(
-        float x,
-        float y,
-        void *font,
-        char *string) {
+//Work in progress
+//I want to make a graphical representation of B-tree (In future)
 
-    char *c;
-    glRasterPos2f(x, y);
-    for (c = string; *c != '\0'; c++) {
-        glutBitmapCharacter(font, *c);
+//--------------------B-tree--------------------
+struct BTreeNode {
+    int val[MAX + 1], count;
+    struct BTreeNode *link[MAX + 1];
+};
+
+struct BTreeNode *root;
+
+int bTree() {
+    int ch;
+
+    //Random fill
+    for (int i=0; i<=AMOUNT; i++)
+        insert(rand()%MAX_RAND);
+
+    traversal(root);
+
+    printf("\n");
+    search(rand()%MAX_RAND, &ch, root);
+}
+
+// Create a node
+struct BTreeNode *createNode(int val, struct BTreeNode *child) {
+    struct BTreeNode *newNode;
+    newNode = (struct BTreeNode *)malloc(sizeof(struct BTreeNode));
+    newNode->val[1] = val;
+    newNode->count = 1;
+    newNode->link[0] = root;
+    newNode->link[1] = child;
+    return newNode;
+}
+
+// Insert node
+void insertNode(int val, int pos, struct BTreeNode *node,
+                struct BTreeNode *child) {
+    int j = node->count;
+    while (j > pos) {
+        node->val[j + 1] = node->val[j];
+        node->link[j + 1] = node->link[j];
+        j--;
     }
-} */
+    node->val[j + 1] = val;
+    node->link[j + 1] = child;
+    node->count++;
+}
 
+// Split node
+void splitNode(int val, int *pval, int pos, struct BTreeNode *node,
+               struct BTreeNode *child, struct BTreeNode **newNode) {
+    int median, j;
+
+    if (pos > MIN)
+        median = MIN + 1;
+    else
+        median = MIN;
+
+    *newNode = (struct BTreeNode *)malloc(sizeof(struct BTreeNode));
+    j = median + 1;
+    while (j <= MAX) {
+        (*newNode)->val[j - median] = node->val[j];
+        (*newNode)->link[j - median] = node->link[j];
+        j++;
+    }
+    node->count = median;
+    (*newNode)->count = MAX - median;
+
+    if (pos <= MIN) {
+        insertNode(val, pos, node, child);
+    } else {
+        insertNode(val, pos - median, *newNode, child);
+    }
+    *pval = node->val[node->count];
+    (*newNode)->link[0] = node->link[node->count];
+    node->count--;
+}
+
+// Set value
+int setValue(int val, int *pval,
+             struct BTreeNode *node, struct BTreeNode **child) {
+    int pos;
+    if (!node) {
+        *pval = val;
+        *child = NULL;
+        return 1;
+    }
+
+    if (val < node->val[1]) {
+        pos = 0;
+    } else {
+        for (pos = node->count;
+             (val < node->val[pos] && pos > 1); pos--)
+            ;
+        if (val == node->val[pos]) {
+            //printf("Do not duplicate numbers\n");
+            return 0;
+        }
+    }
+    if (setValue(val, pval, node->link[pos], child)) {
+        if (node->count < MAX) {
+            insertNode(*pval, pos, node, *child);
+        } else {
+            splitNode(*pval, pval, pos, node, *child, child);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// Insert value
+void insert(int val) {
+    int flag, i;
+    struct BTreeNode *child;
+
+    flag = setValue(val, &i, root, &child);
+    if (flag)
+        root = createNode(i, child);
+}
+
+// Search node
+void search(int val, int *pos, struct BTreeNode *myNode) {
+    if (!myNode) {
+        return;
+    }
+
+    if (val < myNode->val[1]) {
+        *pos = 0;
+    } else {
+        for (*pos = myNode->count;
+             (val < myNode->val[*pos] && *pos > 1); (*pos)--)
+            ;
+        if (val == myNode->val[*pos]) {
+            printf("%d found in row %d", val, *pos);
+            return;
+        }
+    }
+    search(val, pos, myNode->link[*pos]);
+
+    return;
+}
+
+//Traverse then nodes
+void traversal(struct BTreeNode *myNode) {
+    int i;
+    if (myNode) {
+        for (i = 0; i < myNode->count; i++) {
+            traversal(myNode->link[i]);
+            printf("%d ", myNode->val[i + 1]);
+        }
+        traversal(myNode->link[i]);
+    }
+}
+
+//^^^^^^^^^^^^^^^^^^^^B-tree^^^^^^^^^^^^^^^^^^^^
+*/
 
 
