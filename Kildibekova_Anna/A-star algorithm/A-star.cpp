@@ -1,7 +1,5 @@
 #include "A-star.h"
 
-// TODO: массив from[size] с адресом предыдущего узла (возможно)
-
 Graph::Graph(uint size, type_of_graph type, uint max_weigh) {
     this->size = size;
     this->max_weight = max_weigh;
@@ -55,18 +53,14 @@ void Graph::bad_case_graph() {
     network_graph();
     for (uint row = 0; row < size; row++) {
         for (uint col = 0; col < size; col++) {
-            adjacency_table[row][col] *= rand() % (1 + 1);;
+            adjacency_table[row][col] *= rand() % (1 + 1);
         }
-    }
-    for (uint node = 0; node < size; node++) {
-        adjacency_table[node][node] = 0;
     }
 }
 
 void Graph::get_heuristic_table() {
     heuristic_mem_alloc();
     create_heuristic_table();
-//    std::cout<<"Graph::get_heuristic_table passed"<<std::endl;  //todo
 }
 
 void Graph::heuristic_mem_alloc() {
@@ -89,8 +83,6 @@ void Graph::create_heuristic_table() {
             heuristic_table[row][col] = 0;
         }
     }
-
-
     for (uint node = 0; node < size; node++) {
         start = node;
         uint curr_node = node;
@@ -116,15 +108,6 @@ void Graph::create_heuristic_table() {
         }
     }
     start = 0;
-
-    //TODO убрать
-//    std::cout<<"heuristic_table:"<<"\n";
-//    for (uint row = 0; row < size; row++) {
-//        for (uint col = 0; col < size; col++) {
-//            std::cout<<heuristic_table[row][col]<<"\t";
-//        }
-//        std::cout<<std::endl;
-//    }
 }
 
 uint Graph::random_weight() {
@@ -173,18 +156,15 @@ void Graph::AStarSearch(uint start_node, uint goal_node) {
     this->goal = goal_node;
     AStar_mem_alloc();
     find_AStar_path();
-//    std::cout<<"Graph::find_AStar_path passed"<<std::endl;  //todo
     print_path_search_res(AStar);
     free_AStar_mem();
 }
 
-void Graph::find_AStar_path() {     // TODO: Упростить читаемость
+void Graph::find_AStar_path() {
     if (start == goal) {return;}
 
     path_cost = 0;
     path_length = 0;
-    //memset(dist_from_start_to, 0, size);     TODO ???
-    //memset(dist_estimate, 0, size);
     for (uint node = 0; node < size; node++) {
         dist_from_start_to[node] = 0;
         dist_estimate[node] = 0;
@@ -202,8 +182,7 @@ void Graph::find_AStar_path() {     // TODO: Упростить читаемос
         currFront.change_front(current_node);
         currFront.get_front(current_node);
         node_to_visit = currFront.front[0];
-        for (uint i = 0; i < currFront.front_pointer; i++) {                            // Для первого узла
-            // foo
+        for (uint i = 0; i < currFront.front_pointer; i++) {
             if (adjacency_table[current_node][currFront.front[i]]) {
                 uint temp_dist_from_start = dist_from_start_to[current_node]
                                             + adjacency_table[current_node][currFront.front[i]];
@@ -214,7 +193,6 @@ void Graph::find_AStar_path() {     // TODO: Упростить читаемос
                                                         + dist_to_goal_from(currFront.front[i]);
                 }
             }
-            // foo
             if (min_dist > dist_estimate[currFront.front[i]]) {
                 min_dist = dist_estimate[currFront.front[i]];
                 node_to_visit = currFront.front[i];
@@ -229,7 +207,6 @@ void Graph::find_AStar_path() {     // TODO: Упростить читаемос
             for (uint node = 0; node < size; node++) {
                 path[node] = 0;
             }
-            //memset(path, 0, size);              TODO
             get_path(&currFront);
             return;}
         min_dist += max_weight + size;
@@ -243,7 +220,6 @@ uint Graph::dist_to_goal_from(uint node) {
 void Graph::AStar_mem_alloc() {
     dist_from_start_to = new uint [size];
     dist_estimate = new uint [size];
-//    std::cout<<"Graph::AStar_mem_alloc passed"<<std::endl;  //todo
 }
 
 void Graph::free_AStar_mem() {
@@ -254,7 +230,6 @@ void Graph::free_AStar_mem() {
     free(dist_estimate);
     path_cost = 0;
     path_length = 0;
-//    std::cout<<"Graph::free_AStar_mem passed"<<std::endl;  //todo
 }
 
 void Graph::DijkstraSearch(uint start_node, uint goal_node) {
@@ -270,7 +245,7 @@ void Graph::DijkstraSearch(uint start_node, uint goal_node) {
 // ^   ^    ____________
 // ='t'=  < MEOW~ ~ ~ ~ |
 // u   u S  ------------
-void Graph::find_Dijkstra_path() {     // TODO: Упростить читаемость
+void Graph::find_Dijkstra_path() {
     if (start == goal) {return;}
 
     path_cost = 0;
@@ -278,7 +253,6 @@ void Graph::find_Dijkstra_path() {     // TODO: Упростить читаем�
     for (uint node = 0; node < size; node++) {
         dist_from_start_to[node] = 0;
     }
-    //memset(dist_from_start_to, 0, size);    TODO
 
     uint min_dist = max_weight;
     uint current_node = start;
@@ -314,7 +288,6 @@ void Graph::find_Dijkstra_path() {     // TODO: Упростить читаем�
             for (uint node = 0; node < size; node++) {
                 path[node] = 0;
             }
-            //memset(path, 0, size);                      TODO
             get_path(&currFront);
             return;}
         min_dist += max_weight;
@@ -337,7 +310,7 @@ uint current_node = goal;
             }
         }
     }
-    //reflect path      // TODO foo
+    //reflect path
     path_length = i;
     for (; i > path_length/2; i --) {
         uint temp = path[path_length - i];
@@ -360,7 +333,6 @@ void Graph::free_Dijkstra_mem() {
     path_length = 0;
 }
 
-//TODO: rename to Queue ?
 /// class Front ///
 
 Front::Front(const Graph * graph) {
@@ -392,7 +364,6 @@ void Front::init_front() {
     front[0] = graph->start;
     front_pointer = 1;
     visited[graph->start] = true;
-//    dist_from_start_to[graph->start] = 0;                        // ???
 }
 
 void Front::get_front(uint current_node) {

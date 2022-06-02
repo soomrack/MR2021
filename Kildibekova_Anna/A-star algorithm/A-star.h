@@ -1,5 +1,5 @@
 //
-// Created by Аня on 19.03.2022.
+//
 //
 #ifndef A_STAR_ALGORITHM_A_STAR_H
 #define A_STAR_ALGORITHM_A_STAR_H
@@ -46,12 +46,14 @@ private:
     uint path_length;
 private:
     void find_AStar_path();
-    uint dist_to_goal_from(uint node);
     void AStar_mem_alloc();
     void free_AStar_mem();
+    uint dist_to_goal_from(uint node);
+private:
     void find_Dijkstra_path();
     void Dijkstra_mem_alloc();
     void free_Dijkstra_mem();
+private:
     void print_path_search_res(type_of_search algorithm);
     void get_path(const Front* currFront);
 public:
@@ -71,8 +73,8 @@ private:
     bool* visited;
 private:
     void init_front();
-    void get_front(uint current_node);
-    void change_front(uint current_node);
+    void get_front(uint current_node);     // Добавление новых узлов
+    void change_front(uint current_node);  // Убирает текущий узел
     void clean_front();
     void memory_allocation();
     void free_memory();
