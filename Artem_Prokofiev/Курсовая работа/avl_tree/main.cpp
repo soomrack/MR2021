@@ -38,6 +38,6 @@ int main() {
        */
     std::cout << "The preliminary traversal of the "
                  "constructed AVL tree looks like: \n";
-    New_Tree.preOrder(New_Tree.root);
+    New_Tree.pre_order(New_Tree.root);
     return 0;
 }

@@ -1,6 +1,14 @@
 #include "avl_tree.h"
 #include <iostream>
 
+Tree::Tree() {
+    root = new node;
+    root -> left = 0;
+    root -> right = 0;
+    root -> key = 0;
+    root -> height = 1;
+};
+
 unsigned short Tree::height(node* p) {
     return p?p -> height:0;
 }
@@ -47,7 +55,7 @@ node* Tree::balance(node* p) {
     return p; // do not need balance
 }
 
-node* Tree::insert(node* p, int k, node* information) {
+node* Tree::pre_insert(node* p, int k, node* information) {
     if(!p) {
         node* A = new node;
         A -> height = 1;
@@ -59,17 +67,20 @@ node* Tree::insert(node* p, int k, node* information) {
     }
 
     if(k < p -> key) {
-        p -> left = insert(p -> left, k, information);
+        p -> left = pre_insert(p -> left, k, information);
     } else if (k > p -> key) {
-        p -> right = insert(p -> right, k, information);
+        p -> right = pre_insert(p -> right, k, information);
     } else {    // Equal keys are not allowed in binary search trees
         return p;
     }
     return balance(p); // balance after insertion
 }
 
+node* Tree::insert(node *p, int k, node *info) {
+    return pre_insert(p, k, info);
+}
 
-node* Tree::search(node* p, int k) {
+node* Tree::pre_search(node* p, int k) {
     while(1) {
         if (k < p -> key) {
             p = p -> left;
@@ -88,6 +99,10 @@ node* Tree::search(node* p, int k) {
     }
 }
 
+node* Tree::search(node *p, int k) {
+    return pre_search(p, k);
+}
+
 node* Tree::find_min(node* p) {
     return p -> left?find_min(p -> left):p;
 }
@@ -100,14 +115,14 @@ node* Tree::remove_min(node* p) {
     return balance(p);
 }
 
-node* Tree::remove(node* p, int k) {
+node* Tree::pre_remove(node* p, int k) {
     if(!p) {
         return 0;
     }
     if( k < p->key ) {
-        p->left = remove(p->left, k);
+        p->left = pre_remove(p->left, k);
     } else if( k > p->key ) {
-        p->right = remove(p->right, k);
+        p->right = pre_remove(p->right, k);
     } else {  // k == p -> key
         node* q = p->left;
         node* r = p->right;
@@ -121,10 +136,14 @@ node* Tree::remove(node* p, int k) {
     return balance(p); // balance after delete node
 }
 
-void Tree::preOrder(node *root) {
+node* Tree::remove(node *p, int k) {
+    return pre_remove(p, k);
+}
+
+void Tree::pre_order(node *root) {
     if(root != NULL) {
         std::cout << root->key << " ";
-        preOrder(root->left);
-        preOrder(root->right);
+        pre_order(root->left);
+        pre_order(root->right);
     }
 }
