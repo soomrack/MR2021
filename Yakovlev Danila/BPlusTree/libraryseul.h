@@ -38,7 +38,6 @@ class BPTree{
     friend class Node;
 private:
     int b_factor;               //ветвистость = 2t-1 так как нумерация с нуля
-    int t;                      //порядок.... я тут в терминах мб напутал, но программа работает,
     Node* root;                //ссылка на текущий корень дерева
     Node* newroot;              //временный корень, так как у меня там что-то все ломается при делении корня
 private:                            //вспомогательные плюшки
@@ -47,21 +46,21 @@ private:                            //вспомогательные плюшк�
     Node* *ptr_path_array;     //массив ссылок узлов от корня до нужного листа
 public:
     BPTree(int t);
-    ~BPTree();
+    virtual ~BPTree();
 public:
-    bool search(int leaf); //работает
-    void* add(int leaf); //работает
-    void* del(int leaf); //работает
-    void print(); // работает
+    bool search(int leaf);
+    void* add(int leaf); //работает, но с рандомом при миллионе листов ломается
+    void* del(int leaf);
+    void print();
 private://for search
     bool search(int leaf, Node* ref_node, int floor);
 private://for add
     int search_place_for_add(int leaf, Node* &ref_node, int floor, int floors_for_separation);
-    void* node_separation(Node* &ref_node,Node* &ref_parent_node, int floor, int leaf); //узел для разделения, родительский узел, этаж детей (на котором будем разедлять), лист
+    void* node_separation(Node* &ref_node,Node* &ref_parent_node, int floor, int leaf);
 private://for add and dell
     int search_for_the_first_leaf_of_this_branch(Node* ref_node, int floor);
     Node* search_neighbour_left(int leaf, Node* &ref_node, int floor);
-    Node* search_neighbour_right(int leaf, Node* &ref_node, int floor,Node* minimally_larger_node, int mln_floor); //пока неполноценен. в 1 из 2t он не работает.
+    Node* search_neighbour_right(int leaf, Node* &ref_node, int floor,Node* minimally_larger_node, int mln_floor);
     Node* search_leaf_neighbour(Node* ref_node, int floor);
 private://for dell
     bool search_place_for_del(int leaf, Node* &ref_node, int floor);

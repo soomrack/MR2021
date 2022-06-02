@@ -1,4 +1,3 @@
-
 // Created by Мотылек on 13.05.2022.
 //
 /*нумерация в узле
@@ -77,13 +76,16 @@ Node::~Node() {
 BPTree::BPTree(int t) {
     H = 0;
     Hplus = false;
-    this -> t = t;
     b_factor = 2*t-1;
     root = new Node(b_factor,false);
 }
-BPTree::~BPTree() {//вообще тут надо виртуальный деструктор.хммм
-    int ooo = 0;
-    //удаление всех листьев и узлов... я забываю тебя создать...
+BPTree::~BPTree(){
+    while(root!= nullptr){
+        del(search_for_the_first_leaf_of_this_branch(root, 0));
+    }
+    b_factor=0;
+    H=0;
+    Hplus=false;
 }
 
 ///готово
@@ -108,7 +110,7 @@ bool BPTree::search(int leaf,Node* ref_node, int floor) {
 void* BPTree::add(int leaf) {
     //cout << endl<<"_____ Добавление " << leaf <<" _____"<< endl;
     Hplus = false;
-///0. отработка исключения
+    ///0. отработка исключения
     if (root->max_ref_child_id == -1){      // если нет ни одного еще листа
         root->child_array[0] = new Node(leaf,true);
         root->max_ref_child_id++;
@@ -338,7 +340,7 @@ void* BPTree::del(int leaf) {
     delete ptr_path_array;
     return nullptr;
 }
-void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, int floor){//перестройка этажей, бабочки летают ,переворачивая все верх вверх ногами...
+void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, int floor){//перестройка этажей, бабочки летают..
     int i = 0;
     bool node_neighbour_left = false;
     ///1. Проходим по листу родителя пока не дойдем до узла просящего добавки узлов.
@@ -346,7 +348,7 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
     ///1.2. если он последний - обратимся к соседу слева, иначе к соседу справа
     if (i== ref_parent_node ->max_ref_child_id) {i--; node_neighbour_left= true;}else i++;
     ///2. проверка колва детей. если их больше половина минус 1, то просто возьмем крайний узел и подвинем остальных - проверено
-    if (ref_parent_node -> child_array[i] -> max_ref_child_id > t-2){
+    if (ref_parent_node -> child_array[i] -> max_ref_child_id > b_factor/2){
         if (node_neighbour_left){   //взаимствование у соседа слева
             ///двигаем узлы вправо для освобождения первого места добавления
             int n = ref_node -> max_ref_child_id+1;
@@ -414,9 +416,13 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
             root = ref_parent_node ->child_array[0];
             delete ref_parent_node;//сработает ?
         }
+        else if ((ref_parent_node -> max_ref_child_id==0)and(H==1)){//если же он оказался при этом предлистовым...
+            delete ref_parent_node;//сработает ?
+            root = nullptr;
+        }
         return nullptr;
     }
-    if (ref_parent_node -> max_ref_child_id == t-3){
+    if (ref_parent_node -> max_ref_child_id == b_factor/2-1){
         return tree_edits_after_deletion(ptr_path_array[floor-1],  ptr_path_array[floor], floor);
     }
     return nullptr;
@@ -429,7 +435,7 @@ bool BPTree::search_place_for_del(int leaf, Node* &ref_node, int floor){
         return search_place_for_del(leaf, ref_node->child_array[i-1], floor+1);
     }
     bool combining = false;
-    if (ref_node->max_ref_child_id == t - 2) combining = true;
+    if (ref_node->max_ref_child_id == b_factor/2) combining = true;
     return combining;
 }///требуется улучшение как у "соседа справа"
 ///готово
