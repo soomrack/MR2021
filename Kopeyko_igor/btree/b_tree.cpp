@@ -15,10 +15,6 @@
 
 static int last_key = -1; //используется в функции print_keys_in_string
 
-//std::cout << "Hello, World!";
-//std::cout << "Hello, World!" << std::endl;
-
-
 Node::Node(){
     int factor = 4;
 
@@ -88,7 +84,6 @@ void BTree::count_tree(){
 
 int Node::count_tree(unsigned int B_factor, Node* root){
     int number = 0;
-    //std::cout << "{" << this << "}";
     for (int i = 0; i < B_factor - 1; i++) {
         if (keys[i] != -1){
             number++;
@@ -156,7 +151,7 @@ void Node::print_only_this(unsigned int B_factor, Node* root, Node* parent) {
     }
     std::cout << "["<< pointers[B_factor - 1] << "] ";
 
-    std::cout << "__"<< TEMP_KEY << "__";//DEBUG
+    std::cout << "__"<< TEMP_KEY << "__";
     std::cout << "<"<< TEMP_POINTER << "> \n ";
 }
 
@@ -293,14 +288,13 @@ Node * Node::find_this_parent(int B_factor, Node * active_node, Node * root){
 }
 
 void Node::Node_segmentation_root (unsigned int B_factor, Node* active_node, int key, Node * root, Node * parent){
-//пока опишем создания узла в случае если у родительского узла есть свободные места
+// Разеделение узла в случае если это коренной узел
     int free_pointer_count = count_free_pointer(B_factor);
-    this->refresh(B_factor,root, nullptr); //new
+    this->refresh(B_factor,root, nullptr);
 
     //создаем 2 узла
     Node* a = active_node->pointers[0];
     Node* b = active_node->pointers[1];
-
     active_node->pointers[0] = new Node (B_factor);
     active_node->pointers[1] = new Node (B_factor);
 
@@ -317,13 +311,13 @@ void Node::Node_segmentation_root (unsigned int B_factor, Node* active_node, int
         }
         //сохраняем центр и удаляем все лишнее
         active_node->keys[0] = active_node->keys[center];
-        for (int i = 1 /*был центр ну я сделал 1*/; i < B_factor/* - 1*/; i++) {
+        for (int i = 1; i < B_factor/* - 1*/; i++) {
             active_node->keys[i] = -1;
         }
         //если у узлов имеются ссылки
         if (free_pointer_count == 0) {
-            active_node->pointers[0]->pointers[0] = a; //было active_node->pointers[0]->pointers[0] = a;
-            active_node->pointers[0]->pointers[1] = b; //было active_node->pointers[0]->pointers[1] = a;
+            active_node->pointers[0]->pointers[0] = a;
+            active_node->pointers[0]->pointers[1] = b;
 
             //заполняем первый до центра
             for (int i = 2; i <= center; i++) {
@@ -403,11 +397,6 @@ void Node::Node_segmentation_round (unsigned int B_factor, Node* active_node, in
 }
 
 
-void Node::set(int keys_in[], Node **pointers_in) {
-    keys = keys_in;
-    pointers = pointers_in;
-}
-
 BTree::BTree() {
     B_factor = 4;
     root = new Node (B_factor);
@@ -439,7 +428,7 @@ void Node::add(int key, unsigned int B_factor, Node * active_node, Node * root, 
 
         this->add_to_any_child(B_factor, key, free_key_count, root);
 
-    } else if (free_key_count == 0) { //если все места заняты, но есть пустые указатели
+    } else if (free_key_count == 0) { //если все места заняты
 
           //если узел кореенной
         if (this == root) {
@@ -449,10 +438,10 @@ void Node::add(int key, unsigned int B_factor, Node * active_node, Node * root, 
                 this->Node_segmentation_root(B_factor, active_node, key, root, parent);
                 this->add(key, B_factor, this, root, parent);
             }
-            // если у родителей есть пустое место
+            // если все ключи заполнены и все указатели заполнены перенаправляем вниз
         } else if ((free_key_count == 0) && (free_pointer_count == 0) && (TEMP_KEY == -1) && (TEMP_POINTER == nullptr)){
             this->add_to_any_child(B_factor, key, free_key_count, root);
-        } else {
+        } else { //Деление узла, если все места заполнены и нет указателей
             this->Node_segmentation_round(B_factor, this, key, root, parent);
         }
     }
@@ -929,4 +918,9 @@ void Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * 
             node_with_key->merge_nodes_brothers_with_pointers(key,B_factor,node_with_key,parent,root,PARENT_HAS_ONE_KEY);
         }
     }
+}
+
+Node::~Node(){
+    delete keys;
+    delete pointers;
 }
