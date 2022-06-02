@@ -348,7 +348,7 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
     ///1.2. если он последний - обратимся к соседу слева, иначе к соседу справа
     if (i== ref_parent_node ->max_ref_child_id) {i--; node_neighbour_left= true;}else i++;
     ///2. проверка колва детей. если их больше половина минус 1, то просто возьмем крайний узел и подвинем остальных - проверено
-    if (ref_parent_node -> child_array[i] -> max_ref_child_id > b_factor/2){
+    if (ref_parent_node -> child_array[i] -> max_ref_child_id > b_factor/2-1){
         if (node_neighbour_left){   //взаимствование у соседа слева
             ///двигаем узлы вправо для освобождения первого места добавления
             int n = ref_node -> max_ref_child_id+1;
@@ -422,7 +422,7 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
         }
         return nullptr;
     }
-    if (ref_parent_node -> max_ref_child_id == b_factor/2-1){
+    if (ref_parent_node -> max_ref_child_id == b_factor/2-2){
         return tree_edits_after_deletion(ptr_path_array[floor-1],  ptr_path_array[floor], floor);
     }
     return nullptr;
@@ -435,7 +435,7 @@ bool BPTree::search_place_for_del(int leaf, Node* &ref_node, int floor){
         return search_place_for_del(leaf, ref_node->child_array[i-1], floor+1);
     }
     bool combining = false;
-    if (ref_node->max_ref_child_id == b_factor/2) combining = true;
+    if (ref_node->max_ref_child_id == b_factor/2-1) combining = true;
     return combining;
 }///требуется улучшение как у "соседа справа"
 ///готово
