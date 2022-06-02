@@ -1,0 +1,3 @@
+C:/Users/Admin/Documents/AAstadying/cpp/simakov/MR2021/Simakov-Pavel/dijkstra/cmake-build-debug/CMakeFiles/dijkstra.dir
+C:/Users/Admin/Documents/AAstadying/cpp/simakov/MR2021/Simakov-Pavel/dijkstra/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Admin/Documents/AAstadying/cpp/simakov/MR2021/Simakov-Pavel/dijkstra/cmake-build-debug/CMakeFiles/rebuild_cache.dir

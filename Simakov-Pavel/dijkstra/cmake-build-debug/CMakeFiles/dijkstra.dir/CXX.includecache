@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Admin/Documents/AAstadying/cpp/simakov/MR2021/Simakov-Pavel/dijkstra/graph.h
+vector
+-
+list
+-
+stack
+-
+
+C:/Users/Admin/Documents/AAstadying/cpp/simakov/MR2021/Simakov-Pavel/dijkstra/main.cpp
+iostream
+-
+chrono
+-
+vector
+-
+graph.h
+C:/Users/Admin/Documents/AAstadying/cpp/simakov/MR2021/Simakov-Pavel/dijkstra/graph.h
+
