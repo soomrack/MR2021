@@ -1,46 +1,42 @@
 #include <iostream>
-
 #include <ctime>
-
 #include <chrono>
+#define MAXSIZE 1000
 
 using namespace std;
-//функция, сливающая массивы
-void Merge(int * A, int first, int last) {
-    int middle, start, final, j;
-    int * mas = new int[1000];
-    middle = (first + last) / 2; //вычисление среднего элемента
-    start = first; //начало левой части
-    final = middle + 1; //начало правой части
-    for (j = first; j <= last; j++) //выполнять от начала до конца
-        if ((start <= middle) && ((final > last) || (A[start] < A[final]))) {
-            mas[j] = A[start];
+
+void Merge(int* A, int firstElement, int lastElement) {                                  //функция, сливающая массивы
+    static int middleElement, start, final;
+    static int mas[MAXSIZE];
+    middleElement = (firstElement + lastElement) / 2;                                     //вычисление среднего элемента
+    start = firstElement;                                                                 //начало левой части
+    final = middleElement + 1;                                                            //начало правой части
+    for (int i = firstElement; i <= lastElement; i++) {                                   //выполнять от начала до конца
+        if ((start <= middleElement) && ((final > lastElement) || (A[start] < A[final]))) {
+            mas[i] = A[start];
             start++;
-        }
-        else {
-            mas[j] = A[final];
+        } else {
+            mas[i] = A[final];
             final++;
         }
-    //возвращение результата в список
-    for (j = first; j <= last; j++) A[j] = mas[j];
-    delete[] mas;
-};
-//рекурсивная процедура сортировки
-void MergeSort(int * A, int first, int last) {
-    {
-        if (first < last) {
-            MergeSort(A, first, (first + last) / 2); //сортировка левой части
-            MergeSort(A, (first + last) / 2 + 1, last); //сортировка правой части
-            Merge(A, first, last); //слияние двух частей
-        }
+    }
+    for (int i = firstElement; i <= lastElement; i++){
+        A[i] = mas[i];                                                                   //возвращение результата в список
     }
 };
-//главная функция
+void MergeSort(int massiv[], int firstElement, int lastElement) {                        //рекурсивная процедура сортировки
+    if (firstElement < lastElement) {
+        MergeSort(massiv, firstElement, (firstElement + lastElement) / 2);     //сортировка левой части
+        MergeSort(massiv, (firstElement + lastElement) / 2 + 1, lastElement);  //сортировка правой части
+        Merge(massiv, firstElement, lastElement);                                        //слияние двух частей
+    }
+};
 class Timer {
 public:
     Timer() {
         start = std::chrono::high_resolution_clock::now();
-    }~Timer() {
+    }
+    ~Timer() {
         end = std::chrono::high_resolution_clock::now();
         std::chrono::duration < double > duration = end - start;
         std::cout << "DURATION " << duration.count() << " s\n\n";
@@ -49,19 +45,21 @@ private:
     std::chrono::time_point < std::chrono::high_resolution_clock > start, end;
 };
 int main() {
-    srand(time(0));
-    int i, n;
-    int * A = new int[1000];
+    srand(time(NULL));
+    int arraSize;
     cout << "Array size > ";
-    cin >> n;
-    for (i = 0; i < n; i++) {
-        A[i] = (rand() % 1000);
-    } {
-        Timer t;
-        MergeSort(A, 1, n); //вызов сортирующей процедуры
+    cin >> arraSize;
+    //int testArray[6] = {1,4,5,2,7,8};
+    int* sortableArray = new int[arraSize];
+    for (int i = 0; i < arraSize; i++) {
+        sortableArray[i] = (rand() % 100);
     }
+    Timer t;
+    //MergeSort(testArray, 0, 6); // тестирование сортировки
+    MergeSort(sortableArray, 0, arraSize-1); //вызов сортирующей процедуры
     cout << "sorted array: "; //вывод упорядоченного массива
-    for (i = 1; i <= n; i++) cout << A[i] << " ";
-    delete[] A;
+    for (int i = 1; i <= arraSize; i++) {
+        cout << sortableArray[i] << " ";
+    }
     return 0;
 }
