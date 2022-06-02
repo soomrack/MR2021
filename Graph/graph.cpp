@@ -36,7 +36,7 @@ Vertex<T>::Vertex(int id) {
 
 
 template <typename T>
-Vertex<T>::Vertex(const Vertex &other) {
+Vertex<T>::Vertex(const Vertex& other) {
     id = other.id;
     edges = other.edges;
 }
@@ -56,7 +56,7 @@ void Vertex<T>::add_edge(Vertex<T>* neighbor, T distance) {
 
 template<typename T>
 void Vertex<T>::remove_edge(Vertex<T>* neighbor) {
-    for (auto & it : edges) {
+    for (auto& it : edges) {
         if (it.get_neighbor() == neighbor) {
             edges.remove(it);           // change!!! It works, but very strange
             break;
@@ -65,7 +65,7 @@ void Vertex<T>::remove_edge(Vertex<T>* neighbor) {
 }
 
 template<typename T>
-bool Edge<T>::operator== (const Edge<T> &other) {
+bool Edge<T>::operator== (const Edge<T>& other) {
     return (neighbor == other.neighbor) && (distance == other.distance);
 }
 
@@ -78,8 +78,8 @@ Edge<T>::Edge(Vertex<T>* neighbor, T distance) {
 
 
 template <typename T>
-BaseGraph<T>::BaseGraph(int num_of_vertices) {
-    for (id_counter = 0; id_counter < num_of_vertices; id_counter++) {
+BaseGraph<T>::BaseGraph(int vertices) {
+    for (id_counter = 0; id_counter < vertices; id_counter++) {
         auto v = new Vertex<T>(id_counter);
         vertices.push_back(v);
     }
@@ -87,12 +87,12 @@ BaseGraph<T>::BaseGraph(int num_of_vertices) {
 
 
 template <typename T>
-BaseGraph<T>::BaseGraph(std::list<Vertex<T>*> &vertices) {
+BaseGraph<T>::BaseGraph(std::list<Vertex<T>*>& vertices) {
     this->vertices = vertices;
 }
 
 template <typename T>
-BaseGraph<T>::BaseGraph(std::vector<std::vector<T>> &adjacency_matrix){
+BaseGraph<T>::BaseGraph(std::vector<std::vector<T>>& adjacency_matrix) {
     this->adjacency_matrix = adjacency_matrix;
     this->id_counter = adjacency_matrix.size();
 
@@ -112,7 +112,7 @@ BaseGraph<T>::BaseGraph(std::vector<std::vector<T>> &adjacency_matrix){
 }
 
 template <typename T>
-BaseGraph<T>::BaseGraph(std::vector<std::list<int>> &adjacency_list){
+BaseGraph<T>::BaseGraph(std::vector<std::list<int>>& adjacency_list) {
     this->adjacency_list = adjacency_list;
     this->id_counter = adjacency_list.size();
 
@@ -133,26 +133,26 @@ BaseGraph<T>::BaseGraph(std::vector<std::list<int>> &adjacency_list){
 }
 
 template <typename T>
-BaseGraph<T>::BaseGraph(const BaseGraph &other) {
+BaseGraph<T>::BaseGraph(const BaseGraph& other) {
     adjacency_matrix = other.adjacency_matrix;
     adjacency_list = other.adjacency_list;
 }
 
 template <typename T>
-BaseGraph<T>::BaseGraph(BaseGraph &&other) noexcept {
+BaseGraph<T>::BaseGraph(BaseGraph&& other) noexcept {
     adjacency_matrix = other.adjacency_matrix;
     adjacency_list = other.adjacency_list;
 }
 
 template <typename T>
 BaseGraph<T>::~BaseGraph() {
-    for (auto & v : vertices) {
+    for (auto& v : vertices) {
         delete v;
     }
 }
 
 template <typename T>
-int BaseGraph<T>::add_edge(int source_id, int target_id, int weight, EdgeType edge_type){
+int BaseGraph<T>::add_edge(int source_id, int target_id, int weight, EdgeType edge_type) {
 
     // Edge, where start and end are the same vertex, is unexpected
     if (source_id == target_id) {
@@ -169,15 +169,15 @@ int BaseGraph<T>::add_edge(int source_id, int target_id, int weight, EdgeType ed
 
 
     switch (edge_type) {
-        case UNDIRECTED:
-            source->add_edge(target, weight);
-            target->add_edge(source, weight);
-            break;
-        case DIRECTED:
-            source->add_edge(target, weight);
-            break;
-        default:
-            break;
+    case UNDIRECTED:
+        source->add_edge(target, weight);
+        target->add_edge(source, weight);
+        break;
+    case DIRECTED:
+        source->add_edge(target, weight);
+        break;
+    default:
+        break;
     }
 
     return 0;
@@ -200,15 +200,15 @@ int BaseGraph<T>::remove_edge(int source_id, int target_id, EdgeType edge_type) 
     }
 
     switch (edge_type) {
-        case UNDIRECTED:
-            source->remove_edge(target);
-            target->remove_edge(source);
-            break;
-        case DIRECTED:
-            source->remove_edge(target);
-            break;
-        default:
-            break;
+    case UNDIRECTED:
+        source->remove_edge(target);
+        target->remove_edge(source);
+        break;
+    case DIRECTED:
+        source->remove_edge(target);
+        break;
+    default:
+        break;
     }
 
     return 0;
@@ -302,23 +302,23 @@ void BaseGraph<T>::actualize_adjacency_matrix() {
 template <typename T>
 std::vector<std::pair<int, int>> GraphTarjansBridges<T>::tarjans_find_bridges()
 {
-    int num_of_vertices = BaseGraph<T>::adjacency_matrix.size();
+    int vertices = BaseGraph<T>::adjacency_matrix.size();
 
     // Mark all the vertices as not visited
-    std::vector<bool> visited(num_of_vertices, false);
+    std::vector<bool> visited(vertices, false);
 
-    std::vector<int> disc(num_of_vertices);
-    std::vector<int> low(num_of_vertices);
+    std::vector<int> disc(vertices);
+    std::vector<int> low(vertices);
 
     // initially parents are not specified
-    std::vector<int> parent(num_of_vertices, -1);
+    std::vector<int> parent(vertices, -1);
 
     std::vector<std::pair<int, int>> bridges;
     tarjan_s_time = 0;
 
     // Call the recursive helper function to find Bridges
     // in DFS tree rooted with vertex 'i'
-    for (int i = 0; i < num_of_vertices; i++) {
+    for (int i = 0; i < vertices; i++) {
         if (!visited[i])
             tarjan_s_bridge_finding_dfs(i, visited, disc, low, parent, bridges);
     }
@@ -329,11 +329,11 @@ std::vector<std::pair<int, int>> GraphTarjansBridges<T>::tarjans_find_bridges()
 // A recursive function that finds bridges using DFS traversal
 template <typename T>
 void GraphTarjansBridges<T>::tarjan_s_bridge_finding_dfs(int u,
-                                                         std::vector<bool> &visited,
-                                                         std::vector<int> &disc,
-                                                         std::vector<int> &low,
-                                                         std::vector<int> &parent,
-                                                         std::vector<std::pair<int, int>> &bridges) {
+    std::vector<bool>& visited,
+    std::vector<int>& disc,
+    std::vector<int>& low,
+    std::vector<int>& parent,
+    std::vector<std::pair<int, int>>& bridges) {
 
     // Mark the current node as visited
     visited[u] = true;
@@ -361,13 +361,13 @@ void GraphTarjansBridges<T>::tarjan_s_bridge_finding_dfs(int u,
             // If the lowest vertex reachable from subtree
             // under v is  below u in DFS tree, then u-v
             // is a tarjans_find_bridges
-            if (low[v] > disc[u]){
+            if (low[v] > disc[u]) {
                 bridges.emplace_back(u, v);
             }
         }
-            // Update low value of u for parent function calls.
+        // Update low value of u for parent function calls.
         else if (v != parent[u])
-            low[u]  = std::min(low[u], disc[v]);
+            low[u] = std::min(low[u], disc[v]);
     }
 }
 
@@ -393,12 +393,13 @@ template<typename T>
 std::tuple<std::vector<std::vector<T>>, std::vector<std::vector<int>>> GraphFloydWarshall<T>::floyd_warshall_ways() {
     int vertices = BaseGraph<T>::adjacency_matrix.size();
     //initializing vector to restore the paths
-    restore_matrix.assign(vertices, std::vector<int> (vertices));
+    restore_matrix.assign(vertices, std::vector<int>(vertices));
     for (int row = 0; row < vertices; row++) {
         for (int col = 0; col < vertices; col++) {
             if (BaseGraph<T>::adjacency_matrix[row][col] == INF<T>) {
                 restore_matrix[row][col] = 0;
-            } else
+            }
+            else
                 restore_matrix[row][col] = col + 1;
         }
     }
@@ -524,13 +525,13 @@ int GraphDijkstra<T>::dijkstra_log(int top_from, int top_to)
     std::priority_queue <std::pair <int, int > > q;
     q.push(std::make_pair(0, top_from));
     while (!q.empty())
-        {
+    {
         int first_length = -q.top().first;
         int first_top = q.top().second;
         q.pop();
         if (first_length > distances[first_top]) continue;
         for (int i = 0; i < tops; i++)
-            {
+        {
             int to = i;
             int length = BaseGraph<T>::adjacency_matrix[first_top][i];
             if (distances[to] > distances[first_top] + length)
@@ -538,8 +539,8 @@ int GraphDijkstra<T>::dijkstra_log(int top_from, int top_to)
                 distances[to] = distances[first_top] + length;
                 q.push(std::make_pair(-distances[to], to));
             }
-            }
         }
+    }
     if (distances[top_to] == INF<T>) return -1;
     else return distances[top_to];
 }
@@ -548,9 +549,9 @@ int GraphDijkstra<T>::dijkstra_log(int top_from, int top_to)
 template<typename T>
 std::vector<std::vector<T>> GraphDijkstra<T>::dijkstra() {
     int vertices = BaseGraph<T>::adjacency_matrix.size();
-    std::vector<std::vector<T>> paths_matrix (vertices, std::vector<T> (vertices));
+    std::vector<std::vector<T>> paths_matrix(vertices, std::vector<T>(vertices));
     for (int i = 1; i <= vertices; i++) {
-        paths_matrix[i-1] = dijkstra_from_one_vertex(i);
+        paths_matrix[i - 1] = dijkstra_from_one_vertex(i);
     }
     BaseGraph<T>::adjacency_matrix = paths_matrix;
     return BaseGraph<T>::adjacency_matrix;
@@ -566,54 +567,59 @@ void GraphTraversal<T>::print_vector(std::vector<T> vector_to_print) {
 }
 
 template<typename T>
-void GraphTraversal<T>::bfs_search() {
+std::vector<T> GraphTraversal<T>::bfs_search() { // BFS search
     int vertices = BaseGraph<T>::adjacency_list.size();
-    std::cout << std::endl << "BFS search: ";
+    std::vector<T> bfs_search;
     std::vector<T> nodes(vertices, 0);
     std::queue<T> Queue;
     Queue.push(0);
     while (!Queue.empty()) {
         T node = Queue.front();
         Queue.pop();
-        nodes[node] = 1;
-        for (auto iter = BaseGraph<T>::adjacency_list[node].begin(); 
+        nodes[node] = 2;
+        for (auto iter = BaseGraph<T>::adjacency_list[node].begin();
             iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
             if (nodes[*iter] == 0) {
                 Queue.push(*iter);
+                nodes[*iter] = 1;
             }
         }
-        std::cout << node << " ";
+        bfs_search.push_back(node);
     }
+    return bfs_search;
 }
 
 template<typename T>
-void GraphTraversal<T>::dfs_search() {
+std::vector<T> GraphTraversal<T>::dfs_search() {  // DFS search
     int vertices = BaseGraph<T>::adjacency_list.size();
-    std::cout << std::endl << "DFS search: ";
+    std::vector<T> dfs_search;
     std::vector<T> nodes(vertices, 0);
     std::stack<T> Stack;
     Stack.push(0);
     while (!Stack.empty()) {
         T node = Stack.top();
         Stack.pop();
-        if (nodes[node] == 1) continue;
-        nodes[node] = 1;
+        if (nodes[node] == 2) continue;
+        nodes[node] = 2;
         for (auto iter = BaseGraph<T>::adjacency_list[node].rbegin();
-             iter != BaseGraph<T>::adjacency_list[node].rend(); ++iter) {
-            if (nodes[*iter] != 1) {
+            iter != BaseGraph<T>::adjacency_list[node].rend(); ++iter) {
+            if (nodes[*iter] != 2) {
                 Stack.push(*iter);
+                nodes[*iter] = 1;
             }
         }
-        std::cout << node << " ";
+        dfs_search.push_back(node);
     }
+    return dfs_search;
 }
 
 template<typename T>
-std::vector<T> GraphTraversal<T>::find_path(const T from, const T to) { // Find a path between two vertices
+std::vector<T> GraphTraversal<T>::find_path(T from, T to) {   // BFS based find path
     int vertices = BaseGraph<T>::adjacency_list.size();
-    if (from > vertices || to > vertices) {
-        std::cout << "Find min path error. Index exceeds the number of vertices."
-                     "Index must be not more " << vertices - 1 << "\n";
+    if (from >= vertices || to >= vertices) {
+        std::cout << "Find min path error. "
+            "Index exceeds the number of vertices. Index must be not more "
+            << vertices - 1 << "\n";
         return restored_path;
     }
     if (from == to) {
@@ -629,33 +635,32 @@ std::vector<T> GraphTraversal<T>::find_path(const T from, const T to) { // Find 
     Edge Edge_beetween_two_vertices;
     std::stack<Edge> Edges;
     Queue.push(from);
-    bool find = false;
-    while (!Queue.empty() && !find) {
+    bool path_found = false;
+    while (!Queue.empty() && !path_found) {
         T node = Queue.front();
         Queue.pop();
-        nodes[node] = 1;
-
+        nodes[node] = 2;
         for (auto iter = BaseGraph<T>::adjacency_list[node].begin();
-             iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
+            iter != BaseGraph<T>::adjacency_list[node].end(); ++iter) {
             if (nodes[*iter] == 0) {
+                nodes[*iter] = 1;
                 Queue.push(*iter);
                 Edge_beetween_two_vertices.begin = node;
                 Edge_beetween_two_vertices.end = *iter;
                 Edges.push(Edge_beetween_two_vertices);
                 if (*iter == to) {
-                    find = true;
+                    path_found = true;
                     break;
                 }
             }
         }
     }
-    if (find) {
-        T update_to = to;
-        while (update_to != from && !Edges.empty()) {
+    if (path_found) {
+        while (to != from) {
             Edge_beetween_two_vertices = Edges.top();
             Edges.pop();
-            if (Edge_beetween_two_vertices.end == update_to) {
-                update_to = Edge_beetween_two_vertices.begin;
+            if (Edge_beetween_two_vertices.end == to) {
+                to = Edge_beetween_two_vertices.begin;
                 restored_path.push_back(Edge_beetween_two_vertices.end);
             }
         }
@@ -669,35 +674,38 @@ std::vector<T> GraphTraversal<T>::find_path(const T from, const T to) { // Find 
 }
 
 template<typename T>
-std::vector<T> GraphTraversal<T>::topological_sort() { // Topological sorting of a graph
+std::vector<T> GraphTraversal<T>::topological_sort() { // DFS based topological sort
+    //graph is DAG check required
     int vertices = BaseGraph<T>::adjacency_list.size();
     std::vector<T> nodes(vertices, 0);
     std::stack<T> Stack;
     for (int i = 0; i < vertices; ++i) {
-        if (nodes[i] == 0) {
-            Stack.push(i);
-            while (!Stack.empty()) {
-                T node = Stack.top();
-                if (nodes[node] == 1) {
-                    topological_sorted_graph.push_back(node);
-                    Stack.pop();
-                    continue;
+        Stack.push(i);
+        while (!Stack.empty()) {
+            T node = Stack.top();
+            if (nodes[node] == 2) {
+                Stack.pop();
+                continue;
+            }
+            if (nodes[node] == 1) {
+                topological_sorted_graph.push_back(node);
+                Stack.pop();
+                nodes[node] = 2;
+                continue;
+            }
+            nodes[node] = 1;
+            bool has_edge = false;
+            for (auto iter = BaseGraph<T>::adjacency_list[node].rbegin(); 
+                iter != BaseGraph<T>::adjacency_list[node].rend(); ++iter) {
+                if (nodes[*iter] != 2) {
+                    Stack.push(*iter);
+                    has_edge = true;
                 }
-                nodes[node] = 1;
-                bool has_edge = false;
-
-                for (auto iter = BaseGraph<T>::adjacency_list[node].rbegin();
-                     iter != BaseGraph<T>::adjacency_list[node].rend(); ++iter) {
-
-                    if (nodes[*iter] != 1) {
-                        Stack.push(*iter);
-                        has_edge = true;
-                    }
-                }
-                if (!has_edge) {
-                    topological_sorted_graph.push_back(node);
-                    Stack.pop();
-                }
+            }
+            if (!has_edge) {
+                topological_sorted_graph.push_back(node);
+                Stack.pop();
+                nodes[node] = 2;
             }
         }
     }
@@ -708,30 +716,30 @@ std::vector<T> GraphTraversal<T>::topological_sort() { // Topological sorting of
 template<typename T>
 T get_inf() {
     T inf = std::numeric_limits<T>::infinity();
-    if (inf == (T) 0) {
+    if (inf == (T)0) {
         return std::numeric_limits<T>::max();
     }
     return inf;
 }
 
 template<typename T>
-void GraphTarjansSCCalgorithm<T>::Tarjan_SCC_algorithm(){
-    std::vector<bool> presents_in_stack( BaseGraph<T>::id_counter, false);
+void GraphTarjansSCCalgorithm<T>::Tarjan_SCC_algorithm() {
+    std::vector<bool> presents_in_stack(BaseGraph<T>::id_counter, false);
     std::stack<int> stack_of_relatives;
     std::vector<int> queue_num(BaseGraph<T>::id_counter, -1);
     std::vector<int> low_link(BaseGraph<T>::id_counter, -1);
-    for (int i = 0; i < BaseGraph<T>::id_counter; i++){
-        if (queue_num[i] == -1){
-            Tarjan_DFS(i, queue_num, low_link, presents_in_stack, stack_of_relatives );
+    for (int i = 0; i < BaseGraph<T>::id_counter; i++) {
+        if (queue_num[i] == -1) {
+            Tarjan_DFS(i, queue_num, low_link, presents_in_stack, stack_of_relatives);
         }
     }
 }
 
 template<typename T>
 void GraphTarjansSCCalgorithm<T>::Print_SCC(int head_of_SCC, std::stack<int>& stack_of_relatives,
-                                            std::vector<bool>& presents_in_stack) {
+    std::vector<bool>& presents_in_stack) {
     std::cout << "SCC: ";
-    while (stack_of_relatives.top() != head_of_SCC ) {
+    while (stack_of_relatives.top() != head_of_SCC) {
         std::cout << stack_of_relatives.top() << ", ";
         presents_in_stack[stack_of_relatives.top()] = false;
         stack_of_relatives.pop();
@@ -742,26 +750,26 @@ void GraphTarjansSCCalgorithm<T>::Print_SCC(int head_of_SCC, std::stack<int>& st
 }
 
 template<typename T>
-void GraphTarjansSCCalgorithm<T>::Tarjan_DFS(int current_node, std::vector<int> &queue_num, std::vector<int> &low_link,
-                                             std::vector<bool> &presents_in_stack, std::stack<int>& stack_of_relatives) {
+void GraphTarjansSCCalgorithm<T>::Tarjan_DFS(int current_node, std::vector<int>& queue_num, std::vector<int>& low_link,
+    std::vector<bool>& presents_in_stack, std::stack<int>& stack_of_relatives) {
     static int disc_time = 0;
     queue_num[current_node] = disc_time;
     low_link[current_node] = disc_time;
     disc_time++;
     stack_of_relatives.push(current_node);
     presents_in_stack[current_node] = true;
-    for (int descendant = 0; descendant <= BaseGraph<T>::id_counter; descendant++){
-        if ( BaseGraph<T>::adjacency_matrix[current_node][descendant] == 0){
+    for (int descendant = 0; descendant <= BaseGraph<T>::id_counter; descendant++) {
+        if (BaseGraph<T>::adjacency_matrix[current_node][descendant] == 0) {
         }
         else if (queue_num[descendant] == -1) {
-            Tarjan_DFS(descendant, queue_num, low_link, presents_in_stack, stack_of_relatives );
-            low_link[current_node] = std::min(low_link[current_node],low_link[descendant]);
+            Tarjan_DFS(descendant, queue_num, low_link, presents_in_stack, stack_of_relatives);
+            low_link[current_node] = std::min(low_link[current_node], low_link[descendant]);
         }
         else if (presents_in_stack[descendant]) {
-            low_link[current_node] = std::min(low_link[current_node],queue_num[descendant]);
+            low_link[current_node] = std::min(low_link[current_node], queue_num[descendant]);
         }
     }
-    if ( low_link[current_node] == queue_num[current_node]){
+    if (low_link[current_node] == queue_num[current_node]) {
         Print_SCC(current_node, stack_of_relatives, presents_in_stack);
     }
 

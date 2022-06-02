@@ -5,7 +5,7 @@
 #include <list>
 #include <stack>
 
-typedef enum{
+typedef enum {
     UNDIRECTED,
     DIRECTED,
 } EdgeType;
@@ -33,19 +33,19 @@ private:
     std::list<Edge<T>> edges;
 public:
     explicit Vertex(int id = 0);
-    Vertex(const Vertex &other);
+    Vertex(const Vertex& other);
     ~Vertex() = default;
 public:
     void add_edge(Vertex<T>* neighbor, T distance);
     void remove_edge(Vertex<T>* neighbor);
 public:
-    int get_id() {return id;}
-    std::list<Edge<T>> get_edges() {return edges;}
+    int get_id() { return id; }
+    std::list<Edge<T>> get_edges() { return edges; }
 };
 
 
 template <typename T>
-class Edge{
+class Edge {
 private:
     Vertex<T>* neighbor;
     T distance;
@@ -53,31 +53,31 @@ public:
     explicit Edge(Vertex<T>* neighbor = nullptr, T distance = 0);
     ~Edge() = default;
 public:
-    bool operator== (const Edge<T> &other);
+    bool operator== (const Edge<T>& other);
 public:
-    Vertex<T>* get_neighbor() {return neighbor;}
-    T get_distance() {return distance;}
+    Vertex<T>* get_neighbor() { return neighbor; }
+    T get_distance() { return distance; }
 };
 
 
 // Класс графа с базовой функциональностью
 template <typename T>
-class BaseGraph{
+class BaseGraph {
 protected:
     int id_counter = 0;
     std::list<Vertex<T>*> vertices;
     std::vector<std::vector<T>> adjacency_matrix;   // Матрица смежности
     std::vector<std::list<int>> adjacency_list;       // Список смежности
 public:
-    explicit BaseGraph(int num_of_vertices = 0);
-    explicit BaseGraph(std::list<Vertex<T>*> &vertices);
-    explicit BaseGraph(std::vector<std::vector<T>> &adjacency_matrix);
-    explicit BaseGraph(std::vector<std::list<int>> &adjacency_list);
-    BaseGraph(const BaseGraph &other);
-    BaseGraph(BaseGraph &&other) noexcept;
+    explicit BaseGraph(int vertices = 0);
+    explicit BaseGraph(std::list<Vertex<T>*>& vertices);
+    explicit BaseGraph(std::vector<std::vector<T>>& adjacency_matrix);
+    explicit BaseGraph(std::vector<std::list<int>>& adjacency_list);
+    BaseGraph(const BaseGraph& other);
+    BaseGraph(BaseGraph&& other) noexcept;
     virtual ~BaseGraph();
 
-// Методы для взаимодействия с графом (т.е. геттеры, сеттеры и т.д.)
+    // Методы для взаимодействия с графом (т.е. геттеры, сеттеры и т.д.)
 public:
     Vertex<T>* find_vertex(int id);
     int add_edge(int source_id, int target_id, int weight = 0, EdgeType edge_type = UNDIRECTED);
@@ -85,10 +85,10 @@ public:
     int add_vertex();
     int remove_vertex(int id);
 public:
-    int get_id_counter() {return id_counter;}
-    std::list<Vertex<T>*> get_vertices() {return vertices;}
-    std::vector<std::vector<T>> get_adjacency_matrix() {return adjacency_matrix;}
-    std::vector<std::list<int>> get_adjacency_list() {return adjacency_list;}
+    int get_id_counter() { return id_counter; }
+    std::list<Vertex<T>*> get_vertices() { return vertices; }
+    std::vector<std::vector<T>> get_adjacency_matrix() { return adjacency_matrix; }
+    std::vector<std::list<int>> get_adjacency_list() { return adjacency_list; }
 public:
     void actualize_adjacency_list();
     void actualize_adjacency_matrix();
@@ -100,23 +100,23 @@ public:
 // Все эти классы наследуются от базового графа как virtual public
 
 template<typename T>
-class GraphTarjansBridges: virtual public BaseGraph<T> {
+class GraphTarjansBridges : virtual public BaseGraph<T> {
 protected:
     int tarjan_s_time = 0;
 public:
     std::vector<std::pair<int, int>> tarjans_find_bridges();
 private:
     void tarjan_s_bridge_finding_dfs(int u,
-                                     std::vector<bool> &visited,
-                                     std::vector<int> &disc,
-                                     std::vector<int> &low,
-                                     std::vector<int> &parent,
-                                     std::vector<std::pair<int, int>> &bridges);
+        std::vector<bool>& visited,
+        std::vector<int>& disc,
+        std::vector<int>& low,
+        std::vector<int>& parent,
+        std::vector<std::pair<int, int>>& bridges);
 };
 
 
 template<typename T>
-class GraphFloydWarshall: virtual public BaseGraph<T> {
+class GraphFloydWarshall : virtual public BaseGraph<T> {
 private:
     std::vector<std::vector<int>> restore_matrix;   // Матрица для восстановления кратчайшего пути
     std::vector<int> restored_path;                 // Вектор, в котором хранится путь восстановленный методом restore_path
@@ -134,7 +134,7 @@ private:
 
 
 template<typename T>
-class GraphDijkstra: virtual public BaseGraph<T>{
+class GraphDijkstra : virtual public BaseGraph<T> {
 public:
     std::vector<std::vector<T>> dijkstra();
     int dijkstra_log(int top_from, int top_to);
@@ -144,23 +144,23 @@ private:
 
 
 template<typename T>
-class GraphTraversal: virtual public BaseGraph<T> {
+class GraphTraversal : virtual public BaseGraph<T> {
 private:
     std::vector<T> restored_path;                   // Вектор для хранения пути между двумя вершинами
     std::vector<T> topological_sorted_graph;        // Топологически отсортированный граф
 public:
-    void print_vector(std::vector<T> vector_to_print);
-    void bfs_search();
-    void dfs_search();
+    void print_vector(const std::vector<T> vector_to_print);
+    std::vector<T> bfs_search();
+    std::vector<T> dfs_search();
     std::vector<T> find_path(T from, T to);
     std::vector<T> topological_sort();
 };
 
 template<typename T>
-class GraphTarjansSCCalgorithm: virtual public BaseGraph<T> {
+class GraphTarjansSCCalgorithm : virtual public BaseGraph<T> {
 private:
-    void Tarjan_DFS( int current_node, std::vector<int>& queue_num, std::vector<int>& low_link, std::vector<bool>& presents_in_stack,
-                     std::stack<int>& stack_of_relatives);
+    void Tarjan_DFS(int current_node, std::vector<int>& queue_num, std::vector<int>& low_link, std::vector<bool>& presents_in_stack,
+        std::stack<int>& stack_of_relatives);
     void Print_SCC(int head_of_SCC, std::stack<int>& stack_of_relatives, std::vector<bool>& presents_in_stack);
 public:
     void Tarjan_SCC_algorithm();
@@ -171,18 +171,18 @@ public:
 // т.е. создающийся с помощью ромбовидного наследования
 
 template<typename T>
-class Graph:
-        virtual public GraphFloydWarshall<T>,
-        virtual public GraphTarjansBridges<T>,
-        virtual public GraphDijkstra<T>,
-        virtual public GraphTraversal<T>,
-        virtual public GraphTarjansSCCalgorithm<T> {
+class Graph :
+    virtual public GraphFloydWarshall<T>,
+    virtual public GraphTarjansBridges<T>,
+    virtual public GraphDijkstra<T>,
+    virtual public GraphTraversal<T>,
+    virtual public GraphTarjansSCCalgorithm<T> {
 public:
-    explicit Graph(int num_of_vertices = 0) : BaseGraph<T>(num_of_vertices) {};
-    explicit Graph(std::vector<std::vector<T>> &adjacency_matrix) : BaseGraph<T>(adjacency_matrix) {};
-    explicit Graph(std::vector<std::list<int>> &adjacency_list) : BaseGraph<T>(adjacency_list) {};
-    Graph(const Graph &other) : BaseGraph<T>(other) {};
-    Graph(Graph &&other) noexcept : BaseGraph<T>(other) {};
+    explicit Graph(int vertices = 0) : BaseGraph<T>(vertices) {};
+    explicit Graph(std::vector<std::vector<T>>& adjacency_matrix) : BaseGraph<T>(adjacency_matrix) {};
+    explicit Graph(std::vector<std::list<int>>& adjacency_list) : BaseGraph<T>(adjacency_list) {};
+    Graph(const Graph& other) : BaseGraph<T>(other) {};
+    Graph(Graph&& other) noexcept : BaseGraph<T>(other) {};
     virtual ~Graph() = default;
 };
 
