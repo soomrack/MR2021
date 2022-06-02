@@ -472,6 +472,7 @@ Node* Node::search(int key, int level_down, int B_factor, Node * root, Node * ac
     if (pointers[0] == nullptr) {
         return nullptr;
     }
+    //ищем ключ в узлах ниже
     for (int i = 0; i < B_factor; i++) {
         if (key < this->keys[i]){
             node_with_key = pointers[i]->search(key, level_down,B_factor,root,active_node, nullptr);
@@ -485,7 +486,7 @@ Node* Node::search(int key, int level_down, int B_factor, Node * root, Node * ac
     return node_with_key;//level_down;
 }
 
-//УДАЛЕНИЕ УЗЛА
+//УДАЛЕНИЕ УЗЛА и используемые функции
 
 int Node::count_keys(int B_factor) {
     return ((B_factor-1) - this->count_free_key(B_factor));
@@ -803,11 +804,11 @@ void Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node* node_
         parent->pointers[node_with_key_index - 1] = nullptr;
         parent->remove_free_pointer(B_factor);
 
-        //в конце
+        //в конце работаем с родителем
         key = parent->keys[0];
 
         if (parent_status == PARENT_HAS_ONE_KEY){
-            parent->delete_key(key/*parent->keys[node_with_key_index]*/,B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+            parent->delete_key(key,B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
         } else if (parent_status == PARENT_ROOT_HAS_ONE){
             change_root(parent->pointers[0], root, B_factor);
         }
@@ -833,10 +834,10 @@ void Node::merge_nodes_brothers_with_pointers(int key, int B_factor, Node* node_
         parent->pointers[node_with_key_index + 1] = nullptr;
         parent->remove_free_pointer(B_factor);
 
-        //в конце
+        //в конце работаем с родителем
         key = parent->keys[0];
         if (parent_status == PARENT_HAS_ONE_KEY){
-            parent->delete_key(key/*parent->keys[node_with_key_index]*/,B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
+            parent->delete_key(key,B_factor,root, parent->find_this_parent(B_factor,root,root),parent,USED);
         } else if (parent_status == PARENT_ROOT_HAS_ONE){
             change_root(parent->pointers[0], root, B_factor);
         }
@@ -869,7 +870,7 @@ void Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * 
         else if (node_with_key->count_keys(B_factor) == 1){ //остался один ключ, спросим у братьев соседей
             success = success + ask_brother_key(key,B_factor,node_with_key,parent,root);
         }
-        if ((success) == 0){
+        if ((success) == 0){ //если у братьев взять не получилуось
             //объеденимся с братом, даже если у родителя всего один ключ
             if (parent->count_keys(B_factor) > 1) {
                 node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_MORE_KEYS);
@@ -879,14 +880,14 @@ void Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * 
                 node_with_key->merge_nodes_brothers(key, B_factor, node_with_key, parent, root, PARENT_HAS_ONE_KEY);
             }
         }
-    } else { //узел - ветка
+    } else { //узел это ветка, есть дети
         int key_index = -1;
         for(int i = 0; i < B_factor - 1; i++){
             if(node_with_key->keys[i] == key){
                 key_index = i;
             }
         }
-        if (is_used == NOT_USED) { //идем вниз воровать ключи
+        if (is_used == NOT_USED) { //идем вниз воровать ключи (в случае если еще не воровали)
             //идем в вниз до узлов без детей и если возможно берем крайние ключи
             del_key_only_this(key,B_factor,node_with_key); //удалим ключ
             success = node_with_key->lift_up_left(key,B_factor,root,parent,node_with_key, key_index);
@@ -902,7 +903,7 @@ void Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * 
             //украсть ключ снизу
             node_with_key->steal_down_key(key,B_factor,node_with_key,parent,root,key_index);
             return;
-            //после того как забрали силой нужно ДЕЛЕГИРОВАТЬ ОТСУТСТВИЕ КЛЮЧА В САМЫЙ НИЗ
+            //после того как забрали силой ДЕЛЕГИРОВАЛИ ОТСУТСТВИЕ КЛЮЧА В САМЫЙ НИЗ
         }
         if (1){ //будем брать ключ у братьев с детьми (если у них есть больше 1)
             success = success + node_with_key->ask_brother_key_with_pointers(key,B_factor,node_with_key,parent,root);
@@ -910,7 +911,7 @@ void Node::delete_key(int key, int B_factor, Node * root, Node * parent, Node * 
                 return;
             }
         }
-        if (parent->count_keys(B_factor) > 1) {
+        if (parent->count_keys(B_factor) > 1) { //сливаем с братьями
             node_with_key->merge_nodes_brothers_with_pointers(key,B_factor,node_with_key,parent,root,PARENT_HAS_MORE_KEYS);
         } else if (parent == root) {
             node_with_key->merge_nodes_brothers_with_pointers(key,B_factor,node_with_key,parent,root,PARENT_ROOT_HAS_ONE);
