@@ -7,6 +7,22 @@
 using namespace std;
 
 int main() {
+    Prefix_tree dict;
+    string str = "aabccbbbabcdaddcd";
+
+    dict.add_str_to_tree("abc");
+    dict.add_str_to_tree("bbb");
+    dict.add_str_to_tree("add");
+    dict.add_str_to_tree("cd");
+    dict.add_str_to_tree("c");
+    dict.add_str_to_tree("abcd");
+
+    dict.find_all_pos(str);
+    return 0;
+}
+
+
+/*
 
     //ifstream input("text_100k.txt");
     ifstream input("text_100k_~alf.txt");
@@ -39,5 +55,4 @@ int main() {
     time = time * 1000.0;
     cout << "Time: " << time << " ms" << endl;
 
-    return 0;
-}
+ */
