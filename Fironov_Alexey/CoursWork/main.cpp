@@ -5,31 +5,17 @@ using namespace std;
 
 class Ford{
 private:
-    int noOfNodes;                  //Ко-во узлов
-    int length;                     //Размерность матрицы смежности
-    vector<vector<int>> graph;      //Матрица смежности
+    int noOfNodes;              //Ко-во узлов
+    int length;                 //Размерность матрицы смежности
+    vector<vector<int>> graph;  //Размерность матрицы смежности
     vector<vector<int>> database;   //2 x length - вес пути до вершины
 public:
-    void addEdge(int i, int j, int cost);       //Добавление в таблицу смежности
+    void addEdge(int i, int j, int cost);
     void calculate(int startNode);
-    bool find(vector<int> nodes, int number);   //Наличие элемента в массиве. Защита от повторного заполнения
-
-    Ford(int length, int n){
-        this->noOfNodes = n;
-        this->length = length;
-        this->graph.resize(length);
-        this->database.resize(length);
-        for (int i=0; i < length; i++){
-            this->database[i].resize(2);
-            for(int j = 0; j < 2; j++){
-                this->database[i][j]=0;
-            }
-            this->graph[i].resize(length);
-            for(int j=0; j < length; j++){
-                this->graph[i].push_back(0);
-            }
-        }
-    }
+    bool find(vector<int> nodes, int number);
+    Ford(int length, int n);
+    Ford(const Ford &other);
+    Ford(Ford&& other) noexcept;
 };
 
 bool Ford::find(vector<int> nodes, int number){
@@ -40,37 +26,67 @@ bool Ford::find(vector<int> nodes, int number){
     }
     return true;
 }
+Ford::Ford(Ford&& other) noexcept{
+    length = other.length;
+    noOfNodes = other.noOfNodes;
+    graph = other.graph;
+    database = other.graph;
+    other.length = 0;
+    other.noOfNodes = 0;
+}
 
+Ford::Ford(const Ford &other){
+    length = other.length;
+    noOfNodes = other.noOfNodes;
+    graph = other.graph;
+    database = other.database;
+}
+Ford::Ford(int length, int n){
+    noOfNodes = n;
+    this->length = length;
+    graph.resize(length);
+    database.resize(length);
+    for(int i=0; i<length; i++){
+        database[i].resize(2);
+        for(int j = 0; j<2; j++){
+            database[i][j]=0;
+        }
+        graph[i].resize(length);
+        for(int j=0; j<length; j++){
+            graph[i].push_back(0);
+        }
+    }
+}
 
 void Ford::addEdge(int i, int j, int cost){
-    this->graph[i][j] = cost;
+    graph[i][j] = cost;
 }
 
 
 void Ford::calculate(int startNode){
     int infinity = numeric_limits<int>::max();
-    vector<int> nodes;                                  //Хранение номеров узлов
-    for(int i=0; i<this->length; i++){
-        for (int j = 0; j<this->length; j++){
-            if (this->graph[i][j] != 0){
-                if(this->find(nodes, i)){
+    vector<int> nodes;                           //Хранение номеров узлов
+    for(int i=0; i<length; i++){
+        for (int j = 0; j<length; j++){
+            if (graph[i][j] != 0){
+                if(find(nodes, i)){
                     if(i == startNode) {                //Стартовый узел
-                        this->database[i][0] = 0;
-                        this->database[i][1] = 0;
+                        database[i][0] = 0;
+                        database[i][1] = 0;
                     }else{                              //Остальные узлы
-                        this->database[i][0] = infinity;
-                        this->database[i][1] = 0;
+                        database[i][0] = infinity;
+                        database[i][1] = 0;
 
                     }
                     nodes.push_back(i);
                 }
-                if (this->find(nodes, j)){
+                if (find(nodes, j)){
                     if(j == startNode) {
-                        this->database[j][0] = 0;
-                        this->database[j][1] = 0;
+                        database[j][0] = 0;
+                        database[j][1] = 0;
                     }else{
-                        this->database[j][0] = infinity;
-                        this->database[j][1] = 0;
+                        database[j][0] = infinity;
+                        database[j][1] = 0;
                     }
                     nodes.push_back(j);
                 }
@@ -79,16 +95,17 @@ void Ford::calculate(int startNode){
     }
 
 
-    for (int k=0; k<this->noOfNodes-1; k++){
+    for (int k=0; k<noOfNodes-1; k++){
         for (int i = 0; i < nodes.size(); i++) {
-            int prev = this->database[nodes[i]][0];         //Вес в текущем узле
-            for (int j = 0; j < this->length; j++) {
-                if (this->graph[nodes[i]][j] != 0) {
-                    if (prev < infinity) {                  //Проверка родительского нода
-                        int cost = prev + this->graph[nodes[i]][j];
+            int prev = database[nodes[i]][0];           //Вес в текущем узле
+            for (int j = 0; j < length; j++) {
+                if (graph[nodes[i]][j] != 0) {
+                    if (prev < infinity) {              //Проверка родительского нода
+                        int cost = prev + graph[nodes[i]][j];
                         if (cost < database[j][0]) {
                             database[j][0] = cost;
                             database[j][1] = i;
+
                         }
                     }
                 }
@@ -97,9 +114,8 @@ void Ford::calculate(int startNode){
     }
 
     for(int node : nodes){
-        cout << "Minimal distance to "<<node<<" node is:"<<this->database[node][0]<<'\n';
+        cout << "Minimal distance to "<<node<<" node is:"<<database[node][0]<<'\n';
     }
-
 
 }
 int main()
