@@ -7,7 +7,7 @@ class Ford{
 private:
     int noOfNodes;              //Ко-во узлов
     int length;                 //Размерность матрицы смежности
-    vector<vector<int>> graph;  //Размерность матрицы смежности
+    vector<vector<int>> graph;  //Матрицы смежности
     vector<vector<int>> database;   //2 x length - вес пути до вершины
 public:
     void addEdge(int i, int j, int cost);
