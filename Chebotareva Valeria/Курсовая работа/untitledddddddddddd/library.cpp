@@ -23,7 +23,7 @@ UF::UF(const UF &otherUF) {
 }
 
 //перемещения
-UF:: UF( UF &&otherUF) {
+UF::UF( UF &&otherUF) {
     cnt = otherUF.cnt;
     id = otherUF.id;
     size = otherUF.id;
