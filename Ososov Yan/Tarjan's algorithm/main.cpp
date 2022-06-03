@@ -89,5 +89,18 @@ int main() {
     auto end=chrono::high_resolution_clock::now();
     chrono::duration<float> duration = end - start;
     cout << "Duration " << duration.count() << endl;
+    //Проверка
+    vector<vector<int>> grid_1;
+    grid_1 = grid;
+    grid = {{1,1,0,0,0,0,0},
+            {0,0,1,0,0,0,0},
+            {0,0,0,1,0,1,0},
+            {0,0,0,0,1,0,0},
+            {0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0},
+            {0,0,1,0,0,0,0}};
+    cout << grid[0][0] << endl;
+    cout << grid_1[0][0]  << endl;
+
 }
 
