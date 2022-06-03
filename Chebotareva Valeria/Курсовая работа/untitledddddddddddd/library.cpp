@@ -26,7 +26,7 @@ UF::UF(const UF &otherUF) {
 UF::UF( UF &&otherUF) {
     cnt = otherUF.cnt;
     id = otherUF.id;
-    size = otherUF.id;
+    size = otherUF.size;
     otherUF.id=nullptr;
     otherUF.size=nullptr;
 }
