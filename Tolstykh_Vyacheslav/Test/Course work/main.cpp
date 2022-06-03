@@ -104,37 +104,7 @@ void Tree::remove(int data) {
     root->remove(data);
 }
 
-void test_insert_time(int nodes_count) {
-
-    vector<int> values(nodes_count);
-    for (int i = 0; i < values.size(); ++i) {
-        values[i] = rand() % nodes_count;
-    }
-
-    Tree* tree = new Tree();
-    int start = clock();
-
-    for (int i = 0; i < values.size(); i++) {
-        tree->insert(values[i]);
-    }
-
-    int end = clock();
-    cout << "nodes_count: " << nodes_count << ", milliseconds: ";
-    cout << (end - start) * 1000 / CLOCKS_PER_SEC << endl;
-}
-
 int main() {
-
-    //тест insert
-    cout << "Inserts tests...\n";
-    test_insert_time(1000000);
-    test_insert_time(2000000);
-    test_insert_time(3000000);
-    test_insert_time(4000000);
-    test_insert_time(5000000);
-    test_insert_time(6000000);
-    test_insert_time(7000000);
-    test_insert_time(8000000);
 
     return 0;
 }
