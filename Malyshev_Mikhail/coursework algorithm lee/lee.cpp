@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <algorithm>
 #include <vector>
 #include "lee.h"
 
@@ -123,6 +124,10 @@ bool Grid::lee(int ax, int ay, int bx, int by) {
         }
         px.push_back(ax);
         py.push_back(ay);                    // теперь px[0..len] и py[0..len] - координаты ячеек пути
+
+        reverse(px.begin(), px.end());
+        reverse(py.begin(), py.end());
+
         return true;
 }
 
