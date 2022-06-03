@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void Merge(int* A, int firstElement, int lastElement) {                                  //функция, сливающая массивы
+void Merge(int* A, int firstElement, int lastElement) {                                   //функция, сливающая массивы
     static int middleElement, start, final;
     static int mas[MAXSIZE];
     middleElement = (firstElement + lastElement) / 2;                                     //вычисление среднего элемента
@@ -28,7 +28,7 @@ void MergeSort(int massiv[], int firstElement, int lastElement) {               
     if (firstElement < lastElement) {
         MergeSort(massiv, firstElement, (firstElement + lastElement) / 2);     //сортировка левой части
         MergeSort(massiv, (firstElement + lastElement) / 2 + 1, lastElement);  //сортировка правой части
-        Merge(massiv, firstElement, lastElement);                                        //слияние двух частей
+        Merge(massiv, firstElement, lastElement);                                     //слияние двух частей
     }
 };
 class Timer {
@@ -55,11 +55,12 @@ int main() {
         sortableArray[i] = (rand() % 100);
     }
     Timer t;
-    //MergeSort(testArray, 0, 6); // тестирование сортировки
-    MergeSort(sortableArray, 0, arraSize-1); //вызов сортирующей процедуры
-    cout << "sorted array: "; //вывод упорядоченного массива
+    //MergeSort(testArray, 0, 6);                                                      // тестирование сортировки
+    MergeSort(sortableArray, 0, arraSize-1);                //вызов сортирующей процедуры
+    cout << "Sorted array: ";                                                         //вывод упорядоченного массива
     for (int i = 1; i <= arraSize; i++) {
         cout << sortableArray[i] << " ";
     }
+    delete sortableArray[];
     return 0;
 }
