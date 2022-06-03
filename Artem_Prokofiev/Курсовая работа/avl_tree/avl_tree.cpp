@@ -150,3 +150,16 @@ void Tree::pre_order(node *root) {
         pre_order(root->right);
     }
 }
+
+void Tree::clear(node* current){
+    if(!(current -> right) && !(current -> left)) {
+        delete current;
+    } else {
+        clear(current -> right);
+        clear(current -> left);
+    }
+}
+
+Tree::~Tree(){
+    clear(root);
+}

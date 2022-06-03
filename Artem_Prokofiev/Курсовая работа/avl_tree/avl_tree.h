@@ -19,6 +19,8 @@ public:
     node* remove(node* p, int k);                // Delete key k from tree p
     void pre_order(node *root);                  // Print preliminary traversal of the tree
     Tree();                                      // Start tree parameters
+    void clear(node* current);
+    ~Tree();
 
 private:
     node* rotate_right(node* p);                 // Left rotate subtree rooted with p
