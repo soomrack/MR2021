@@ -11,6 +11,29 @@ UF::UF(int N) {
     }
 }
 
+//копирования
+UF::UF(const UF &otherUF) {
+    cnt = otherUF.cnt;
+    id = new int[cnt];
+    size = new int[cnt];
+    for (int i = 0; i < cnt; i++) {
+        id[i] = otherUF.id[i];
+        size[i] = otherUF.size[i];
+    }
+}
+
+//перемещения
+UF:: UF( UF&& otherUF) {
+    cnt = otherUF.cnt;
+    id = new int[cnt];
+    size = new int[cnt];
+    for (int i = 0; i < cnt; i++) {
+        id[i] = otherUF.id[i];
+        size[i] = otherUF.size[i];
+    }
+    otherUF.~UF();
+}
+
 //удаление
 UF::~UF() {
     delete[] id;

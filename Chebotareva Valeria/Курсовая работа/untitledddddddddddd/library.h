@@ -8,8 +8,13 @@ private:
     int cnt = 0;
     int *size;
 public:
+    //создание
     UF(int N);
-
+//копирования
+    UF(const UF &otherUF);
+    //переноса
+    UF( UF&& otherUF);
+//удаление
     ~UF();
 
     int find(int p);

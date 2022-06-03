@@ -1,0 +1,4 @@
+ToolSet: 3.2.0 (local)@D:\Desktop\bulat
+Options: 
+
+Options:-DCMAKE_MAKE_PROGRAM=/cygdrive/d/Program Files/clion/CLion 2021.3.1/bin/ninja/cygwin/ninja.exe
