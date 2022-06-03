@@ -23,15 +23,12 @@ UF::UF(const UF &otherUF) {
 }
 
 //перемещения
-UF:: UF( UF&& otherUF) {
+UF:: UF( UF &&otherUF) {
     cnt = otherUF.cnt;
-    id = new int[cnt];
-    size = new int[cnt];
-    for (int i = 0; i < cnt; i++) {
-        id[i] = otherUF.id[i];
-        size[i] = otherUF.size[i];
-    }
-    otherUF.~UF();
+    id = otherUF.id;
+    size = otherUF.id;
+    otherUF.id=nullptr;
+    otherUF.size=nullptr;
 }
 
 //удаление
