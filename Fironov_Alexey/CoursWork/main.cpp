@@ -41,6 +41,7 @@ Ford::Ford(const Ford &other){
     graph = other.graph;
     database = other.database;
 }
+
 Ford::Ford(int length, int n){
     noOfNodes = n;
     this->length = length;
@@ -62,9 +63,8 @@ void Ford::addEdge(int i, int j, int cost){
     graph[i][j] = cost;
 }
 
-
 void Ford::calculate(int startNode){
-    int infinity = numeric_limits<int>::max();
+    const int infinity = numeric_limits<int>::max();
     vector<int> nodes;                           //Хранение номеров узлов
     for(int i=0; i<length; i++){
         for (int j = 0; j<length; j++){
@@ -97,11 +97,11 @@ void Ford::calculate(int startNode){
 
     for (int k=0; k<noOfNodes-1; k++){
         for (int i = 0; i < nodes.size(); i++) {
-            int prev = database[nodes[i]][0];           //Вес в текущем узле
+            const int prev = database[nodes[i]][0];           //Вес в текущем узле
             for (int j = 0; j < length; j++) {
                 if (graph[nodes[i]][j] != 0) {
                     if (prev < infinity) {              //Проверка родительского нода
-                        int cost = prev + graph[nodes[i]][j];
+                       const int cost = prev + graph[nodes[i]][j];
                         if (cost < database[j][0]) {
                             database[j][0] = cost;
                             database[j][1] = i;
