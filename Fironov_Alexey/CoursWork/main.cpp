@@ -18,7 +18,7 @@ public:
     Ford(Ford&& other) noexcept;
 };
 
-bool Ford::find(vector<int> nodes, int number){
+bool Ford::find(vector<int> nodes, const int number){
     for(int i=0; i<nodes.size(); i++){
         if (nodes[i] == number){
             return false;
