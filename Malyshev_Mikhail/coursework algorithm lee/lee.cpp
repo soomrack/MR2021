@@ -1,6 +1,9 @@
 #include <iostream>
 #include <ctime>
+#include <vector>
 #include "lee.h"
+
+using namespace std;
 
 const int WALL   = -1;         // непроходимая клетка
 const int BLANK  = -2;         // свободная непомеченная клетка
@@ -52,7 +55,6 @@ void Grid::Random() {   // случайная генерация поля
 
 bool Grid::lee(int ax, int ay, int bx, int by) {
 
-        int px[W * H], py[W * H];      // координаты клеток, входящих  путь
         int len;                       // длина пути
 
         int dx[4] = {1, 0, -1, 0};   // смещения для определения соседей клетки  по x
@@ -99,10 +101,13 @@ bool Grid::lee(int ax, int ay, int bx, int by) {
         x = bx;
         y = by;
         wave = len;
+        vector<int> px;
+        vector<int> py; // координаты клеток, входящих  путь
+
         while ( wave > 0 )            // пока не достигнем 0
         {
-            px[wave] = x;
-            py[wave] = y;                   // записываем ячейку (x, y) в путь
+            px.push_back(x);
+            py.push_back(y);                 // записываем ячейку (x, y) в путь
             wave--;
             for (k = 0; k < 4; ++k)
             {
@@ -116,8 +121,8 @@ bool Grid::lee(int ax, int ay, int bx, int by) {
                 }
             }
         }
-        px[0] = ax;
-        py[0] = ay;                    // теперь px[0..len] и py[0..len] - координаты ячеек пути
+        px.push_back(ax);
+        py.push_back(ay);                    // теперь px[0..len] и py[0..len] - координаты ячеек пути
         return true;
 }
 
