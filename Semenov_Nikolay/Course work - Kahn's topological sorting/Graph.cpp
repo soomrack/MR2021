@@ -19,13 +19,6 @@ Graph::Graph(int sumVertices) {                                                 
 Graph::Graph(std::vector<std::vector<int>> &other_list) {                                  // Конструктор листа смежностей на основе
     sumVertices = other_list.size();                                                       // исходного листа смежностей
     adjList = other_list;
-    std::vector<int> temp(sumVertices, 0);                                                 // Инициализируем степень вхождения вершины
-    degree = temp;
-    for (int row = 0; row < adjList.size(); row++) {                                       // Задаём степень вхождения каждой вершины
-        for (int col = 0; col < adjList[row].size(); col++) {                              // проходя по листу смежностей
-            degree[adjList[row][col]]++;
-        }
-    }
 }
 
 Graph::Graph(const Graph& other_list) {                                                    // Конструктор копирования
@@ -66,17 +59,18 @@ Graph::Graph(int sumEV, Type type) {                                            
                     }
                     sort(adjList[row].begin(), adjList[row].end());                        // Сортируем перечень целей рёбер текущей вершины в списке смежностей
             }
-            std::vector<int> temp(sumVertices, 0);                                         // Инициализируем степень вхождения вершины
-            degree = temp;
-            for (int row = 0; row < adjList.size(); row++) {                               // Задаём степень вхождения каждой вершины
-                for (int col = 0; col < adjList[row].size(); col++) {                      // проходя по листу смежностей
-                    degree[adjList[row][col]]++;
-                }
-            }
     }
 }
 
 std::vector<int> Graph::doTopologicalSort(){
+    std::vector<int> temp(sumVertices, 0);                                                 // Инициализируем степень вхождения вершины
+    degree = temp;
+    for (int row = 0; row < adjList.size(); row++) {                                       // Задаём степень вхождения каждой вершины
+        for (int col = 0; col < adjList[row].size(); col++) {                              // проходя по листу смежностей
+            degree[adjList[row][col]]++;
+        }
+    }
+    
     std::vector<int> F;                                                                    // Вектор конечного результата
     std::vector<int> Z;                                                                    // Набор всех узлов без входящих ребер (degree = 0)
     int n = sumVertices;                                                                   // Получаем общее количество вершин графа
