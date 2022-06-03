@@ -61,6 +61,6 @@ int main() {
     for (int i = 1; i <= arraSize; i++) {
         cout << sortableArray[i] << " ";
     }
-    delete sortableArray[];
+    delete []sortableArray;
     return 0;
 }
