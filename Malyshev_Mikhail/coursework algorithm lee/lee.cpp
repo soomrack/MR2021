@@ -121,3 +121,34 @@ bool Grid::lee(int ax, int ay, int bx, int by) {
         return true;
 }
 
+Grid::~Grid() {
+    for (int i = 0; i < H; i++) {
+        delete[] grid[i];
+    }
+    delete[] grid;
+    grid = nullptr;
+}
+
+Grid::Grid(const Grid &other_grid) {
+    H = other_grid.H;
+    W = other_grid.W;
+    grid = new int* [H];
+    for (int i = 0; i < H; i++) {
+        grid[H] = new int[W];
+    }
+    for (int i = 0; i < W; i++) {
+        for (int j = 0; j < H; j++) {
+            grid[i][j] = other_grid.grid[i][j];
+        }
+    }
+}
+
+Grid::Grid(Grid &&other_grid) noexcept {
+    H = other_grid.H;
+    W = other_grid.W;
+    grid = other_grid.grid;
+    other_grid.H = 0;
+    other_grid.W = 0;
+    grid = nullptr;
+}
+

@@ -15,6 +15,9 @@ private:
 public:
     Grid();
     Grid(int W, int H);
+    Grid(const Grid& other_grid);
+    Grid(Grid&& other_grid) noexcept ;
+    ~Grid();
     void Random (); // случайная генерация поля
     bool lee(int ax, int ay, int bx, int by);     // поиск пути из клетки (ax, ay) в клетку (bx, by)
 };
