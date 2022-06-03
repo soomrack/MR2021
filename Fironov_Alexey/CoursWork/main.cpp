@@ -10,10 +10,10 @@ private:
     vector<vector<int>> graph;
     vector<vector<int>> database;
 public:
-    void addEdge(int i, int j, int cost);
-    void calculate(int startNode);
+    void addEdge(const int i, const int j, const int cost);
+    void calculate( const int startNode);
     bool find(vector<int> nodes, int number);
-    Ford(int length, int n);
+    Ford(const int length, const int n);
     Ford(const Ford &other);
     Ford(Ford&& other) noexcept;
 };
