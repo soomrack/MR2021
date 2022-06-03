@@ -5,10 +5,10 @@ using namespace std;
 
 class Ford{
 private:
-    int noOfNodes;              //Ко-во узлов
-    int length;                 //Размерность матрицы смежности
-    vector<vector<int>> graph;  //Матрицы смежности
-    vector<vector<int>> database;   //2 x length - вес пути до вершины
+    int noOfNodes;
+    int length;
+    vector<vector<int>> graph;
+    vector<vector<int>> database;
 public:
     void addEdge(int i, int j, int cost);
     void calculate(int startNode);
@@ -41,8 +41,7 @@ Ford::Ford(const Ford &other){
     graph = other.graph;
     database = other.database;
 }
-
-Ford::Ford(int length, int n){
+Ford::Ford(const int length, const int n){
     noOfNodes = n;
     this->length = length;
     graph.resize(length);
@@ -59,21 +58,22 @@ Ford::Ford(int length, int n){
     }
 }
 
-void Ford::addEdge(int i, int j, int cost){
+void Ford::addEdge(const int i, const int j, const int cost){
     graph[i][j] = cost;
 }
 
-void Ford::calculate(int startNode){
+
+void Ford::calculate(const int startNode){
     const int infinity = numeric_limits<int>::max();
-    vector<int> nodes;                           //Хранение номеров узлов
+    vector<int> nodes;
     for(int i=0; i<length; i++){
         for (int j = 0; j<length; j++){
             if (graph[i][j] != 0){
                 if(find(nodes, i)){
-                    if(i == startNode) {                //Стартовый узел
+                    if(i == startNode) {
                         database[i][0] = 0;
                         database[i][1] = 0;
-                    }else{                              //Остальные узлы
+                    }else{
                         database[i][0] = infinity;
                         database[i][1] = 0;
 
@@ -97,11 +97,11 @@ void Ford::calculate(int startNode){
 
     for (int k=0; k<noOfNodes-1; k++){
         for (int i = 0; i < nodes.size(); i++) {
-            const int prev = database[nodes[i]][0];           //Вес в текущем узле
+            const int prev = database[nodes[i]][0];
             for (int j = 0; j < length; j++) {
                 if (graph[nodes[i]][j] != 0) {
-                    if (prev < infinity) {              //Проверка родительского нода
-                       const int cost = prev + graph[nodes[i]][j];
+                    if (prev < infinity) {
+                        const int cost = prev + graph[nodes[i]][j];
                         if (cost < database[j][0]) {
                             database[j][0] = cost;
                             database[j][1] = i;
@@ -116,7 +116,6 @@ void Ford::calculate(int startNode){
     for(int node : nodes){
         cout << "Minimal distance to "<<node<<" node is:"<<database[node][0]<<'\n';
     }
-
 }
 int main()
 {
