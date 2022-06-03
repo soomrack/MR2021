@@ -40,6 +40,8 @@ private:
 
     void rightRotate(NodePtr x);
 
+    void deleteAllNodeHelper(NodePtr current);
+
 public:
     RedBlackTree();
 
@@ -47,7 +49,10 @@ public:
 
     NodePtr minimum(NodePtr node);
 
-    void deleteAll(){ root = TNULL; }
+    void deleteAll(){
+        deleteAllNodeHelper(root);
+        //root = TNULL;
+    };
 
     NodePtr searchTree(int k) { return searchTreeHelper(this->root, k); }
 
