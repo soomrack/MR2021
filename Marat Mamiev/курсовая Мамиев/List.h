@@ -5,6 +5,8 @@ class List {
 public:
 	List();
 	~List();
+	List(const List& other_list);
+	List(List&& other_list);
 public:
 	bool empty() const;
 	void clear();

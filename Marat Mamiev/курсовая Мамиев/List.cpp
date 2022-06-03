@@ -1,6 +1,5 @@
 #include <iostream>
 #include "List.h"
-#include <stdexcept>
 
 #define EXPLICIT_INSTANTIATION(CLASSNAME)   \
     template class CLASSNAME<int8_t>;       \
@@ -18,6 +17,24 @@ List<T>::List()
 {
 	list_size = 0;
 	head = nullptr;
+}
+
+template <typename T>
+List<T>::List(const List& other_list) { //конструктор копирования
+	list_size = other_matrix.list_size;
+	for (int i = 0; i < list_size - 1; ++i) {
+		Node* next = other_list[i];
+	}
+}
+
+template <typename T>
+List<T>::List(List&& other_list) { //конструктор перемещения
+	list_size = other_matrix.list_size;
+	other_matrix.list_size = 0;
+	for (int i = 0; i < list_size - 1; ++i) {
+		Node* next = other_list[i];
+		other_list[i] = nullptr;
+	}
 }
 
 template <typename T>
@@ -44,7 +61,7 @@ void List<T>::print() {
 template <typename T>
 void List<T>::removeAt(const int index) {
 	if (index >= size()) {
-		throw std::length_error("going overboard the list");
+		std::cout << "going overboard the list";
 	}
 	if (index == 0) {
 		pop_front();
@@ -64,7 +81,7 @@ void List<T>::removeAt(const int index) {
 template <typename T>
 void List<T>::insert(const T& data, int index) {
 	if (index >= size()) {
-		throw std::length_error("going overboard the list");
+		std::cout << "going overboard the list";
 	}
 	if (index == 0) {
 		push_front(data);
@@ -118,7 +135,7 @@ void List<T>::pop_front() {
 template<typename T>
 T& List<T>::operator[](const int index) {
 	if (index >= size()) {
-		throw std::length_error("going overboard the list");
+		std::cout << "going overboard the list";
 	}
 	int count = 0;
 	Node* temp_head = head;
