@@ -29,16 +29,14 @@ private:
     std::vector<int> convex_hull;
     int numb;
 
-    double OrientTriangle2(int p1,int p2, int p3) {
-        return mas[p1].x * (mas[p2].y - mas[p3].y) + mas[p2].x * (mas[p3].y - mas[p1].y) + mas[p3].x * (mas[p1].y - mas[p2].y);
-    }
-
-    bool isInside(int p1,int p2, int p3) {
-        return ( mas[p1].x <= mas[p2].x && mas[p2].x <= mas[p3].x &&
-                 mas[p1].y <= mas[p2].y && mas[p2].y <= mas[p3].y);
-    }
+    double OrientTriangle2(int p1,int p2, int p3);
+    bool isInside(int p1,int p2, int p3);
 
 public:
+
+    Plane(){
+        numb = 0;
+    }
 
     Plane(int numb) {
         this->numb = numb;
@@ -51,22 +49,30 @@ public:
         mas.clear();
         convex_hull.clear();
     }
-
-    void input() {
-        std::default_random_engine generator;
-        //std::normal_distribution<double> distribution(0.5,0.1);
-        std::uniform_real_distribution<double> distribution(0,1);
-
-        for (int i=0;i<numb;i++) {
-            mas[i].x = distribution(generator);
-            mas[i].y = distribution(generator);
-        }
-    }
-
+    void input();
     void ConvexHullJarvis();
 
 };
 
+double Plane::OrientTriangle2(int p1,int p2, int p3) {
+    return mas[p1].x * (mas[p2].y - mas[p3].y) + mas[p2].x * (mas[p3].y - mas[p1].y) + mas[p3].x * (mas[p1].y - mas[p2].y);
+}
+
+bool Plane::isInside(int p1,int p2, int p3) {
+    return ( mas[p1].x <= mas[p2].x && mas[p2].x <= mas[p3].x &&
+             mas[p1].y <= mas[p2].y && mas[p2].y <= mas[p3].y);
+}
+
+void Plane::input() {
+    std::default_random_engine generator;
+    std::normal_distribution<double> distribution(0.5,0.1);
+    //std::uniform_real_distribution<double> distribution(0,1);
+
+    for (int i=0;i<numb;i++) {
+        mas[i].x = distribution(generator);
+        mas[i].y = distribution(generator);
+    }
+}
 void Plane::ConvexHullJarvis() {
     auto start_time = std::chrono::steady_clock::now();
     // находим самую левую из самых нижних
