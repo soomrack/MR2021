@@ -63,8 +63,7 @@ Graph::Graph(int sumEV, Type type) {                                            
 }
 
 std::vector<int> Graph::doTopologicalSort(){
-    std::vector<int> temp(sumVertices, 0);                                                 // Инициализируем степень вхождения вершины
-    degree = temp;
+    std::vector<int> degree(sumVertices, 0);                                                 // Инициализируем степень вхождения вершины
     for (int row = 0; row < adjList.size(); row++) {                                       // Задаём степень вхождения каждой вершины
         for (int col = 0; col < adjList[row].size(); col++) {                              // проходя по листу смежностей
             degree[adjList[row][col]]++;
