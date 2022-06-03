@@ -30,6 +30,22 @@ void Node::insert(int a) {
         left = new Node(a);
 }
 
+Tree::Tree(const Tree& other_tree) { //конструктор копирования
+    tree_size = other_tree.tree_size;
+    for (int i = 0; i < tree_size - 1; ++i) {
+        Tree* next = other_tree[i];
+    }
+}
+
+Tree::Tree(Tree&& other_tree) { //конструктор перемещения
+    tree_size = other_tree.tree_size;
+    other_tree.other_tree = 0;
+    for (int i = 0; i < other_tree - 1; ++i) {
+        Node* root = other_tree[i];
+        other_tree[i] = nullptr;
+    }
+}
+
 void Node::print() {
     if (left) 
         left->print();
@@ -51,10 +67,10 @@ int Node::find(int data) {
         this->right->find(data);
 }
 void Node::destroy(){
-   if (this->left) 
-            this->left->destroy();
-    if (this->right) 
-            this->right->destroy();
+   if (left) 
+        left->destroy();
+    if (right) 
+        right->destroy();
     delete[] this;
     
 }
@@ -83,6 +99,8 @@ public:
     void print();
     int find(int);
     void remove(int);
+    Tree(const Tree& other_tree);
+    Tree::Tree(Tree&& other_tree);
 };
 
 void Tree::insert(int data) {
