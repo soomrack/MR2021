@@ -2,7 +2,7 @@
 //
 /*нумерация в узле
  * ключи
- * 0(MIN) 1 2 3 4 .... n
+ * 0(MIN) 1 2 3 4 .... n(MAX)
  * ссылки
  * 0 1 2 3 4 ... n
 */
@@ -26,6 +26,8 @@ Node::Node(int data_leaf_or_bfactor,bool leaf_or_node) {
     }
     leaf = leaf_or_node;
 }
+
+
 Node::Node(const Node &node){
     this-> size_array = node.size_array;
     if (leaf) {
@@ -41,6 +43,8 @@ Node::Node(const Node &node){
     }
     this-> leaf = node.leaf;
 }
+
+
 Node::Node(Node &&node) noexcept {
     size_array = node.size_array;
     leaf = node.leaf;
@@ -61,6 +65,8 @@ Node::Node(Node &&node) noexcept {
         node.max_ref_child_id = 0;
     }
 }
+
+
 Node::~Node() {
     if (leaf) {
         key_data = 0;
@@ -73,12 +79,15 @@ Node::~Node() {
     }
 }
 
+
 BPTree::BPTree(int t) {
     H = 0;
     Hplus = false;
     b_factor = 2*t-1;
     root = new Node(b_factor,false);
 }
+
+
 BPTree::~BPTree(){
     while(root!= nullptr){
         del(search_for_the_first_leaf_of_this_branch(root, 0));
@@ -88,11 +97,13 @@ BPTree::~BPTree(){
     Hplus=false;
 }
 
-///готово
+
 bool BPTree::search(int leaf){
     if (H==0) if (root->child_array[0] == nullptr) return false;//единственный случай пустоты - ни один лист не создан
     return search(leaf, root, 0);
 }
+
+
 bool BPTree::search(int leaf,Node* ref_node, int floor) {
     if (floor < H){//до предлистового узла поднимаемся
         int i = 1;
@@ -106,7 +117,7 @@ bool BPTree::search(int leaf,Node* ref_node, int floor) {
     return false;
 };
 
-///готово
+
 void* BPTree::add(int leaf) {
     //cout << endl<<"_____ Добавление " << leaf <<" _____"<< endl;
     Hplus = false;
@@ -118,7 +129,7 @@ void* BPTree::add(int leaf) {
         //cout <<"_____ Добавили первый лист номиналом " << leaf << " _____" << endl<< endl;
         return nullptr;
     }
-/// 1. поиск последнего узла, в который добавим лист
+    /// 1. поиск последнего узла, в который добавим лист
     ptr_path_array = new Node*[H];
     ptr_path_array[0] = root;
     int floors_for_separation = search_place_for_add(leaf, root, 0, 0);//сколько ярусов нужно разделить пополам по пути добавления листа
@@ -159,7 +170,7 @@ void* BPTree::add(int leaf) {
             floors_for_separation--;
         }
     }
-///3. подготовка предлистового узла и добавление листа
+    ///3. подготовка предлистового узла и добавление листа
     Node *here = ptr_path_array[H-1];
     int i = here->max_ref_child_id + 1;
     while (i > i_new_leaf) {// тут смещение ссылок и копий на 1 вправо до места добавления листа
@@ -178,7 +189,7 @@ void* BPTree::add(int leaf) {
     }
     here -> max_ref_child_id++;
     if (Hplus) {H++; Hplus = false;}//если в процессе был создан новый корень, то высота увеличилась
-///4. Поправляем ссылки на соседеей
+    ///4. Поправляем ссылки на соседеей
     Node* left_node = search_neighbour_left(leaf, root, 0);
     if (left_node-> key_data < leaf) {
         //cout << "Сосед слева "<< left_node->key_data << endl;
@@ -193,6 +204,8 @@ void* BPTree::add(int leaf) {
     delete ptr_path_array;
     return nullptr;
 }
+
+
 int BPTree::search_place_for_add(int leaf, Node* &ref_node, int floor, int floors_for_separation){
     if (floor < H-1){ //до предлистового узла поднимаемся
         int i = 0;
@@ -208,6 +221,8 @@ int BPTree::search_place_for_add(int leaf, Node* &ref_node, int floor, int floor
     else floors_for_separation = 0;
     return floors_for_separation;
 }
+
+
 void* BPTree::node_separation(Node* &ref_node,Node* &ref_parent_node, int floor, int leaf){
         ///1. подвинуть у родителя узлы для добавления
     int i_place_node = ref_parent_node-> max_ref_child_id;
@@ -249,7 +264,7 @@ void* BPTree::node_separation(Node* &ref_node,Node* &ref_parent_node, int floor,
     return nullptr;
 }
 
-///отточены))
+
 int BPTree::search_for_the_first_leaf_of_this_branch(Node* ref_node, int floor){//дохожу до листа, беру значение для разделения
     if(floor<H){
         floor++;
@@ -257,6 +272,8 @@ int BPTree::search_for_the_first_leaf_of_this_branch(Node* ref_node, int floor){
     }
     return ref_node->key_data;
 }
+
+
 Node* BPTree::search_neighbour_left(int leaf, Node* &ref_node, int floor){
     if (floor < H-1){//до листа
         int i = 0;
@@ -267,6 +284,8 @@ Node* BPTree::search_neighbour_left(int leaf, Node* &ref_node, int floor){
     while ((i <= ref_node->max_ref_child_id) and (leaf > ref_node->key_copy[i])) i++;
     return ref_node->child_array[i-1];
 }
+
+
 Node* BPTree::search_neighbour_right(int leaf, Node* &ref_node, int floor, Node* minimally_larger_node, int mln_floor){
     if (floor < H-1){//до предлистового узла
         int i = 0;
@@ -297,10 +316,10 @@ Node* BPTree::search_leaf_neighbour(Node* ref_node, int floor){//дохожу д
     return ref_node;
 }
 
-///подредактировал. пока ошибок не всплывало
+
 void* BPTree::del(int leaf) {
     Hplus = false;
-/// 1. поиск последнего узла, в котором удалим лист
+    /// 1. поиск последнего узла, в котором удалим лист
     ptr_path_array = new Node*[H];
     ptr_path_array[0] = root;
     bool change_node = search_place_for_del(leaf, root, 0);//нужно ли начинать перестройку узлов после удаления листа
@@ -313,14 +332,14 @@ void* BPTree::del(int leaf) {
         delete ptr_path_array;
         return nullptr;
     }
-///2. поправка соседей
+    ///2. поправка соседей
     Node* left_node = search_neighbour_left(leaf, root, 0);
     Node* right_node = search_neighbour_right(leaf, root, 0, nullptr, 0);
 
     if ((left_node != here->child_array[i])and(right_node != nullptr)){//если они существуют оба
         left_node -> neighbour = right_node;
     }
-///3. удаление и наведение порядка в текущем узле предлистовом
+    ///3. удаление и наведение порядка в текущем узле предлистовом
     here -> max_ref_child_id--;
     delete here->child_array[i];    //удаление листа поэтому соседи и были раньше
     while (i <= here->max_ref_child_id) {   // тут смещение ссылок и копий на 1 влево с места удаления листа
@@ -332,14 +351,15 @@ void* BPTree::del(int leaf) {
         here->key_copy[i] = MAX;
         here->child_array[i] = nullptr;
     }
-
-///4. А теперь настройка дерева. Объединение узлов / одалживание у соседей........................рекурсия по дереву к корню
+    ///4. А теперь настройка дерева. Объединение узлов / одалживание у соседей........................рекурсия по дереву к корню
     if (change_node){
         tree_edits_after_deletion(ptr_path_array[H-1],  ptr_path_array[H-2], H-1);
     }
     delete ptr_path_array;
     return nullptr;
 }
+
+
 void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, int floor){//перестройка этажей, бабочки летают..
     int i = 0;
     bool node_neighbour_left = false;
@@ -427,6 +447,8 @@ void* BPTree::tree_edits_after_deletion(Node* &ref_node,Node* &ref_parent_node, 
     }
     return nullptr;
 }
+
+
 bool BPTree::search_place_for_del(int leaf, Node* &ref_node, int floor){
     if (floor < H-1){
         int i = 1;
@@ -438,12 +460,15 @@ bool BPTree::search_place_for_del(int leaf, Node* &ref_node, int floor){
     if (ref_node->max_ref_child_id == b_factor/2-1) combining = true;
     return combining;
 }///требуется улучшение как у "соседа справа"
-///готово
+
+
 void BPTree::print(){
     cout << "B+ - tree:"<< endl;
     Node* once_leaf = search_once_leaf(root, 0);
     print_leaf(once_leaf);
 }
+
+
 Node* BPTree::search_once_leaf(Node* ref_node, int floor){//поиск первого листа
     if (floor < H){
         floor++;
@@ -451,6 +476,8 @@ Node* BPTree::search_once_leaf(Node* ref_node, int floor){//поиск перв�
     }
     return ref_node;
 }
+
+
 Node* BPTree::print_leaf(Node* ref_leaf){//печать всех листов
     cout << ref_leaf->key_data << "  ";
     if (ref_leaf->neighbour == nullptr){
@@ -459,3 +486,4 @@ Node* BPTree::print_leaf(Node* ref_leaf){//печать всех листов
     }
     return print_leaf(ref_leaf->neighbour);
 }
+
