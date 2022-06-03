@@ -1,78 +1,117 @@
-#include <cstdlib>
 #include <iostream>
-#include <limits>
 #include <vector>
-
-#include <ctime>
-
+#include <limits>
 using namespace std;
 
-const int inf = numeric_limits<int>::max(); // Принимаем за "бесконечность" наибольшее число int
+class Ford{
+private:
+    int noOfNodes;                  //Ко-во узлов
+    int length;                     //Размерность матрицы смежности
+    vector<vector<int>> graph;      //Матрица смежности
+    vector<vector<int>> database;   //2 x length - вес пути до вершины
+public:
+    void addEdge(int i, int j, int cost);       //Добавление в таблицу смежности
+    void calculate(int startNode);
+    bool find(vector<int> nodes, int number);   //Наличие элемента в массиве. Защита от повторного заполнения
 
-
-struct edge {
-    int a, b, cost; //a - номер предыдущей вершины, b - номер новой вершины, cost - вес ребра
+    Ford(int length, int n){
+        this->noOfNodes = n;
+        this->length = length;
+        this->graph.resize(length);
+        this->database.resize(length);
+        for (int i=0; i < length; i++){
+            this->database[i].resize(2);
+            for(int j = 0; j < 2; j++){
+                this->database[i][j]=0;
+            }
+            this->graph[i].resize(length);
+            for(int j=0; j < length; j++){
+                this->graph[i].push_back(0);
+            }
+        }
+    }
 };
 
-
-void solve(const vector<edge> &e, int n, int start_value)
-{
-    vector<int> d(n, inf);
-    d[start_value] = 0; // вес ребра для нулевой вершины - 0
-
-    for(;;)
-    {
-        bool any = false;
-        for (int k = 0; k < e.size(); ++k)
-            if (d[e[k].a] < inf)    //Проверка для рёбер отрицательного веса
-                if (d[e[k].b] > d[e[k].a] + e[k].cost)
-                {
-                    d[e[k].b] = d[e[k].a] + e[k].cost;
-                    any = true;
-//====================БЛОК ВЫВОДА=========================
-                    for (int i = 1; i < n; ++i)
-                    {
-                        if (d[i] != inf) cout << i << ": " << d[i] << endl;
-                        else cout << i << ": NO" << endl;
-                    }
-                    cout << endl << endl;
-//========================================================
-                }
-        if (!any) break;
+bool Ford::find(vector<int> nodes, int number){
+    for(int i=0; i<nodes.size(); i++){
+        if (nodes[i] == number){
+            return false;
+        }
     }
+    return true;
 }
 
-int main()
-{
-    unsigned int start_time =  clock(); // начальное врем
 
-    edge temp;
-    vector<edge> e;
-    int n = 0, w = 0, i = 0, j = 0;
+void Ford::addEdge(int i, int j, int cost){
+    this->graph[i][j] = cost;
+}
 
-    cout<<"Количество вершин > "; cin>>n;
 
-    for (i = 0; i < n; i++)
-        for (j = 1; j<n; j++)
-        {
-            if (i < j) {
-                cout << "Вес " << i << " -> " << j << " > ";
-                cin >> w;
-                if (w != 0) {   // нулевой вес = отсутствие связи
-                    temp.a = i;
-                    temp.b = j;
-                    temp.cost = w;
+void Ford::calculate(int startNode){
+    int infinity = numeric_limits<int>::max();
+    vector<int> nodes;                                  //Хранение номеров узлов
+    for(int i=0; i<this->length; i++){
+        for (int j = 0; j<this->length; j++){
+            if (this->graph[i][j] != 0){
+                if(this->find(nodes, i)){
+                    if(i == startNode) {                //Стартовый узел
+                        this->database[i][0] = 0;
+                        this->database[i][1] = 0;
+                    }else{                              //Остальные узлы
+                        this->database[i][0] = infinity;
+                        this->database[i][1] = 0;
+
+                    }
+                    nodes.push_back(i);
+                }
+                if (this->find(nodes, j)){
+                    if(j == startNode) {
+                        this->database[j][0] = 0;
+                        this->database[j][1] = 0;
+                    }else{
+                        this->database[j][0] = infinity;
+                        this->database[j][1] = 0;
+                    }
+                    nodes.push_back(j);
                 }
             }
-        e.push_back(temp);
+        }
     }
 
-    solve(e, n, 0);
 
-    unsigned int end_time = clock(); // конечное время
-    unsigned int search_time = end_time - start_time; // искомое время
-    cout << search_time << ": " << search_time << endl;
+    for (int k=0; k<this->noOfNodes-1; k++){
+        for (int i = 0; i < nodes.size(); i++) {
+            int prev = this->database[nodes[i]][0];         //Вес в текущем узле
+            for (int j = 0; j < this->length; j++) {
+                if (this->graph[nodes[i]][j] != 0) {
+                    if (prev < infinity) {                  //Проверка родительского нода
+                        int cost = prev + this->graph[nodes[i]][j];
+                        if (cost < database[j][0]) {
+                            database[j][0] = cost;
+                            database[j][1] = i;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for(int node : nodes){
+        cout << "Minimal distance to "<<node<<" node is:"<<this->database[node][0]<<'\n';
+    }
 
 
-    system("pause");
+}
+int main()
+{
+    Ford ford = Ford(4,4);
+    ford.addEdge(0,1,4);
+    ford.addEdge(0,2,4);
+    ford.addEdge(0,3,7);
+    ford.addEdge(2,1,-1);
+    ford.addEdge(1,3,3);
+    ford.addEdge(2,3,6);
+
+    ford.calculate(0);
+    return 0;
 }
